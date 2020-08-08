@@ -1,0 +1,24 @@
+/*
+ * WS2812S.h
+ *
+ *  Created on: 3 mai 2016
+ *      Author: Nirgal
+ */
+
+#ifndef BSP_MATRIXLED_WS2812S_H_
+#define BSP_MATRIXLED_WS2812S_H_
+
+#include "config.h"
+
+void LED_MATRIX_init(void);
+
+void LED_MATRIX_test(void);
+
+//@pre pixels est un tableau de 64 cases maximum... (size est le nombre de cases)
+void LED_MATRIX_display(uint32_t * pixels, uint8_t size);
+void LED_MATRIX_display_only_one_pixel(uint32_t pixel, uint8_t rank, uint8_t size);
+void LED_MATRIX_display_full(uint32_t pixel, uint8_t size);
+void LED_MATRIX_send_pixel(uint32_t pixel);
+void LED_MATRIX_reset(void);
+
+#endif /* BSP_MATRIXLED_WS2812S_H_ */
