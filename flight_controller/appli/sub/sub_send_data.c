@@ -81,9 +81,9 @@ void sub_send_data(State_drone_t * drone){
 		data_groups[DATA_ANGLE_Z].nb_octet = 3 ;
 		data_groups[DATA_ANGLES_ACC].nb_octet = 3 ;
 
-		data_groups[DATA_ANGLES].periode = 0 ;
+		data_groups[DATA_ANGLES].periode = 5 ;
 		data_groups[DATA_ANGLE_Z].periode = 0 ;
-		data_groups[DATA_ANGLES_ACC].periode = 0 ;
+		data_groups[DATA_ANGLES_ACC].periode = 10 ;
 
 		data_groups[DATA_ANGLES].telemetrie_function = TELEMETRIE_send_angle_x_y_as_int ;
 		data_groups[DATA_ANGLE_Z].telemetrie_function = TELEMETRIE_send_angle_z_as_int ;
@@ -137,7 +137,6 @@ void sub_send_data(State_drone_t * drone){
 	}
 
 	static uint32_t compteur = 0 ;
-	//On place les if dans l'ordre de priorité d'envoit
 	int32_t compteur_octet = NB_OCTECT_MAX ;
 
 	for(uint8_t data = 0; data < NB_DATA_GROUP; data ++){
@@ -153,7 +152,6 @@ void sub_send_data(State_drone_t * drone){
 			}
 		}
 	}
-
 	compteur ++ ;
 
 }
