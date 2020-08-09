@@ -23,6 +23,7 @@ void sub_free_time(State_drone_t * drone, State_base_t * base){
 			case 0 :
 				//On lit les potentielles données de l ibus
 				IBUS_check_data(&drone->communication.ibus);
+				state ++;
 				break;
 
 			case 1 :
@@ -30,6 +31,7 @@ void sub_free_time(State_drone_t * drone, State_base_t * base){
 				if(free_time >= ms5611_time_needed){
 					ms5611_time_needed = sub_ms5611(drone);
 				}
+				state ++;
 				break;
 
 			case 2 :
@@ -37,16 +39,19 @@ void sub_free_time(State_drone_t * drone, State_base_t * base){
 				if(UART_data_ready(UART_TELEMETRIE)){
 					sub_receive_data(UART_get_next_byte(UART_TELEMETRIE), drone, base);
 				}
+				state ++;
 				break;
 
 			case 3 :
 				//On envoit les données en buffer vers l'uart de telemétrie
 				uart_send(&drone->communication.uart_telem);
+				state ++;
 				break;
 
 			case 4 :
 				//On fait clignoter la led d'etat
 				LED_SEQUENCE_play(&drone->ihm.led_etat);
+				state ++;
 				break ;
 
 			case 5:
@@ -71,8 +76,6 @@ void sub_free_time(State_drone_t * drone, State_base_t * base){
 
 
 		}
-		if(state)
-			state ++;
 
 
 

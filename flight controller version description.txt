@@ -1,0 +1,65 @@
+
+		Détails des différentes version du flight controller
+
+Dernière version "fiable" mdr : 	2
+Version en cours de dev :		2.1
+
+Version 1 :
+	Ajouts
+		Drone vole
+		Télémétrie présente 
+		Tension de la batterie mesuré
+
+Version 2 :
+	AJout:
+		Ruban leds
+		Safety feature : ppm_is_ok batterie_is_ok gps_is_ok
+		Ajout du "free time"
+		Lecture du gps
+		Mise en place gestion des subs
+		Sub parachute
+		Gestion lecture du gps
+	Modifs:
+		Amélioration de la télémétrie 
+		Gestion des moteurs non blocante
+
+Version 2.1
+	Ajouts:
+		Séquence de leds
+	Modifs:
+		Télémétrie : On remplit un buffer qui est vidé à interval de temps régulier pour optimizer le truc 
+
+Version 2.2 
+	Ajouts:
+		Structures Drone et base pour mieux organisé les données
+		Fonctions pour les switch sur les mae high_lvl et low_lvl
+	Modifs:
+		Rennommage low lvl et high lvl (flight mode)
+		Modifs dans l'appelle des fonction et des mae
+		
+Version 2.3
+	Ajouts:
+		IMU : calibration du mpu disponible
+		Telemetrie : permet un controle basique depuis le pc
+		Telemtrie : messages de transition "transition car switch2"
+		Code : structure de transition avec pointeur fonction sur fonction de test
+		Code : on démarre pas si le mpu est pas init
+
+	Modifs:
+		Moteurs : Distinction entre la lib qui gère un moteur à la fois et la sub pour allumer et eteindre les moteurs qui les gère tous les 4 
+		Code : Trie dans les includes du main
+		Structure : Réorganisation struct drone avec des sous structure pour organisé les données
+		PID : ajout d'un filtre sur le D qui permet de réduire le bruit envoyer aux moteurs
+		PID : controle du yaw en degree et non en degree / sec
+		
+Version 2.4
+	Ajouts:
+		Ibus : prise en charge du ibus pour remplacer le ppm qui cassait les couilles 
+		MS5611 : ça tourne
+		Télémétrie : Contrôle des coefs du pid depuis le pc 
+		
+	Modifs:
+		Soft : Gestion du "free time" plus clean
+		
+		
+		
