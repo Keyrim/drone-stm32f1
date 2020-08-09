@@ -7,10 +7,7 @@
 
 #include "Telemetrie.h"
 
-#include "stm32f1_uart.h"
-#include "macro_types.h"
-
-
+// ----------------- fonctions hors sub telemetrie -----------------------------
 void TELEMETRIE_send_consigne_base(uint8_t consigne,  uart_struct_e * uart){
 	uint8_t bytes[2] ;
 	bytes[0] = ID_BASE_CONSIGNE_BASE ;
@@ -25,86 +22,6 @@ void TELEMETRIE_send_high_lvl_transi(uint8_t transi, uart_struct_e * uart){
 	uart_add_few(uart, bytes, 2);
 }
 
-
-// Données des moteurs
-void TELEMETRIE_send_moteur_all(int32_t m1, int32_t m2, int32_t m3, int32_t m4, uart_struct_e * uart){
-	uint8_t  bytes[4] = {0} ;
-	bytes[0] = ID_PC_MOTEUR_ALL ;
-	bytes[1] = (uint8_t)(((m1 - 1000) / 4 )  & 0b11111111);
-	bytes[2] = (uint8_t)(((m2 - 1000) / 4 )  & 0b11111111);
-	bytes[3] = (uint8_t)(((m3 - 1000) / 4 )  & 0b11111111);
-	bytes[4] = (uint8_t)(((m4 - 1000) / 4 )  & 0b11111111);
-	uart_add_few(uart, bytes, 5);
-}
-
-
-//	Données de la técomande
-void TELEMETRIE_send_channel_all_1_4(int32_t ch1, int32_t ch2, int32_t ch3, int32_t ch4, uart_struct_e * uart){
-	uint8_t  bytes[5] = {0} ;
-	bytes[0] = ID_PC_CHAN_1_4 ;
-	bytes[1] = (uint8_t)(((ch1 - 1000) / 4 )  & 0b11111111);
-	bytes[2] = (uint8_t)(((ch2 - 1000) / 4 )  & 0b11111111);
-	bytes[3] = (uint8_t)(((ch3 - 1000) / 4 )  & 0b11111111);
-	bytes[4] = (uint8_t)(((ch4 - 1000) / 4 )  & 0b11111111);
-	uart_add_few(uart, bytes, 5);
-}
-void TELEMETRIE_send_channel_all_5_8(int32_t ch1, int32_t ch2, int32_t ch3, int32_t ch4, uart_struct_e * uart){
-	uint8_t  bytes[5] = {0} ;
-	bytes[0] = ID_PC_CHAN_5_8 ;
-	bytes[1] = (uint8_t)(((ch1 - 1000) / 4 )  & 0b11111111);
-	bytes[2] = (uint8_t)(((ch2 - 1000) / 4 )  & 0b11111111);
-	bytes[3] = (uint8_t)(((ch3 - 1000) / 4 )  & 0b11111111);
-	bytes[4] = (uint8_t)(((ch4 - 1000) / 4 )  & 0b11111111);
-	uart_add_few(uart, bytes, 5);
-}
-
-
-
-void TELEMETRIE_send_angle_x_y_as_int(double x, double y, uart_struct_e * uart){
-	uint8_t  bytes[3] = {0} ;
-	bytes[0] = ID_PC_ANGLE_X_Y ;
-	bytes[1] = (int8_t)x;
-	bytes[2] = (int8_t)y;
-	uart_add_few(uart, bytes, 3);
-}
-void TELEMETRIE_send_angle_z_as_int(double z, uart_struct_e * uart){
-	uint8_t  bytes[3] = {0} ;
-	int16_t yaw = (int16_t)z;
-	bytes[0] = ID_PC_ANGLE_Z ;
-	bytes[1] = (uint8_t)(yaw >> 8);
-	bytes[2] = (uint8_t)(yaw & 0b11111111);
-	uart_add_few(uart, bytes, 3);
-}
-
-void TELEMETRIE_send_angle_x_y_acc_as_int(double x, double y, uart_struct_e * uart){
-	uint8_t  bytes[3] = {0} ;
-	bytes[0] = ID_PC_ANGLE_X_Y_ACC ;
-	bytes[1] = (uint8_t)x;
-	bytes[2] = (uint8_t)y;
-	uart_add_few(uart, bytes, 3);
-}
-
-
-//Données state
-void TELEMETRIE_send_state_flying(uint8_t state, uart_struct_e * uart){
-	uint8_t  bytes[2] = {0} ;
-	bytes[0] = ID_PC_STATE_FLYING ;
-	bytes[1] = state;
-	uart_add_few(uart, bytes, 2);
-}
-
-//Accélération
-void TELEMETRIE_send_acc_z(double acc_z, uart_struct_e * uart){
-	uint8_t bytes[5] = {0};
-	int32_t int_ac = (int32_t)( acc_z * (double) 1000000);
-	bytes[0] = ID_PC_ACC_Z ;
-	bytes[1] = (uint8_t)((int_ac >> 24) & 0b11111111) ;
-	bytes[2] = (uint8_t)((int_ac >> 16) & 0b11111111) ;
-	bytes[3] = (uint8_t)((int_ac >> 8) & 0b11111111) ;
-	bytes[4] = (uint8_t)((int_ac ) & 0b11111111) ;
-	uart_add_few(uart, bytes, 5);
-}
-
 //Double
 void TELEMETRIE_send_double(double value, uint8_t id, uart_struct_e * uart){
 	uint8_t bytes[5] = {0};
@@ -117,40 +34,123 @@ void TELEMETRIE_send_double(double value, uint8_t id, uart_struct_e * uart){
 	uart_add_few(uart, bytes, 5);
 }
 
+// ------------------------- Fonctions sub telemetrie
+
+
+//Altitude
+void TELEMETRIE_send_altitude(State_drone_t * drone){
+	TELEMETRIE_send_double(drone->capteurs.ms5611.altitude, ID_PC_ALTITUDE, &drone->communication.uart_telem);
+}
+//Pids
+void TELEMETRIE_send_pid_roll(State_drone_t * drone){
+	TELEMETRIE_send_double(drone->stabilisation.pid_roll_rate.output, ID_PC_PID_ROLL, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_pitch(State_drone_t * drone){
+	TELEMETRIE_send_double(drone->stabilisation.pid_pitch_rate.output, ID_PC_PID_PITCH, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_yaw(State_drone_t * drone){
+	TELEMETRIE_send_double(drone->stabilisation.pid_yaw.output, ID_PC_PID_YAW, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_roll_p(State_drone_t * drone){
+	TELEMETRIE_send_double(drone->stabilisation.pid_roll.P, ID_PC_PID_P_ROLL, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_roll_d(State_drone_t * drone){
+	TELEMETRIE_send_double(drone->stabilisation.pid_roll.D_filtered[0], ID_PC_PID_D_ROLL, &drone->communication.uart_telem);
+}
+//Accélération
+void TELEMETRIE_send_acc_z(State_drone_t * drone){
+	TELEMETRIE_send_double(drone->capteurs.mpu.z_acc, ID_PC_ACC_Z, &drone->communication.uart_telem);
+}
 //Données gps
-void TELEMETRIE_send_lat(double latitude, uart_struct_e * uart){
-	uint8_t bytes[5] = {0};
-	int32_t int_lat = (int32_t)( latitude * (double) 1000000);
-	bytes[0] = ID_PC_LATTITUDE ;
-	bytes[1] = (uint8_t)((int_lat >> 24) & 0b11111111) ;
-	bytes[2] = (uint8_t)((int_lat >> 16) & 0b11111111) ;
-	bytes[3] = (uint8_t)((int_lat >> 8) & 0b11111111) ;
-	bytes[4] = (uint8_t)((int_lat ) & 0b11111111) ;
-	uart_add_few(uart, bytes, 5);
+void TELEMETRIE_send_lat(State_drone_t * drone){
+	TELEMETRIE_send_double(drone->capteurs.gps.lat_degrees, ID_PC_LATTITUDE, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_long(State_drone_t * drone){
+	TELEMETRIE_send_double(drone->capteurs.gps.long_degrees, ID_PC_LONGITUDE, &drone->communication.uart_telem);
 }
 
-void TELEMETRIE_send_long(double longitude, uart_struct_e * uart){
-	uint8_t bytes[5] = {0};
-	int32_t int_long = (int32_t)( longitude * (double) 1000000);
-	bytes[0] = ID_PC_LONGITUDE ;
-	bytes[1] = (uint8_t)((int_long >> 24) & 0b11111111) ;
-	bytes[2] = (uint8_t)((int_long >> 16) & 0b11111111) ;
-	bytes[3] = (uint8_t)((int_long >> 8) & 0b11111111) ;
-	bytes[4] = (uint8_t)((int_long ) & 0b11111111) ;
-	uart_add_few(uart, bytes, 5);
+
+
+// Données des moteurs
+void TELEMETRIE_send_moteur_all(State_drone_t * drone){
+	uint8_t  bytes[4] = {0} ;
+	bytes[0] = ID_PC_MOTEUR_ALL ;
+	bytes[1] = (uint8_t)(((drone->stabilisation.escs[0].pulsation - 1000) / 4 )  & 0b11111111);
+	bytes[2] = (uint8_t)(((drone->stabilisation.escs[1].pulsation - 1000) / 4 )  & 0b11111111);
+	bytes[3] = (uint8_t)(((drone->stabilisation.escs[2].pulsation - 1000) / 4 )  & 0b11111111);
+	bytes[4] = (uint8_t)(((drone->stabilisation.escs[3].pulsation - 1000) / 4 )  & 0b11111111);
+	uart_add_few(&drone->communication.uart_telem, bytes, 5);
 }
+
+
+//	Données de la técomande
+void TELEMETRIE_send_channel_all_1_4(State_drone_t * drone){
+	uint8_t  bytes[5] = {0} ;
+	bytes[0] = ID_PC_CHAN_1_4 ;
+	bytes[1] = (uint8_t)(((drone->communication.ibus.channels[0] - 1000) / 4 )  & 0b11111111);
+	bytes[2] = (uint8_t)(((drone->communication.ibus.channels[1] - 1000) / 4 )  & 0b11111111);
+	bytes[3] = (uint8_t)(((drone->communication.ibus.channels[2] - 1000) / 4 )  & 0b11111111);
+	bytes[4] = (uint8_t)(((drone->communication.ibus.channels[3] - 1000) / 4 )  & 0b11111111);
+	uart_add_few(&drone->communication.uart_telem, bytes, 5);
+}
+void TELEMETRIE_send_channel_all_5_8(State_drone_t * drone){
+	uint8_t  bytes[5] = {0} ;
+	bytes[0] = ID_PC_CHAN_5_8 ;
+	bytes[1] = (uint8_t)(((drone->communication.ibus.channels[4] - 1000) / 4 )  & 0b11111111);
+	bytes[2] = (uint8_t)(((drone->communication.ibus.channels[5] - 1000) / 4 )  & 0b11111111);
+	bytes[3] = (uint8_t)(((drone->communication.ibus.channels[6] - 1000) / 4 )  & 0b11111111);
+	bytes[4] = (uint8_t)(((drone->communication.ibus.channels[7] - 1000) / 4 )  & 0b11111111);
+	uart_add_few(&drone->communication.uart_telem, bytes, 5);
+}
+
+
+
+void TELEMETRIE_send_angle_x_y_as_int(State_drone_t * drone){
+	uint8_t  bytes[3] = {0} ;
+	bytes[0] = ID_PC_ANGLE_X_Y ;
+	bytes[1] = (uint8_t)(drone->capteurs.mpu.x);
+	bytes[2] = (uint8_t)(drone->capteurs.mpu.y);
+	uart_add_few(&drone->communication.uart_telem, bytes, 3);
+}
+void TELEMETRIE_send_angle_z_as_int(State_drone_t * drone){
+	uint8_t  bytes[3] = {0} ;
+	int16_t yaw = (int16_t)drone->capteurs.mpu.z;
+	bytes[0] = ID_PC_ANGLE_Z ;
+	bytes[1] = (uint8_t)(yaw >> 8);
+	bytes[2] = (uint8_t)(yaw & 0b11111111);
+	uart_add_few(&drone->communication.uart_telem, bytes, 3);
+}
+
+void TELEMETRIE_send_angle_x_y_acc_as_int(State_drone_t * drone){
+	uint8_t  bytes[3] = {0} ;
+	bytes[0] = ID_PC_ANGLE_X_Y_ACC ;
+	bytes[1] = (uint8_t)drone->capteurs.mpu.x_acc;
+	bytes[2] = (uint8_t)drone->capteurs.mpu.y_acc;
+	uart_add_few(&drone->communication.uart_telem, bytes, 3);
+}
+
+
+//Données state
+void TELEMETRIE_send_state_flying(State_drone_t * drone){
+	uint8_t  bytes[2] = {0} ;
+	bytes[0] = ID_PC_STATE_FLYING ;
+	bytes[1] = drone->soft.state_flight_mode;
+	uart_add_few(&drone->communication.uart_telem, bytes, 2);
+}
+
+
 
 //Donnée v_bat
-void TELEMETRIE_send_v_bat(double v_bat, uart_struct_e * uart){
+void TELEMETRIE_send_v_bat(State_drone_t * drone){
 	uint8_t  bytes[2] = {0} ;
 	bytes[0] = ID_PC_BATTERIE ;
-	bytes[1] = (uint8_t)(v_bat * 10 );
-	uart_add_few(uart, bytes, 2);
+	bytes[1] = (uint8_t)(drone->capteurs.batterie.voltage * 10);
+	uart_add_few(&drone->communication.uart_telem, bytes, 2);
 }
 
-void TELEMETRIE_send_every_is_ok(uint8_t every_is_ok, uart_struct_e * uart){
+void TELEMETRIE_send_every_is_ok(State_drone_t * drone){
 	uint8_t  bytes[2] = {0} ;
 	bytes[0] = ID_PC_EVERY_IS_OK ;
-	bytes[1] = every_is_ok;
-	uart_add_few(uart, bytes, 2);
+	bytes[1] = (uint8_t)( 2 * drone->communication.ibus.is_ok +  drone->capteurs.gps.is_ok);
+	uart_add_few(&drone->communication.uart_telem, bytes, 2);
 }
