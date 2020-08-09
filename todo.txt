@@ -13,9 +13,9 @@ TODO MODIFS :
 	
 TODO AJOUTS :
 	- gestion du compas
-	- passer en control sur un modele, si je donne une consigne pour 
-	- différent mode de stabilization 
-
+	- passer en control sur un modele 
+	- différent mode de stabilization 				IN_PROGRESS
+	- telemetrie send angular speed and rate pid output		
 
 TODO VIDEO :
 	- quoi et comment :

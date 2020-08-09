@@ -104,12 +104,17 @@ void LOW_LVL_Process_High_Lvl(State_drone_t * drone, State_base_t * base){
 			HIGH_LVL_IMU_Failed_Init(drone);
 			break;
 
+		case PID_CHANGE_SETTINGS:
+			HIGH_LVL_Change_Pid_Settings(drone);
+			break;
+
 		case POSITION_HOLD:
 			//TODO Position hold function
 			break;
 		case ALTITUDE_HOLD:
 			//TODO Altitude hold function
 			break;
+
 	}
 	drone->soft.state_low_level = STABILISATION ;
 

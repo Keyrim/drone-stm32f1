@@ -36,6 +36,14 @@ typedef enum{
 	ID_PC_X_Y_BASE =						121,
 	ID_PC_ANGLE_X_Y_ACC =					122,
 	ID_PC_ANGLE_Z =							123,
+	ID_PC_ROLL_KP =							124,
+	ID_PC_ROLL_KI =							125,
+	ID_PC_ROLL_KD =							126,
+	ID_PC_PITCH_KP =						127,
+	ID_PC_PITCH_KI =						128,
+	ID_PC_PITCH_KD =						129,
+
+	ID_PC_ANGLE_X_Y_Z_RATE = 				140,
 
 	ID_PC_MOTEUR_ALL = 						160,
 	ID_PC_CHAN_1_4 =						161,

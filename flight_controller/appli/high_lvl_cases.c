@@ -208,6 +208,8 @@ void transition_high_lvl(State_drone_t * drone){
 				break;
 			else if(check_manual_pc_request(drone))
 				break;
+			if(drone->communication.ibus.channels[SWITCH_3] > 1300)
+				drone->soft.state_flight_mode = PID_CHANGE_SETTINGS ;
 			else if(test_ppm(drone, TRUE)){
 				if(TRANSITION_test(&arm_switch_test, drone, TRUE, 1)){
 					if(TRANSITION_test(&throttle_low_test, drone, FALSE, 1)){
@@ -278,6 +280,11 @@ void transition_high_lvl(State_drone_t * drone){
 			break;
 
 		case POSITION_HOLD:
+			break;
+
+		case PID_CHANGE_SETTINGS :
+			if(drone->communication.ibus.channels[SWITCH_3] < 1300)
+				drone->soft.state_flight_mode = ON_THE_GROUND ;
 			break;
 
 		case CALIBRATE_MPU6050:
@@ -422,10 +429,46 @@ void HIGH_LVL_IMU_Failed_Init(State_drone_t * drone){
 	if(drone->soft.entrance_flight_mode){
 			drone->stabilisation.stab_mode = STAB_OFF ;
 			LED_SEQUENCE_set_sequence(&drone->ihm.led_etat, SEQUENCE_LED_7);
-		}
+	}
 	transition_high_lvl(drone);
 }
 
+void HIGH_LVL_Change_Pid_Settings(State_drone_t * drone){
+	if(drone->soft.entrance_flight_mode){
+			drone->stabilisation.stab_mode = STAB_OFF ;
+			LED_SEQUENCE_set_sequence(&drone->ihm.led_etat, SEQUENCE_LED_9);
+	}
+
+	PID_t * pid_roll ;
+	PID_t * pid_pitch ;
+
+	#if SET_COEF_ON_RATE_PID
+		pid_roll = &drone->stabilisation.pid_roll_rate ;
+		pid_pitch = &drone->stabilisation.pid_pitch_rate ;
+	#else
+		pid_roll = &drone->stabilisation.pid_roll ;
+		pid_pitch = &drone->stabilisation.pid_pitch ;
+	#endif
+
+	const float divider = 1000000 ;
+	if(drone->communication.ibus.channels[SWITCH_3] > 1300 && drone->communication.ibus.channels[SWITCH_3] < 1600){
+		//Bosse sur le roll
+
+		pid_roll->settings[PID_KP] += (float)(drone->communication.ibus.channels[8] - 1500) / divider ;
+		pid_roll->settings[PID_KD] += (float)(drone->communication.ibus.channels[9] - 1500) / divider ;
+		if(pid_roll->settings[PID_KP] < 0) pid_roll->settings[PID_KP] = 0 ;
+		if(pid_roll->settings[PID_KD] < 0) pid_roll->settings[PID_KD] = 0 ;
+
+	}
+	else if(drone->communication.ibus.channels[SWITCH_3] > 1600){
+		pid_pitch->settings[PID_KP] += (float)(drone->communication.ibus.channels[8] - 1500) / divider ;
+		pid_pitch->settings[PID_KD] += (float)(drone->communication.ibus.channels[9] - 1500) / divider ;
+		if(pid_pitch->settings[PID_KP] < 0) pid_pitch->settings[PID_KP] = 0 ;
+		if(pid_pitch->settings[PID_KD] < 0) pid_pitch->settings[PID_KD] = 0 ;
+	}
+	transition_high_lvl(drone);
+
+}
 
 
 

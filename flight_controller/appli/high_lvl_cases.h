@@ -22,6 +22,8 @@ void HIGH_LVL_Calibrate_MPU(State_drone_t * drone);
 void HIGH_LVL_Manual_Pc(State_drone_t * drone);
 void HIGH_LVL_IMU_Failed_Init(State_drone_t * drone);
 void HIGH_LVL_Manual_Accro(State_drone_t * drone);
+void HIGH_LVL_Change_Pid_Settings(State_drone_t * drone);
+
 
 
 #endif /* HIGH_LVL_CASES_H_ */

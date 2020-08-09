@@ -33,6 +33,14 @@ void TELEMETRIE_send_double(double value, uint8_t id, uart_struct_e * uart){
 	bytes[4] = (uint8_t)((int_value ) & 0b11111111) ;
 	uart_add_few(uart, bytes, 5);
 }
+void TELEMETRIE_send_double_16b(double value, uint8_t id, uart_struct_e * uart){
+	uint8_t  bytes[3] = {0} ;
+	int16_t int_value =  (int16_t)( value * (double) 100);
+	bytes[0] = id ;
+	bytes[1] = (uint8_t)(int_value >> 8);
+	bytes[2] = (uint8_t)(int_value & 0b11111111);
+	uart_add_few(uart, bytes, 3);
+}
 
 // ------------------------- Fonctions sub telemetrie
 
@@ -68,6 +76,49 @@ void TELEMETRIE_send_lat(State_drone_t * drone){
 void TELEMETRIE_send_long(State_drone_t * drone){
 	TELEMETRIE_send_double(drone->capteurs.gps.long_degrees, ID_PC_LONGITUDE, &drone->communication.uart_telem);
 }
+
+#if SET_COEF_ON_RATE_PID
+void TELEMETRIE_send_pid_roll_kp(State_drone_t * drone){
+	TELEMETRIE_send_double_16b(drone->stabilisation.pid_roll_rate.settings[PID_KP], ID_PC_ROLL_KP, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_roll_ki(State_drone_t * drone){
+	TELEMETRIE_send_double_16b(drone->stabilisation.pid_roll_rate.settings[PID_KI], ID_PC_ROLL_KI, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_roll_kd(State_drone_t * drone){
+	TELEMETRIE_send_double_16b(drone->stabilisation.pid_roll_rate.settings[PID_KD], ID_PC_ROLL_KD, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_pitch_kp(State_drone_t * drone){
+	TELEMETRIE_send_double_16b(drone->stabilisation.pid_pitch_rate.settings[PID_KP], ID_PC_PITCH_KP, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_pitch_ki(State_drone_t * drone){
+	TELEMETRIE_send_double_16b(drone->stabilisation.pid_pitch_rate.settings[PID_KI], ID_PC_PITCH_KI, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_pitch_kd(State_drone_t * drone){
+	TELEMETRIE_send_double_16b(drone->stabilisation.pid_pitch_rate.settings[PID_KD], ID_PC_PITCH_KD, &drone->communication.uart_telem);
+}
+
+
+#else
+void TELEMETRIE_send_pid_roll_kp(State_drone_t * drone){
+	TELEMETRIE_send_double_16b(drone->stabilisation.pid_roll.settings[PID_KP], ID_PC_ROLL_KP, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_roll_ki(State_drone_t * drone){
+	TELEMETRIE_send_double_16b(drone->stabilisation.pid_roll.settings[PID_KI], ID_PC_ROLL_KI, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_roll_kd(State_drone_t * drone){
+	TELEMETRIE_send_double_16b(drone->stabilisation.pid_roll.settings[PID_KD], ID_PC_ROLL_KD, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_pitch_kp(State_drone_t * drone){
+	TELEMETRIE_send_double_16b(drone->stabilisation.pid_pitch.settings[PID_KP], ID_PC_PITCH_KP, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_pitch_ki(State_drone_t * drone){
+	TELEMETRIE_send_double_16b(drone->stabilisation.pid_pitch.settings[PID_KI], ID_PC_PITCH_KI, &drone->communication.uart_telem);
+}
+void TELEMETRIE_send_pid_pitch_kd(State_drone_t * drone){
+	TELEMETRIE_send_double_16b(drone->stabilisation.pid_pitch.settings[PID_KD], ID_PC_PITCH_KD, &drone->communication.uart_telem);
+}
+
+#endif
 
 
 
@@ -108,9 +159,17 @@ void TELEMETRIE_send_channel_all_5_8(State_drone_t * drone){
 void TELEMETRIE_send_angle_x_y_as_int(State_drone_t * drone){
 	uint8_t  bytes[3] = {0} ;
 	bytes[0] = ID_PC_ANGLE_X_Y ;
-	bytes[1] = (uint8_t)(drone->capteurs.mpu.x);
-	bytes[2] = (uint8_t)(drone->capteurs.mpu.y);
+	bytes[1] = (uint8_t)((int8_t)drone->capteurs.mpu.x);
+	bytes[2] = (uint8_t)((int8_t)drone->capteurs.mpu.y);
 	uart_add_few(&drone->communication.uart_telem, bytes, 3);
+}
+void TELEMETRIE_send_angle_x_y_z_rate_as_int(State_drone_t * drone){
+	uint8_t  bytes[4] = {0} ;
+	bytes[0] =  ID_PC_ANGLE_X_Y_Z_RATE ;
+	bytes[1] = (uint8_t)(drone->capteurs.mpu.x_gyro);
+	bytes[2] = (uint8_t)(drone->capteurs.mpu.y_gyro);
+	bytes[3] = (uint8_t)(drone->capteurs.mpu.z_gyro);
+	uart_add_few(&drone->communication.uart_telem, bytes, 4);
 }
 void TELEMETRIE_send_angle_z_as_int(State_drone_t * drone){
 	uint8_t  bytes[3] = {0} ;
