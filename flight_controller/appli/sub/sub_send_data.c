@@ -9,14 +9,14 @@
 
 #include "../../lib/btm/Telemetrie.h"
 
-#define NB_OCTECT_MAX 20	//On envoit au plus 10 octect par loop
-static bool_e first_call = TRUE ;
+#define NB_OCTECT_MAX 20	//On envoit au plus 20 octects par loop
+static bool_e initialialized = FALSE ;
 
 
 
 typedef struct{
 	int32_t nb_octet;
-	uint32_t periode;	//periode d'envoi par cycle ( 4 => un envoit tous les 4 cycles) et si on veut jamais que noter valeur soit envoyé on peut lui attribué une valeur de -1
+	uint32_t periode;	//periode d'envoi par cycle ( 4 => un envoit tous les 4 cycles)
 	bool_e to_send;
 }Data_group;
 
@@ -43,7 +43,7 @@ Data_group altitude ;
 
 //Sub qui envoit des données par télémétrie à qui veut l'entendre ^^
 void sub_send_data(State_drone_t * drone){
-	if(first_call){
+	if(!initialialized){
 
 		//PIDS
 		pid_roll.nb_octet = 5 ;
@@ -103,7 +103,7 @@ void sub_send_data(State_drone_t * drone){
 		every_is_ok.periode = 30 ;
 
 
-		first_call = FALSE;
+		initialialized = TRUE;
 	}
 
 	static uint32_t compteur = 0 ;

@@ -1,0 +1,102 @@
+Répartitions des adresses
+	0-99 	=> pour le drone 
+		0-19	=> 1 octet 
+		20-39	=> 2 octets 
+		40-59	=> 3 octets 
+		60-79	=> 4 octets 
+		80-99	=> 5 octets 
+	100-199 => pour le pc  
+		100-119	=> 1 octet 
+		120-139	=> 2 octets 
+		140-159	=> 3 octets 
+		160-179	=> 4 octets 
+		180-199	=> 5 octets 
+	200-255	=> pour la ground station
+		200-209	=> 1 octet 
+		210-219	=> 2 octets 
+		220-229	=> 3 octets 
+		230-239	=> 4 octets 
+		240-249	=> 5 octets 
+
+Le nombre d'octect n'inclut pas l'octect envoyé, en effet on dois toujours avoir un un id plus un msg, mais un msg d'erreur par exemple doit être composé d'un id d'une donné 
+On supprime au passage les ids inutile (moteur et telecomande un par un etc)
+
+Id pour le drone :
+	1 octect :
+		ID_DRONE_CONSIGNE		0
+	2 octects :
+		ID_DRONE_PITCH_ROLL_BASE 	20	
+	3 octects :
+	4 octects :
+		ID_DRONE_ROLL_KP		60
+		ID_DRONE_ROLL_KI		61
+		ID_DRONE_ROLL_KD		62
+		ID_DRONE_PITCH_KP		63
+		ID_DRONE_PITCH_KI		64
+		ID_DRONE_PITCH_KD		65
+
+	5 octects :		
+
+Id pour le pc :
+	1 octect :
+		ID_PC_BATTERIE 			100
+		ID_PC_STATE_FLYING		101
+		ID_PC_EVERY_IS_OK		102
+		ID_PC_HIGH_LVL_TRANSITION	103
+	2 octects :
+		ID_PC_ANGLE_X_Y			120	
+		ID_PC_X_Y_BASE			121
+		ID_PC_ANGLE_X_Y_ACC		122
+		ID_PC_ANGLE_Z			123
+	3 octects :
+	4 octects :
+		ID_PC_MOTEUR_ALL 		160
+		ID_PC_CHAN_1_4			161
+		ID_PC_CHAN_5_8			162
+		ID_PC_LONGITUDE			163
+		ID_PC_LATTITUDE			164
+		ID_PC_ACC_Z			165
+		ID_PC_PID_D_ROLL		166
+		ID_PC_PID_P_ROLL		167
+		ID_PC_PID_ROLL			168
+		ID_PC_PID_PITCH			169
+		ID_PC_PID_YAW			170
+		ID_PC_ALTITUDE			171
+		ID_PC_PID_ROLL_RATE		172
+		ID_PC_PID_PITCH_RATE		173
+		ID_PC_PID_YAW_RATE		174
+		
+	5 octects :
+
+
+Id pour la base au sol :
+	1 octect :
+		ID_CONSIGNE_BASE		200
+	2 octects :	
+	3 octects :
+	4 octects :
+	5 octects :
+
+
+Adressage des sous ids : quand j'envoit un msg d'erreur je vais voir mon id_error puis	le sub_id_error_v_bat par example, le détail sur l'erreur
+
+Sous ID_CONSIGNE:
+	SUB_ID_DRONE_CONSIGNE_STOP_MOTEUR 		0
+	SUB_ID_DRONE_CONSIGNE_CALIBRATE_MPU 		1
+	SUB_ID_DRONE_CONSIGNE_MANUAL_PC			2
+	SUB_ID_DRONE_CONSIGNE_MOTOR_UP			3
+	SUB_ID_DRONE_CONSIGNE_MOTOR_DOWN		4
+	
+Sous ID_COSNIGNE_BASE :
+	SUB_ID_BASE_CONSIGNE_START_SENDING_ANGLES	0
+	SUB_ID_BASE_CONSIGNE_STOP_SENDING_ANGLES	1
+
+Sous ID_PC_HIGH_LVL_TRANSITION:
+	SUB_ID_PC_HIGH_LVL_TRANSITION_ARM_SWITCH	0
+	SUB_ID_PC_HIGH_LVL_TRANSITION_PPM_ISNT_OK	1
+	SUB_ID_PC_HIGH_LVL_TRANSITION_SUB_ENDED		2
+	SUB_ID_PC_HIGH_LVL_TRANSITION_SWITCH		3
+	SUB_ID_PC_HIGH_LVL_TRANSITION_THROTTLE_LOW	4
+	SUB_ID_PC_HIGH_LVL_TRANSITION_PC_REQUEST	5
+	
+

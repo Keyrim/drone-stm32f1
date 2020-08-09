@@ -1,0 +1,25 @@
+
+TODO MODIFS :
+	- rajouter des trammes de recalage envoyés de temps en temps
+	- ids à ajouter : les ids de présence genre "drone je suis présent"
+	-
+	- 						
+	- 			
+	- controle par séquence sur switch (huat bas huat bas)
+	- reset la consigne en throttle quand on passse en mode de vole 
+	
+-
+
+	
+TODO AJOUTS :
+	- gestion du compas
+	- passer en control sur un modele, si je donne une consigne pour 
+	- différent mode de stabilization 
+
+
+TODO VIDEO :
+	- quoi et comment :
+		- quoi => vidéo du drone qui vole avec la télécomande .. ?
+		- comment => sur une f103 bluepil avec la hal et system workbench =>schéma de l'architecture du code :
+				init => main loop => low lvl 
+						  => free time 
