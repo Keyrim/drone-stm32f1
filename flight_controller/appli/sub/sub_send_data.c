@@ -113,7 +113,7 @@ void sub_send_data(State_drone_t * drone){
 		data_groups[DATA_X_Y_Z_RATE].nb_octet = 4 ;
 
 		data_groups[DATA_ANGLES].periode = 5 ;
-		data_groups[DATA_ANGLE_Z].periode = 10 ;
+		data_groups[DATA_ANGLE_Z].periode = 100 ;
 		data_groups[DATA_ANGLES_ACC].periode = 10 ;
 		data_groups[DATA_X_Y_Z_RATE].periode = 5 ;
 
@@ -142,8 +142,8 @@ void sub_send_data(State_drone_t * drone){
 		data_groups[DATA_RADIO_1].nb_octet = 5 ;
 		data_groups[DATA_RADIO_2].nb_octet = 5 ;
 
-		data_groups[DATA_RADIO_1].periode = 20 ;
-		data_groups[DATA_RADIO_2].periode = 50;
+		data_groups[DATA_RADIO_1].periode = 4 ;
+		data_groups[DATA_RADIO_2].periode = 250;
 
 		data_groups[DATA_RADIO_1].telemetrie_function = TELEMETRIE_send_channel_all_1_4 ;
 		data_groups[DATA_RADIO_2].telemetrie_function = TELEMETRIE_send_channel_all_5_8 ;
@@ -163,7 +163,7 @@ void sub_send_data(State_drone_t * drone){
 
 		//moteurs
 		data_groups[DATA_MOTEURS].nb_octet = 5;
-		data_groups[DATA_MOTEURS].periode = 3;
+		data_groups[DATA_MOTEURS].periode = 50;
 		data_groups[DATA_MOTEURS].telemetrie_function = TELEMETRIE_send_moteur_all ;
 
 		initialialized = TRUE;
@@ -174,12 +174,23 @@ void sub_send_data(State_drone_t * drone){
 
 	//On envoit les coefs des pids si on est en train de les changer
 	if(drone->soft.state_flight_mode == PID_CHANGE_SETTINGS){
-		data_groups[DATA_ROLL_KP].periode = 4 ;
-		data_groups[DATA_ROLL_KI].periode = 0 ;
-		data_groups[DATA_ROLL_KD].periode = 4 ;
-		data_groups[DATA_PITCH_KP].periode = 4 ;
-		data_groups[DATA_PITCH_KI].periode = 0 ;
-		data_groups[DATA_PITCH_KD].periode = 4 ;
+		if(drone->communication.ibus.channels[SWITCH_3] > 1600){
+			data_groups[DATA_ROLL_KP].periode = 0 ;
+			data_groups[DATA_ROLL_KI].periode = 0 ;
+			data_groups[DATA_ROLL_KD].periode = 0 ;
+			data_groups[DATA_PITCH_KP].periode = 10 ;
+			data_groups[DATA_PITCH_KI].periode = 0 ;
+			data_groups[DATA_PITCH_KD].periode = 10 ;
+		}
+		else{
+			data_groups[DATA_ROLL_KP].periode = 10 ;
+			data_groups[DATA_ROLL_KI].periode = 0 ;
+			data_groups[DATA_ROLL_KD].periode = 10 ;
+			data_groups[DATA_PITCH_KP].periode = 0 ;
+			data_groups[DATA_PITCH_KI].periode = 0 ;
+			data_groups[DATA_PITCH_KD].periode = 0 ;
+		}
+
 	}
 	else{
 		data_groups[DATA_ROLL_KP].periode = 0 ;

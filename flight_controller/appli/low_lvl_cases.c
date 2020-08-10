@@ -14,7 +14,7 @@ void LOW_LVL_Wait_Loop(State_drone_t * drone){
 	if(time >= drone->soft.previous_time_loop + LOOP_PERIODE){
 		drone->soft.previous_time_loop = time ;
 		drone->soft.state_low_level = PWM_HIGH ;
-		drone->soft.dead_line = 0 ;	//Si c'est l'heure on passe direct au state suivant
+		drone->soft.dead_line = 0 ;	//Si c'est l'heure on passe au state suivant
 	}
 	else
 		drone->soft.dead_line = drone->soft.previous_time_loop + LOOP_PERIODE  ;	//si on a du temps dispo, on le dit

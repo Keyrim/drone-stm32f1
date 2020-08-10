@@ -5,17 +5,22 @@ TODO MODIFS :
 	-
 	- 						
 	- 			
-	- controle par séquence sur switch (huat bas huat bas)
+	- controle par séquence sur switch (huat bas huat bas)			
 	- reset la consigne en throttle quand on passse en mode de vole 
+	- pid calculs en int pour raccourcir le temp de calcul						
+	- imu calcus en int 										
+	- transition high_lvl
 	
--
 
-	
 TODO AJOUTS :
 	- gestion du compas
 	- passer en control sur un modele 
-	- différent mode de stabilization 				IN_PROGRESS
-	- telemetrie send angular speed and rate pid output		
+	- faire un reset pid quand changement de mode de stabilisation		
+
+TODO RECHERCHE :
+	- timer pour les escs :
+		- comparer les timers
+		- trouver les configuration (pin de sorti pour un timer donné)
 
 TODO VIDEO :
 	- quoi et comment :
