@@ -10,7 +10,7 @@
 #include "../../lib/btm/Telemetrie.h"
 
 #define NB_OCTECT_MAX 20	//On envoit au plus 20 octects par loop
-#define NB_DATA_GROUP 18
+#define NB_DATA_GROUP 25
 static bool_e initialialized = FALSE ;
 
 
@@ -42,7 +42,15 @@ typedef enum{
 	DATA_PID_YAW,
 	DATA_PID_ROLL_P,
 	DATA_PID_ROLL_D,
-	DATA_ALTITUDE
+	DATA_ALTITUDE,
+	DATA_X_Y_Z_RATE,
+	DATA_ROLL_KP,
+	DATA_ROLL_KI,
+	DATA_ROLL_KD,
+	DATA_PITCH_KP,
+	DATA_PITCH_KI,
+	DATA_PITCH_KD
+
 }names_data_group_t;
 
 Data_group_t data_groups[NB_DATA_GROUP] ;
@@ -71,6 +79,28 @@ void sub_send_data(State_drone_t * drone){
 		data_groups[DATA_PID_ROLL_P].telemetrie_function = TELEMETRIE_send_pid_roll_p ;
 		data_groups[DATA_PID_ROLL_D].telemetrie_function = TELEMETRIE_send_pid_roll_d ;
 
+		//Pids coefs
+		data_groups[DATA_ROLL_KP].nb_octet = 3 ;
+		data_groups[DATA_ROLL_KI].nb_octet = 3 ;
+		data_groups[DATA_ROLL_KD].nb_octet = 3 ;
+		data_groups[DATA_PITCH_KP].nb_octet = 3 ;
+		data_groups[DATA_PITCH_KI].nb_octet = 3 ;
+		data_groups[DATA_PITCH_KD].nb_octet = 3 ;
+
+		data_groups[DATA_ROLL_KP].periode = 0 ;
+		data_groups[DATA_ROLL_KI].periode = 0 ;
+		data_groups[DATA_ROLL_KD].periode = 0 ;
+		data_groups[DATA_PITCH_KP].periode = 0 ;
+		data_groups[DATA_PITCH_KI].periode = 0 ;
+		data_groups[DATA_PITCH_KD].periode = 0 ;
+
+		data_groups[DATA_ROLL_KP].telemetrie_function = TELEMETRIE_send_pid_roll_kp ;
+		data_groups[DATA_ROLL_KI].telemetrie_function = TELEMETRIE_send_pid_roll_ki ;
+		data_groups[DATA_ROLL_KD].telemetrie_function = TELEMETRIE_send_pid_roll_kd ;
+		data_groups[DATA_PITCH_KP].telemetrie_function = TELEMETRIE_send_pid_pitch_kp ;
+		data_groups[DATA_PITCH_KI].telemetrie_function = TELEMETRIE_send_pid_pitch_ki ;
+		data_groups[DATA_PITCH_KD].telemetrie_function = TELEMETRIE_send_pid_pitch_kd ;
+
 		//Altitude
 		data_groups[DATA_ALTITUDE].nb_octet = 5 ;
 		data_groups[DATA_ALTITUDE].periode = 0 ;
@@ -80,14 +110,17 @@ void sub_send_data(State_drone_t * drone){
 		data_groups[DATA_ANGLES].nb_octet = 3 ;
 		data_groups[DATA_ANGLE_Z].nb_octet = 3 ;
 		data_groups[DATA_ANGLES_ACC].nb_octet = 3 ;
+		data_groups[DATA_X_Y_Z_RATE].nb_octet = 4 ;
 
 		data_groups[DATA_ANGLES].periode = 5 ;
-		data_groups[DATA_ANGLE_Z].periode = 0 ;
+		data_groups[DATA_ANGLE_Z].periode = 100 ;
 		data_groups[DATA_ANGLES_ACC].periode = 10 ;
+		data_groups[DATA_X_Y_Z_RATE].periode = 5 ;
 
 		data_groups[DATA_ANGLES].telemetrie_function = TELEMETRIE_send_angle_x_y_as_int ;
 		data_groups[DATA_ANGLE_Z].telemetrie_function = TELEMETRIE_send_angle_z_as_int ;
 		data_groups[DATA_ANGLES_ACC].telemetrie_function = TELEMETRIE_send_angle_x_y_acc_as_int ;
+		data_groups[DATA_X_Y_Z_RATE].telemetrie_function = TELEMETRIE_send_angle_x_y_z_rate_as_int ;
 
 
 		//Latitude & longitude
@@ -109,8 +142,8 @@ void sub_send_data(State_drone_t * drone){
 		data_groups[DATA_RADIO_1].nb_octet = 5 ;
 		data_groups[DATA_RADIO_2].nb_octet = 5 ;
 
-		data_groups[DATA_RADIO_1].periode = 20 ;
-		data_groups[DATA_RADIO_2].periode = 50;
+		data_groups[DATA_RADIO_1].periode = 4 ;
+		data_groups[DATA_RADIO_2].periode = 250;
 
 		data_groups[DATA_RADIO_1].telemetrie_function = TELEMETRIE_send_channel_all_1_4 ;
 		data_groups[DATA_RADIO_2].telemetrie_function = TELEMETRIE_send_channel_all_5_8 ;
@@ -130,7 +163,7 @@ void sub_send_data(State_drone_t * drone){
 
 		//moteurs
 		data_groups[DATA_MOTEURS].nb_octet = 5;
-		data_groups[DATA_MOTEURS].periode = 3;
+		data_groups[DATA_MOTEURS].periode = 50;
 		data_groups[DATA_MOTEURS].telemetrie_function = TELEMETRIE_send_moteur_all ;
 
 		initialialized = TRUE;
@@ -138,6 +171,35 @@ void sub_send_data(State_drone_t * drone){
 
 	static uint32_t compteur = 0 ;
 	int32_t compteur_octet = NB_OCTECT_MAX ;
+
+	//On envoit les coefs des pids si on est en train de les changer
+	if(drone->soft.state_flight_mode == PID_CHANGE_SETTINGS){
+		if(drone->communication.ibus.channels[SWITCH_3] > 1600){
+			data_groups[DATA_ROLL_KP].periode = 0 ;
+			data_groups[DATA_ROLL_KI].periode = 0 ;
+			data_groups[DATA_ROLL_KD].periode = 0 ;
+			data_groups[DATA_PITCH_KP].periode = 10 ;
+			data_groups[DATA_PITCH_KI].periode = 0 ;
+			data_groups[DATA_PITCH_KD].periode = 10 ;
+		}
+		else{
+			data_groups[DATA_ROLL_KP].periode = 10 ;
+			data_groups[DATA_ROLL_KI].periode = 0 ;
+			data_groups[DATA_ROLL_KD].periode = 10 ;
+			data_groups[DATA_PITCH_KP].periode = 0 ;
+			data_groups[DATA_PITCH_KI].periode = 0 ;
+			data_groups[DATA_PITCH_KD].periode = 0 ;
+		}
+
+	}
+	else{
+		data_groups[DATA_ROLL_KP].periode = 0 ;
+		data_groups[DATA_ROLL_KI].periode = 0 ;
+		data_groups[DATA_ROLL_KD].periode = 0 ;
+		data_groups[DATA_PITCH_KP].periode = 0 ;
+		data_groups[DATA_PITCH_KI].periode = 0 ;
+		data_groups[DATA_PITCH_KD].periode = 0 ;
+	}
 
 	for(uint8_t data = 0; data < NB_DATA_GROUP; data ++){
 		if(data_groups[data].periode){

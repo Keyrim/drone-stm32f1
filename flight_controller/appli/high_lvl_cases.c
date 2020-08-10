@@ -9,6 +9,7 @@
 #include "../../ressources/sequences_led.h"
 #include "../lib/btm/Telemetrie.h"
 #include "../lib/btm/Test_transition.h"
+#include "stdlib.h"
 
 //Fonction de transition
 void transition_high_lvl(State_drone_t * drone);
@@ -208,6 +209,8 @@ void transition_high_lvl(State_drone_t * drone){
 				break;
 			else if(check_manual_pc_request(drone))
 				break;
+			if(drone->communication.ibus.channels[SWITCH_3] > 1300)
+				drone->soft.state_flight_mode = PID_CHANGE_SETTINGS ;
 			else if(test_ppm(drone, TRUE)){
 				if(TRANSITION_test(&arm_switch_test, drone, TRUE, 1)){
 					if(TRANSITION_test(&throttle_low_test, drone, FALSE, 1)){
@@ -278,6 +281,11 @@ void transition_high_lvl(State_drone_t * drone){
 			break;
 
 		case POSITION_HOLD:
+			break;
+
+		case PID_CHANGE_SETTINGS :
+			if(drone->communication.ibus.channels[SWITCH_3] < 1300)
+				drone->soft.state_flight_mode = ON_THE_GROUND ;
 			break;
 
 		case CALIBRATE_MPU6050:
@@ -422,10 +430,62 @@ void HIGH_LVL_IMU_Failed_Init(State_drone_t * drone){
 	if(drone->soft.entrance_flight_mode){
 			drone->stabilisation.stab_mode = STAB_OFF ;
 			LED_SEQUENCE_set_sequence(&drone->ihm.led_etat, SEQUENCE_LED_7);
-		}
+	}
 	transition_high_lvl(drone);
 }
 
+void HIGH_LVL_Change_Pid_Settings(State_drone_t * drone){
+	if(drone->soft.entrance_flight_mode){
+			drone->stabilisation.stab_mode = STAB_OFF ;
+			LED_SEQUENCE_set_sequence(&drone->ihm.led_etat, SEQUENCE_LED_9);
+	}
+
+	PID_t * pid_roll ;
+	PID_t * pid_pitch ;
+
+	#if SET_COEF_ON_RATE_PID
+		pid_roll = &drone->stabilisation.pid_roll_rate ;
+		pid_pitch = &drone->stabilisation.pid_pitch_rate ;
+	#else
+		pid_roll = &drone->stabilisation.pid_roll ;
+		pid_pitch = &drone->stabilisation.pid_pitch ;
+	#endif
+
+	const float divider = 1000000 ;
+	if(drone->communication.ibus.channels[SWITCH_3] > 1300 && drone->communication.ibus.channels[SWITCH_3] < 1600){
+		//Dead band pour ne pas increase pour rien
+		if(abs(drone->communication.ibus.channels[8] - 1500) > 20)
+			pid_roll->settings[PID_KP] += (float)(drone->communication.ibus.channels[8] - 1500) / divider ;
+		if(abs(drone->communication.ibus.channels[9] - 1500) > 20)
+			pid_roll->settings[PID_KD] += (float)(drone->communication.ibus.channels[9] - 1500) / divider ;
+
+		//Pas de valeurs négative, on veut pas compenser à l'envers
+		pid_roll->settings[PID_KP] = MAX(pid_roll->settings[PID_KP], 0);
+		pid_roll->settings[PID_KD] = MAX(pid_roll->settings[PID_KD], 0);
+
+		//Pas de valeur trop importantes non plus
+		pid_roll->settings[PID_KP] = MIN(pid_roll->settings[PID_KP], 3);
+		pid_roll->settings[PID_KD] = MIN(pid_roll->settings[PID_KD], 3);
+
+	}
+	else if(drone->communication.ibus.channels[SWITCH_3] > 1600){
+		//Dead band pour ne pas increase pour rien
+		if(abs(drone->communication.ibus.channels[8] - 1500) > 20)
+			pid_pitch->settings[PID_KP] += (float)(drone->communication.ibus.channels[8] - 1500) / divider ;
+		if(abs(drone->communication.ibus.channels[9] - 1500) > 20)
+			pid_pitch->settings[PID_KD] += (float)(drone->communication.ibus.channels[9] - 1500) / divider ;
+
+		//Pas de valeurs négative, on veut pas compenser à l'envers
+		pid_pitch->settings[PID_KP] = MAX(pid_pitch->settings[PID_KP], 0);
+		pid_pitch->settings[PID_KD] = MAX(pid_pitch->settings[PID_KD], 0);
+
+		//Pas de valeur trop importantes non plus
+		pid_pitch->settings[PID_KP] = MIN(pid_pitch->settings[PID_KP], 3);
+		pid_pitch->settings[PID_KD] = MIN(pid_pitch->settings[PID_KD], 3);
+	}
+	transition_high_lvl(drone);
+
+}
 
 
 

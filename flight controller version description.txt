@@ -55,11 +55,14 @@ Version 2.3
 Version 2.4
 	Ajouts:
 		Ibus : prise en charge du ibus pour remplacer le ppm qui cassait les couilles 
-		MS5611 : ça tourne
+		MS5611 : mesure du baromète qui fonctionne
 		Télémétrie : Contrôle des coefs du pid depuis le pc 
-		
+		AJout Stabilisation en accro / rate 		
+		Télémétrie : envoit des pid "rate" ou "angle" et du gyro
 	Modifs:
 		Soft : Gestion du "free time" plus clean
+		Soft : Sub send data plus propre
+		Soft : Enum ids
 		
 		
 		

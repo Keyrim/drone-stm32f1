@@ -17,8 +17,6 @@
 #define SEQUENCE_LED_6 		0b101010000000	//calibrate mpu
 #define SEQUENCE_LED_7 		0b101010100000	//Imu init seq failled
 #define SEQUENCE_LED_8 		0b111111000000	//Accros
-
-
-//1245
+#define SEQUENCE_LED_9		0b100000000000 	//Modif coef pids
 
 #endif /* RESSOURCES_SEQUENCES_LED_H_ */

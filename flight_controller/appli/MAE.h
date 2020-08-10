@@ -32,7 +32,8 @@ typedef enum{
 	CALIBRATE_MPU6050,
 	MANUAL_PC,
 	MANUAL_ACCRO,
-	IMU_FAILED_INIT
+	IMU_FAILED_INIT,
+	PID_CHANGE_SETTINGS
 }Flight_Mode_SM;
 
 //état pour la stabilisation

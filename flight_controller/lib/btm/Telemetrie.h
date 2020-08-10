@@ -26,7 +26,7 @@ void TELEMETRIE_send_high_lvl_transi(uint8_t transi, uart_struct_e * uart);
 
 //Envoit double
 void TELEMETRIE_send_double(double value, uint8_t id, uart_struct_e * uart);
-
+void TELEMETRIE_send_double_16b(double value, uint8_t id, uart_struct_e * uart);
 
 // ---------------------- Fonctions pour la sub télémétrie ------------------------
 
@@ -40,6 +40,13 @@ void TELEMETRIE_send_pid_yaw(State_drone_t * drone);
 void TELEMETRIE_send_pid_roll_p(State_drone_t * drone);
 void TELEMETRIE_send_pid_roll_d(State_drone_t * drone);
 
+//Pids coefs
+void TELEMETRIE_send_pid_roll_kp(State_drone_t * drone);
+void TELEMETRIE_send_pid_roll_ki(State_drone_t * drone);
+void TELEMETRIE_send_pid_roll_kd(State_drone_t * drone);
+void TELEMETRIE_send_pid_pitch_kp(State_drone_t * drone);
+void TELEMETRIE_send_pid_pitch_ki(State_drone_t * drone);
+void TELEMETRIE_send_pid_pitch_kd(State_drone_t * drone);
 ///////////////////
 
 //Envoi moteurs
@@ -51,6 +58,7 @@ void TELEMETRIE_send_channel_all_5_8(State_drone_t * drone);
 
 //Envoi angle
 void TELEMETRIE_send_angle_x_y_as_int(State_drone_t * drone);
+void TELEMETRIE_send_angle_x_y_z_rate_as_int(State_drone_t * drone);
 void TELEMETRIE_send_angle_z_as_int(State_drone_t * drone);
 
 //Envoi angle de l acc

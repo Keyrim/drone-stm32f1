@@ -14,7 +14,7 @@ void LOW_LVL_Wait_Loop(State_drone_t * drone){
 	if(time >= drone->soft.previous_time_loop + LOOP_PERIODE){
 		drone->soft.previous_time_loop = time ;
 		drone->soft.state_low_level = PWM_HIGH ;
-		drone->soft.dead_line = 0 ;	//Si c'est l'heure on passe direct au state suivant
+		drone->soft.dead_line = 0 ;	//Si c'est l'heure on passe au state suivant
 	}
 	else
 		drone->soft.dead_line = drone->soft.previous_time_loop + LOOP_PERIODE  ;	//si on a du temps dispo, on le dit
@@ -104,12 +104,17 @@ void LOW_LVL_Process_High_Lvl(State_drone_t * drone, State_base_t * base){
 			HIGH_LVL_IMU_Failed_Init(drone);
 			break;
 
+		case PID_CHANGE_SETTINGS:
+			HIGH_LVL_Change_Pid_Settings(drone);
+			break;
+
 		case POSITION_HOLD:
 			//TODO Position hold function
 			break;
 		case ALTITUDE_HOLD:
 			//TODO Altitude hold function
 			break;
+
 	}
 	drone->soft.state_low_level = STABILISATION ;
 
