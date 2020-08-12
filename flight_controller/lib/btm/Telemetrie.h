@@ -25,8 +25,8 @@ void TELEMETRIE_send_consigne_base(uint8_t consigne,  uart_struct_e * uart);
 void TELEMETRIE_send_high_lvl_transi(uint8_t transi, uart_struct_e * uart);
 
 //Envoit double
-void TELEMETRIE_send_double(double value, uint8_t id, uart_struct_e * uart);
-void TELEMETRIE_send_double_16b(double value, uint8_t id, uart_struct_e * uart);
+void TELEMETRIE_send_double(float value, uint8_t id, uart_struct_e * uart);
+void TELEMETRIE_send_double_16b(float value, uint8_t id, uart_struct_e * uart);
 
 // ---------------------- Fonctions pour la sub télémétrie ------------------------
 

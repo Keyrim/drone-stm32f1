@@ -28,8 +28,10 @@ void LOW_LVL_Pwm_High(State_drone_t * drone){
 
 void LOW_LVL_Update_Angles(State_drone_t * drone){
 	//Si le mpu est init, on lit ses valeurs et on applique un "complementary filter" pour récupérer ses angles
+	//volatile uint32_t time = SYSTICK_get_time_us();
 	if(!drone->capteurs.mpu.mpu_result)
 		Mpu_imu_update_angles(&drone->capteurs.mpu);
+	//time = SYSTICK_get_time_us() - time;
 	drone->soft.state_low_level = VERIF_SYSTEM ;
 }
 
@@ -145,10 +147,10 @@ void LOW_Lvl_Stabilisation(State_drone_t * drone){
 			pitch_output 	= PID_compute_SOF_d(&drone->stabilisation.pid_pitch, drone->consigne.pitch, drone->capteurs.mpu.x);
 			yaw_output 		= PID_compute_FOF_d(&drone->stabilisation.pid_yaw, drone->consigne.yaw, drone->capteurs.mpu.z);
 			//Et on envoit aux moteurs en vérifiant qu'on ne dépasse les valeurs autorisées
-			ESC_Set_pulse(&drone->stabilisation.escs[0], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output + pitch_output + yaw_output)));
-			ESC_Set_pulse(&drone->stabilisation.escs[1], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output + pitch_output - yaw_output)));
-			ESC_Set_pulse(&drone->stabilisation.escs[2], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output - pitch_output - yaw_output)));
-			ESC_Set_pulse(&drone->stabilisation.escs[3], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output - pitch_output + yaw_output)));
+			ESC_Set_pulse(&drone->stabilisation.escs[0], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output + pitch_output - yaw_output)));
+			ESC_Set_pulse(&drone->stabilisation.escs[1], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output + pitch_output + yaw_output)));
+			ESC_Set_pulse(&drone->stabilisation.escs[2], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output - pitch_output + yaw_output)));
+			ESC_Set_pulse(&drone->stabilisation.escs[3], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output - pitch_output - yaw_output)));
 			break;
 
 		case ACCRO :
@@ -157,10 +159,10 @@ void LOW_Lvl_Stabilisation(State_drone_t * drone){
 			pitch_output 	= PID_compute_FOF_d(&drone->stabilisation.pid_pitch_rate, drone->consigne.pitch_rate, drone->capteurs.mpu.x_gyro);
 			yaw_output 		= PID_compute_FOF_d(&drone->stabilisation.pid_yaw_rate, drone->consigne.yaw_rate, drone->capteurs.mpu.z_gyro);
 			//Et on envoit aux moteurs en vérifiant qu'on ne dépasse les valeurs autorisées
-			ESC_Set_pulse(&drone->stabilisation.escs[0], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output + pitch_output + yaw_output)));
-			ESC_Set_pulse(&drone->stabilisation.escs[1], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output + pitch_output - yaw_output)));
-			ESC_Set_pulse(&drone->stabilisation.escs[2], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output - pitch_output - yaw_output)));
-			ESC_Set_pulse(&drone->stabilisation.escs[3], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output - pitch_output + yaw_output)));
+			ESC_Set_pulse(&drone->stabilisation.escs[0], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output + pitch_output - yaw_output)));
+			ESC_Set_pulse(&drone->stabilisation.escs[1], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output + pitch_output + yaw_output)));
+			ESC_Set_pulse(&drone->stabilisation.escs[2], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output - pitch_output + yaw_output)));
+			ESC_Set_pulse(&drone->stabilisation.escs[3], (uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output - pitch_output - yaw_output)));
 			break;
 
 		default:
@@ -173,7 +175,7 @@ void LOW_Lvl_Stabilisation(State_drone_t * drone){
 //Fonction qui peut envoyer des données de télémétrie
 void LOW_LVL_Send_Data(State_drone_t * drone){
 	//Si le switch 4 de la télécomande est activé, on envoit les données au pc
-	if(drone->communication.ibus.channels[SWITCH_4] > 1500)
+	//if(drone->communication.ibus.channels[SWITCH_4] > 1500)
 		sub_send_data(drone);
 	drone->soft.state_low_level = WAIT_LOOP ;
 }
