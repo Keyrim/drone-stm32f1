@@ -12,8 +12,8 @@
 #include "stm32f1_sys.h"
 
 //Include des deux machines à état principales (qui elles include bcp de choses)
-#include "high_lvl_cases.h"
-#include "low_lvl_cases.h"
+#include "high_lvl/high_lvl_cases.h"
+#include "low_lvl/low_lvl_cases.h"
 
 
 //Fichier de ref pour les configurations / branchements
@@ -68,6 +68,7 @@ int main(void)
 	ESC_init(&drone.stabilisation.escs[1], esc1_gpio, esc1_pin);
 	ESC_init(&drone.stabilisation.escs[2], esc2_gpio, esc2_pin);
 	ESC_init(&drone.stabilisation.escs[3], esc3_gpio, esc3_pin);
+
 
 	//Init ms5611 baromètre
 	HAL_Delay(50);
