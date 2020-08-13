@@ -13,8 +13,6 @@
 //L'appli sur le pc connait elle aussi tous ces id
 
 typedef enum{
-	ID_NOMBRE_ID =							13,
-
 	//Id pour le drone
 	ID_DRONE_CONSIGNE = 					0,
 

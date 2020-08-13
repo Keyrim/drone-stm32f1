@@ -15,6 +15,7 @@
 #include "high_lvl/high_lvl_cases.h"
 #include "low_lvl/low_lvl_cases.h"
 
+#include "scheduler/scheduler.h"
 
 //Fichier de ref pour les configurations / branchements
 #include "branchement.h"
@@ -85,6 +86,13 @@ int main(void)
 	PID_init(&drone.stabilisation.pid_yaw_rate, PID_SETTINGS_YAW_ACCRO);
 
 	HAL_Delay(50);
+
+
+	//Test du planificateur
+	scheduler_init(&drone, &base);
+	while(1){
+		scheduler();
+	}
 
 
 	//	--------------------------------------------- Main Loop	-----------------------------------------------------
