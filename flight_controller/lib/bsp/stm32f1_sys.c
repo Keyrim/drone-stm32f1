@@ -512,7 +512,7 @@ uint32_t dump_printf(const char *format, ...) {
 	if(ret >= DUMP_PRINTF_BUFFER_SIZE)
 		ret = DUMP_PRINTF_BUFFER_SIZE-1;
 
-	UART_impolite_force_puts_on_uart(UART2_ID, buf, ret);
+	UART_impolite_force_puts_on_uart(UART3_ID, buf, ret);
 
 	va_end(args_list);
 	return ret;

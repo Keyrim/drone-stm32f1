@@ -24,4 +24,5 @@ bool_e queu_remove(task_t * task);
 void task_enable(task_ids_t id, bool_e enable);
 task_t * get_first_task(void);
 task_t * get_next_task(void);
+uint32_t task_execute(task_t * task, uint32_t current_time_us);
 #endif /* SCHEDULER_SCHEDULER_H_ */

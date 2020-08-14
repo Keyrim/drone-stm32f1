@@ -90,6 +90,7 @@ int main(void)
 
 	//Test du planificateur
 	scheduler_init(&drone, &base);
+	printf("Scheduler running\n\r");
 	while(1){
 		scheduler();
 	}

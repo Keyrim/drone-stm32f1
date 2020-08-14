@@ -38,7 +38,7 @@ typedef struct task{
 	void (*function)(uint32_t current_time_us);
 	task_states_t state ;
 	task_ids_t id ;
-	uint32_t execution_time_us ;
+	uint32_t execution_duration_us ;
 	uint32_t desired_period_us ;
 	uint32_t last_execution_us ;
 }task_t;

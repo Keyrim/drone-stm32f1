@@ -12,20 +12,17 @@ static uint32_t task_queu_position = 0 ;
 
 void scheduler_init(State_drone_t * drone, State_base_t * base){
 	tasks_init(drone, base);
-	queu_clear();
 }
 
 void scheduler(void){
 	uint32_t current_time_us = SYSTICK_get_time_us();
-
-	//On itère sur chaque tâche
-	for(task_t * task = get_first_task(); task != NULL; task = get_next_task()){
-		if(task->last_execution_us + task->desired_period_us > current_time_us){
-			task->function(current_time_us);
-			task->last_execution_us = current_time_us ;
+	task_t * task = get_first_task();
+	while(task_queu_position < task_queu_size && task != NULL){
+		if(current_time_us > task->last_execution_us + task->desired_period_us){
+			task_execute(task, current_time_us);
 		}
+		task = get_next_task();
 	}
-
 }
 
 task_t * get_first_task(void){
@@ -35,6 +32,14 @@ task_t * get_first_task(void){
 
 task_t * get_next_task(void){
 	return task_queu[++task_queu_position];
+}
+
+uint32_t task_execute(task_t * task, uint32_t current_time_us){
+	task->last_execution_us = current_time_us ;
+	task->function(current_time_us);
+	current_time_us = SYSTICK_get_time_us();
+	task->execution_duration_us = current_time_us - task->last_execution_us ;
+	return current_time_us ;
 }
 
 //Activation ou désactivation par ajout ou suppression dans la queu dans la queu
@@ -69,9 +74,9 @@ bool_e queu_add(task_t * task){
 	if(queu_contains(task) || task_queu_size >= TASK_COUNT)
 		return FALSE ;
 
-	for(uint32_t t = 0; t < task_queu_size; t++){
+	for(uint32_t t = 0; t < task_queu_size + 1 ; t++){
 		if(task_queu[t] == NULL || task->static_priority > task_queu[t]->static_priority){
-			memmove(&task_queu[t+1], &task_queu[t], sizeof(task) * (task_queu_size - t));
+			memmove(&task_queu[t+1], &task_queu[t], sizeof(task) * (task_queu_size +1 - t));
 			task->state = READY ;
 			task_queu[t] = task ;
 			task_queu_size ++ ;
