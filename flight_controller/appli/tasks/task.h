@@ -13,6 +13,9 @@
 #include "../lib/btm/Mpu_imu.h"
 #include "../system_d.h"
 
+#define TASK_STAT_AVERAGE_OVER 20		//Moyenne glissante sur X valeurs
+#define TASK_DURATION_MAX	2500	//On considère qu une tâche ne peut durer plus de 2000 µs
+
 
 typedef enum task_priority{
 	PRIORITY_REAL_TIME 	= -1 ,
@@ -23,12 +26,12 @@ typedef enum task_priority{
 
 typedef enum task_states{
 	INIT,				//	Tâches existe
-	READY,				// 	Tâches placées dans la file d attente pour être traité
-	WAITING				//	En attente d un évenement / donnée
+	READY				// 	Tâches placées dans la file d attente pour être traité
 }task_states_t;
 
 typedef enum task_ids {
 	TASK_IMU,
+	TASK_IBUS,
 	TASK_PRINTF,
 	TASK_COUNT
 }task_ids_t;
@@ -40,7 +43,15 @@ typedef struct task{
 	task_ids_t id ;
 	uint32_t execution_duration_us ;
 	uint32_t desired_period_us ;
+	uint32_t real_period_us ;
 	uint32_t last_execution_us ;
+
+	//Tableau pour avoir les stats en moyenne glissante
+	uint32_t real_period_us_average_array [TASK_STAT_AVERAGE_OVER];
+	uint32_t real_period_us_average_sum ;
+	uint32_t execution_duration_us_average_array [TASK_STAT_AVERAGE_OVER];
+	uint32_t execution_duration_us_average_sum ;
+	uint32_t average_index ;
 }task_t;
 
 void tasks_init(State_drone_t * drone_, State_base_t * base_);
