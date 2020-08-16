@@ -19,8 +19,9 @@
 
 typedef enum task_priority{
 	PRIORITY_REAL_TIME 	= -1 ,
-	PRIORITY_LOW		= 0 ,
-	PRIOIRTY_MEDIUM	 	= 5 ,
+	//Priorité toujours positive > 0
+	PRIORITY_LOW		= 1 ,
+	PRIORITY_MEDIUM	 	= 5 ,
 	PRIORITY_HIGH		= 10
 }task_priority_t;
 
@@ -32,7 +33,14 @@ typedef enum task_states{
 typedef enum task_ids {
 	TASK_IMU,
 	TASK_IBUS,
+	TASK_ESCS_IBUS_TEST,
 	TASK_PRINTF,
+	TASK_SEND_DATA,
+	TASK_RECEIVE_DATA,
+	TASK_VERIF_SYSTEM,
+	TASK_STABILISATION,
+	TASK_UART_SEND,
+	TASK_HIGH_LVL,
 	TASK_COUNT
 }task_ids_t;
 

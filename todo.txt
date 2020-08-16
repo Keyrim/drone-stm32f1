@@ -10,6 +10,7 @@ TODO MODIFS :
 	- pid calculs en int pour raccourcir le temp de calcul						
 	- imu calcus en int 										
 	- transition high_lvl
+	- receive data => gérer l uart dans la sub, renvoyer vrai si uart lu
 	
 
 TODO AJOUTS :

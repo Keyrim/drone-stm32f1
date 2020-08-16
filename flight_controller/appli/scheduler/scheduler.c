@@ -20,8 +20,10 @@ void scheduler(void){
 
 	//Tâches temps réel (de l'acquisition du gyro à l'envoit des consignes aux moteurs) ont la priorité absolue sur le reste
 	task_t * task_gyro = get_task(TASK_IMU) ;
-	if(current_time_us >= task_gyro->last_execution_us + task_gyro->desired_period_us)
+	if(current_time_us >= task_gyro->last_execution_us + task_gyro->desired_period_us){
 		current_time_us = task_execute(task_gyro, current_time_us);
+		current_time_us = task_execute(get_task(TASK_STABILISATION), current_time_us);
+	}
 	else
 		gyro_time_left = task_gyro->last_execution_us + task_gyro->desired_period_us - current_time_us ;
 

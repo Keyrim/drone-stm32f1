@@ -22,6 +22,7 @@
 #include "../lib/btm/Pid.h"
 #include "../lib/btm/Sequence_led.h"
 #include "../lib/btm/Uart_lib.h"
+#include "../lib/btm/esc_timer.h"
 
 #ifndef SYSTEM_D_H_
 #define SYSTEM_D_H_
@@ -37,6 +38,7 @@ typedef struct{
 //Structure stabilisation
 typedef struct{
 	ESC_e escs[4];
+	ESCs_t escs_timer ;
 	//Pid for lvled mode
 	PID_t pid_roll ;
 	PID_t pid_pitch ;

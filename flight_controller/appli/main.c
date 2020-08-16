@@ -85,6 +85,8 @@ int main(void)
 	PID_init(&drone.stabilisation.pid_pitch_rate, PID_SETTINGS_PITCH_ACCRO);
 	PID_init(&drone.stabilisation.pid_yaw_rate, PID_SETTINGS_YAW_ACCRO);
 
+	ESCS_init(&drone.stabilisation.escs_timer);
+
 	HAL_Delay(50);
 
 

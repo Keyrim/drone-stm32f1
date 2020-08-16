@@ -147,10 +147,10 @@ void TELEMETRIE_send_pid_pitch_kd(State_drone_t * drone){
 void TELEMETRIE_send_moteur_all(State_drone_t * drone){
 	uint8_t  bytes[4] = {0} ;
 	bytes[0] = ID_PC_MOTEUR_ALL ;
-	bytes[1] = (uint8_t)(((drone->stabilisation.escs[0].pulsation - 1000) / 4 )  & 0b11111111);
-	bytes[2] = (uint8_t)(((drone->stabilisation.escs[1].pulsation - 1000) / 4 )  & 0b11111111);
-	bytes[3] = (uint8_t)(((drone->stabilisation.escs[2].pulsation - 1000) / 4 )  & 0b11111111);
-	bytes[4] = (uint8_t)(((drone->stabilisation.escs[3].pulsation - 1000) / 4 )  & 0b11111111);
+	bytes[1] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[0] - 1000) / 4 )  & 0b11111111);
+	bytes[2] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[1] - 1000) / 4 )  & 0b11111111);
+	bytes[3] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[2] - 1000) / 4 )  & 0b11111111);
+	bytes[4] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[3] - 1000) / 4 )  & 0b11111111);
 	uart_add_few(&drone->communication.uart_telem, bytes, 5);
 }
 

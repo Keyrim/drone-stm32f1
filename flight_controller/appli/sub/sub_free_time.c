@@ -44,7 +44,7 @@ void sub_free_time(State_drone_t * drone, State_base_t * base){
 
 			case 3 :
 				//On envoit les données en buffer vers l'uart de telemétrie
-				uart_send(&drone->communication.uart_telem);
+				uart_send(&drone->communication.uart_telem, SYSTICK_get_time_us());
 				state ++;
 				break;
 
