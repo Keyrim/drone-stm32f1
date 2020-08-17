@@ -63,9 +63,6 @@ typedef struct{
 	Flight_Mode_SM state_flight_mode ;
 	bool_e entrance_flight_mode ;
 
-	Low_Level_SM state_low_level ;
-
-	uint32_t previous_time_loop ;
 	uint32_t dead_line ;
 	bool_e flags[NB_FLAGS];
 }DRONE_soft_t;

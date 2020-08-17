@@ -41,6 +41,8 @@ typedef enum task_ids {
 	TASK_STABILISATION,
 	TASK_UART_SEND,
 	TASK_HIGH_LVL,
+	TASK_MS5611,
+	TASK_LED,
 	TASK_COUNT
 }task_ids_t;
 
@@ -50,6 +52,7 @@ typedef struct task{
 	task_states_t state ;
 	task_ids_t id ;
 	uint32_t execution_duration_us ;
+	uint32_t execution_duration_us_worst ;
 	uint32_t desired_period_us ;
 	uint32_t real_period_us ;
 	uint32_t last_execution_us ;

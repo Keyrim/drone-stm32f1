@@ -15,7 +15,8 @@
 void sub_free_time(State_drone_t * drone, State_base_t * base){
 	if(drone->soft.dead_line){
 
-		uint32_t free_time = drone->soft.dead_line - SYSTICK_get_time_us() ;
+		uint32_t current_time_us = SYSTICK_get_time_us() ;
+		uint32_t free_time = drone->soft.dead_line - current_time_us ;
 		static int32_t state = 0 ;
 
 		static uint32_t ms5611_time_needed = 60 ;
@@ -29,7 +30,7 @@ void sub_free_time(State_drone_t * drone, State_base_t * base){
 			case 1 :
 				//Si on a le temps on appelle la sub pour le ms5611
 				if(free_time >= ms5611_time_needed){
-					ms5611_time_needed = sub_ms5611(drone);
+					ms5611_time_needed = sub_ms5611(drone, current_time_us);
 				}
 				state ++;
 				break;
@@ -44,13 +45,13 @@ void sub_free_time(State_drone_t * drone, State_base_t * base){
 
 			case 3 :
 				//On envoit les données en buffer vers l'uart de telemétrie
-				uart_send(&drone->communication.uart_telem, SYSTICK_get_time_us());
+				uart_send(&drone->communication.uart_telem, current_time_us);
 				state ++;
 				break;
 
 			case 4 :
 				//On fait clignoter la led d'etat
-				LED_SEQUENCE_play(&drone->ihm.led_etat);
+				LED_SEQUENCE_play(&drone->ihm.led_etat, current_time_us);
 				state ++;
 				break ;
 

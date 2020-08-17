@@ -24,11 +24,13 @@ void tasks_init(State_drone_t * drone_, State_base_t * base_){
 	task_enable(TASK_IBUS, TRUE);
 	//task_enable(TASK_ESCS_IBUS_TEST, TRUE);
 	task_enable(TASK_SEND_DATA, TRUE);
-	//task_enable(TASK_RECEIVE_DATA, TRUE);
+	task_enable(TASK_RECEIVE_DATA, TRUE);
 	task_enable(TASK_VERIF_SYSTEM, TRUE);
 	task_enable(TASK_STABILISATION, TRUE);
-	task_enable(TASK_UART_SEND, TRUE);
+	//task_enable(TASK_UART_SEND, TRUE);
 	task_enable(TASK_HIGH_LVL, TRUE);
+	//task_enable(TASK_MS5611, TRUE);
+	task_enable(TASK_LED, TRUE);
 
 }
 
@@ -146,7 +148,7 @@ void task_function_uart_send(uint32_t current_time_us){
 
 void task_function_printf(uint32_t current_time_us){
 	UNUSED(current_time_us);
-	printf("%lu\t%lu\n", get_task(TASK_HIGH_LVL)->execution_duration_us, get_cpu_load());
+	printf("%lu\t%lu\n", get_task(TASK_MS5611)->execution_duration_us, get_cpu_load());
 }
 
 void task_function_ibus(uint32_t current_time_us){
@@ -159,7 +161,7 @@ void task_function_ibus(uint32_t current_time_us){
 
 void task_function_escs_ibus_test(uint32_t current_time_us){
 	UNUSED(current_time_us);
-	uint16_t m1 = (uint16_t)((drone->communication.ibus.channels[THROTTLE] - 1000) * 4) ;
+	uint16_t m1 = (uint16_t)drone->communication.ibus.channels[THROTTLE] ;
 	ESCS_set_period(m1, m1, m1, m1);
 }
 
@@ -198,6 +200,14 @@ void task_function_verif_system(uint32_t current_time_us){
 
 }
 
+void task_function_ms5611(uint32_t current_time_us){
+	task_reschedule(TASK_MS5611, sub_ms5611(drone,current_time_us));
+}
+
+void task_function_led(uint32_t current_time_us){
+	LED_SEQUENCE_play(&drone->ihm.led_etat, current_time_us);
+}
+
 #define DEFINE_TASK(id_param, priority_param,  task_function_param, desired_period_us_param) { 	\
 	.id = id_param,										\
 	.static_priority = priority_param,					\
@@ -216,8 +226,10 @@ task_t tasks [TASK_COUNT] ={
 		[TASK_RECEIVE_DATA] = 	DEFINE_TASK(TASK_RECEIVE_DATA, 		PRIORITY_MEDIUM, 		task_function_receive_data, 	PERIOD_US_FROM_HERTZ(500)),
 		[TASK_VERIF_SYSTEM] = 	DEFINE_TASK(TASK_VERIF_SYSTEM, 		PRIORITY_MEDIUM, 		task_function_verif_system, 	PERIOD_US_FROM_HERTZ(10)),
 		[TASK_STABILISATION] =	DEFINE_TASK(TASK_STABILISATION, 	PRIORITY_REAL_TIME, 	task_function_stabilisation, 	PERIOD_US_FROM_HERTZ(250)),
-		[TASK_UART_SEND] = 		DEFINE_TASK(TASK_UART_SEND, 		PRIORITY_MEDIUM, 		task_function_uart_send, 		PERIOD_US_FROM_HERTZ(125)),
-		[TASK_HIGH_LVL] = 		DEFINE_TASK(TASK_HIGH_LVL, 			PRIORITY_HIGH,	 		task_function_high_lvl, 		PERIOD_US_FROM_HERTZ(250))
+		[TASK_UART_SEND] = 		DEFINE_TASK(TASK_UART_SEND, 		PRIORITY_MEDIUM, 		task_function_uart_send, 		PERIOD_US_FROM_HERTZ(500)),
+		[TASK_HIGH_LVL] = 		DEFINE_TASK(TASK_HIGH_LVL, 			PRIORITY_HIGH,	 		task_function_high_lvl, 		PERIOD_US_FROM_HERTZ(250)),
+		[TASK_MS5611] = 		DEFINE_TASK(TASK_MS5611, 			PRIORITY_MEDIUM,	 	task_function_ms5611, 			PERIOD_US_FROM_HERTZ(500)),
+		[TASK_LED] = 			DEFINE_TASK(TASK_LED, 				PRIORITY_LOW,	 		task_function_led, 				PERIOD_US_FROM_HERTZ(10))
 };
 
 task_t * get_task(task_ids_t id){

@@ -17,7 +17,7 @@
 //Ensemble des sub actions
 
 void sub_channels_analysis(State_drone_t * drone);
-uint32_t sub_ms5611(State_drone_t * drone);
+uint32_t sub_ms5611(State_drone_t * drone, uint32_t current_time_us);
 void sub_free_time(State_drone_t * drone, State_base_t * base);
 running_e sub_esc_end_pulse(ESC_e* escs);
 void sub_esc_start_pulse(ESC_e * escs);
