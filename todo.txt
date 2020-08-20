@@ -6,9 +6,7 @@ TODO MODIFS :
 	- 						
 	- 			
 	- controle par séquence sur switch (huat bas huat bas)			
-	- reset la consigne en throttle quand on passse en mode de vole 
-	- pid calculs en int pour raccourcir le temp de calcul						
-	- imu calcus en int 										
+	- reset la consigne en throttle quand on passse en mode de vole 									
 	- transition high_lvl
 	
 

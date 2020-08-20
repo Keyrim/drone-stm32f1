@@ -47,7 +47,7 @@ bool_e IBUS_check_data(ibus_t * ibus){
 				}
 				//ON check que du coup c pas la commande de départ au cas ou et sinon retour au début
 				else if(c != 0x20)
-						ibus->state = LENGTH ;
+					ibus->state = LENGTH ;
 				break ;
 
 			case CHANNELS :

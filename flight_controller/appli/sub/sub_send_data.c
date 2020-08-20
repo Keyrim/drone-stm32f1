@@ -113,7 +113,7 @@ void sub_send_data(State_drone_t * drone){
 		data_groups[DATA_X_Y_Z_RATE].nb_octet = 4 ;
 
 		data_groups[DATA_ANGLES].periode = 5 ;
-		data_groups[DATA_ANGLE_Z].periode = 100 ;
+		data_groups[DATA_ANGLE_Z].periode = 10 ;
 		data_groups[DATA_ANGLES_ACC].periode = 10 ;
 		data_groups[DATA_X_Y_Z_RATE].periode = 5 ;
 
@@ -135,7 +135,7 @@ void sub_send_data(State_drone_t * drone){
 
 		//Accélération
 		data_groups[DATA_ACC_Z].nb_octet = 5 ;
-		data_groups[DATA_ACC_Z].periode = 0 ;
+		data_groups[DATA_ACC_Z].periode = 10 ;
 		data_groups[DATA_ACC_Z].telemetrie_function = TELEMETRIE_send_acc_z ;
 
 		//radios

@@ -12,34 +12,34 @@
 #include "math.h"
 
 typedef struct{
-	//Angles
-	double x;
-	double y;
-	double z;
+	//Angles entre -180 et 180
+	float x;
+	float y;
+	float z;
 	//L'accéllération linéaire
-	double x_acc;
-	double y_acc;
-	double z_acc;
+	float x_acc;
+	float y_acc;
+	float z_acc;
 	//Offset acc
-	double x_acc_offset;
-	double y_acc_offset;
-	double z_acc_offset;
+	float x_acc_offset;
+	float y_acc_offset;
+	float z_acc_offset;
 	//Vitesse angualaire
-	double x_gyro;
-	double y_gyro;
-	double z_gyro;
+	float x_gyro;
+	float y_gyro;
+	float z_gyro;
 	//Offset gyro
-	double x_gyro_offset;
-	double y_gyro_offset;
-	double z_gyro_offset;
+	float x_gyro_offset;
+	float y_gyro_offset;
+	float z_gyro_offset;
 	//Angle obtenu par trigo sur l'acc
-	double x_acc_angle;
-	double y_acc_angle;
+	float x_acc_angle;
+	float y_acc_angle;
 	//float du complementary filter
-	double alpha;
+	float alpha;
 	//Sensi gyro et acc
-	double gyro_sensi;
-	double acc_sensi;
+	float gyro_sensi;
+	float acc_sensi;
 	//Si c'est la première fois qu'on lis, on utilise juste les angles du complementary filter
 	bool_e first_read;
 	//Permet de savoir si le mpu va bien
@@ -48,11 +48,12 @@ typedef struct{
 	MPU6050_t raw_data_mpu ;
 	MPU6050_Result_t mpu_result;
 	//Fréquence d'utilisation du mpu
-	uint16_t frequency;
+	int32_t frequency;
+	float periode ;
 
 }DRONE_mpu6050_t;
 
-void Mpu_imu_init(DRONE_mpu6050_t * angles, MPU6050_Accelerometer_t acc_sensi, MPU6050_Gyroscope_t gyro_sensi, double alpha, uint16_t frequency);
+void Mpu_imu_init(DRONE_mpu6050_t * angles, MPU6050_Accelerometer_t acc_sensi, MPU6050_Gyroscope_t gyro_sensi, float alpha, int32_t frequency);
 void Mpu_imu_update_angles(DRONE_mpu6050_t * angles);
 bool_e Mpu_imu_calibrate(DRONE_mpu6050_t * angles, uint16_t epoch);	//Return true si c fini, faux si il est en train de calibrer
 
