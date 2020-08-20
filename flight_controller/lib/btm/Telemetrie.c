@@ -143,7 +143,7 @@ void TELEMETRIE_send_pid_pitch_kd(State_drone_t * drone){
 //Période task
 void TELEMETRIE_send_periode_task(State_drone_t * drone){
 	uint8_t bytes[4] = {0};
-	uint32_t int_value = (uint32_t)( get_task(TASK_TO_SEND)->real_period_us);
+	uint32_t int_value = (uint32_t)( get_task(TASK_TO_SEND)->execution_duration_us);
 	bytes[0] = ID_PC_TASK_PERIODE ;
 	bytes[1] = (uint8_t)((int_value >> 16) & 0b11111111) ;
 	bytes[2] = (uint8_t)((int_value >> 8) & 0b11111111) ;

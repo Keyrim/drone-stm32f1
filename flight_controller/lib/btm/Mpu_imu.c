@@ -167,12 +167,12 @@ void Mpu_imu_init(DRONE_mpu6050_t * angles, MPU6050_Accelerometer_t acc, MPU6050
 	angles->alpha = alpha ;
 	angles->frequency = frequency ;
 	angles->periode = (float)1 / (float)frequency ;
-//	angles->x_gyro_offset = -0.0088028702290076522 ;
-//	angles->y_gyro_offset = 0.0010219236641221378 ;
-//	angles->z_gyro_offset = 0.0012052519083969487 ;
-//	angles->x_acc_offset = -0.053146484374999997 ;
-//	angles->y_acc_offset = -0.01163623046875 ;
-//	angles->z_acc_offset = -0.072118652343750006 ;
+	angles->x_gyro_offset = -2.77471852f ;
+	angles->y_gyro_offset = 0.390320688f ;
+	angles->z_gyro_offset = 0.586473227f ;
+	angles->x_acc_offset = 0.00647851545f ;
+	angles->y_acc_offset = -0.0312011726f ;
+	angles->z_acc_offset = -0.0675112307f ;
 
 
 	switch(acc){
