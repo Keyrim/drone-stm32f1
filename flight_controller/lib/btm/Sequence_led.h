@@ -25,6 +25,6 @@ typedef struct{
 
 void LED_SEQUENCE_init(sequence_led_t * seq_led, GPIO_TypeDef* gpio, uint16_t gpio_pin, int32_t init_seq, uint32_t periode, int8_t length_sequence, bool_e output_logic);
 void LED_SEQUENCE_set_sequence(sequence_led_t * seq_led, int32_t seq);
-void LED_SEQUENCE_play(sequence_led_t * seq_led);
+void LED_SEQUENCE_play(sequence_led_t * seq_led, uint32_t current_time_us);
 
 #endif /* LIB_PERSO_SEQUENCE_LED_H_ */

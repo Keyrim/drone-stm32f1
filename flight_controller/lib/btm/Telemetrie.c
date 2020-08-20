@@ -6,7 +6,6 @@
  */
 
 #include "Telemetrie.h"
-
 // ----------------- fonctions hors sub telemetrie -----------------------------
 void TELEMETRIE_send_consigne_base(uint8_t consigne,  uart_struct_e * uart){
 	uint8_t bytes[2] ;
@@ -141,16 +140,33 @@ void TELEMETRIE_send_pid_pitch_kd(State_drone_t * drone){
 
 #endif
 
+//Période task
+void TELEMETRIE_send_periode_task(State_drone_t * drone){
+	uint8_t bytes[4] = {0};
+	uint32_t int_value = (uint32_t)( get_task(TASK_TO_SEND)->real_period_us);
+	bytes[0] = ID_PC_TASK_PERIODE ;
+	bytes[1] = (uint8_t)((int_value >> 16) & 0b11111111) ;
+	bytes[2] = (uint8_t)((int_value >> 8) & 0b11111111) ;
+	bytes[3] = (uint8_t)((int_value ) & 0b11111111) ;
+	uart_add_few(&drone->communication.uart_telem, bytes, 4);
+}
 
+//Cpu used
+void TELEMETRIE_send_cpu_pourcentage(State_drone_t * drone){
+	uint8_t bytes[2] = {0};
+	bytes[0] = ID_PC_CPU_POURCENTAGE ;
+	bytes[1] = (uint8_t)get_cpu_load() ;
+	uart_add_few(&drone->communication.uart_telem, bytes, 2);
+}
 
 // Données des moteurs
 void TELEMETRIE_send_moteur_all(State_drone_t * drone){
 	uint8_t  bytes[4] = {0} ;
 	bytes[0] = ID_PC_MOTEUR_ALL ;
-	bytes[1] = (uint8_t)(((drone->stabilisation.escs[0].pulsation - 1000) / 4 )  & 0b11111111);
-	bytes[2] = (uint8_t)(((drone->stabilisation.escs[1].pulsation - 1000) / 4 )  & 0b11111111);
-	bytes[3] = (uint8_t)(((drone->stabilisation.escs[2].pulsation - 1000) / 4 )  & 0b11111111);
-	bytes[4] = (uint8_t)(((drone->stabilisation.escs[3].pulsation - 1000) / 4 )  & 0b11111111);
+	bytes[1] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[0] - 1000) / 4 )  & 0b11111111);
+	bytes[2] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[1] - 1000) / 4 )  & 0b11111111);
+	bytes[3] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[2] - 1000) / 4 )  & 0b11111111);
+	bytes[4] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[3] - 1000) / 4 )  & 0b11111111);
 	uart_add_few(&drone->communication.uart_telem, bytes, 5);
 }
 

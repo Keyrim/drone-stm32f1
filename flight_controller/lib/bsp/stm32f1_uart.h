@@ -96,7 +96,10 @@
 	 * @param	str : la chaine de caractère à envoyer
 	 * @param	USARTx : USART1, USART2 ou USART6
 	 */
-	void UART_puts(uart_id_e uart_id, uint8_t * str, uint32_t len);
+	bool_e UART_puts(uart_id_e uart_id, uint8_t * str, uint32_t len);
+
+	void UART_putc_it(uart_id_e uart_id, uint8_t c);
+	void UART_puts_it(uart_id_e uart_id, uint8_t * str, uint16_t len);
 
 	/*
 	 * @brief	Fonction permettant de savoir si le buffer de l'UART demand� est vide ou non.

@@ -33,8 +33,8 @@
 #endif
 
 //Choisir les broches pour l'UART1, parmi ces deux possibilités :
-//#define UART1_ON_PB6_PB7
-#define UART1_ON_PA9_PA10
+#define UART1_ON_PB6_PB7
+//#define UART1_ON_PA9_PA10
 
 //Choisir les broches pour l'UART2, parmi ces deux possibilités :
 #define UART2_ON_PA2_PA3

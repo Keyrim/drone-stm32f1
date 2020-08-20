@@ -10,7 +10,7 @@
 #include "stm32f1_uart.h"
 #include "macro_types.h"
 #include "systick.h"
-#define TX_BUFFER_SIZE 50
+#define TX_BUFFER_SIZE 500
 
 
 //Structure pour l'uart
@@ -22,11 +22,12 @@ typedef struct{
 	uint16_t car_per_transmit ;
 	uint16_t index_buffer;
 	uint32_t last_time_sent ;
+	bool_e to_send ;
 }uart_struct_e;
 
 void uart_init(uart_struct_e * uart, uart_id_e uart_id_, uint32_t baud_rate_, uint32_t periode_);
 bool_e uart_add_one(uart_struct_e * uart, uint8_t c);	//on ajoute un caractère au buffer
 bool_e uart_add_few(uart_struct_e * uart, uint8_t * str, uint16_t len);	//on ajoute plusieurs caractère aux buffer
-void uart_send(uart_struct_e * uart);		//on envoit les caractère en fonction
+void uart_send(uart_struct_e * uart, uint32_t current_time_us);		//on envoit les caractère en fonction
 
 #endif /* UART_LIB_H_ */

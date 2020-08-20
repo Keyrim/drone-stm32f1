@@ -10,19 +10,6 @@
 
 //état pour la high lvl
 typedef enum{
-	WAIT_LOOP,
-	PWM_HIGH,
-	UPDATE_ANGLES,
-	VERIF_SYSTEM,
-	PWM_LOW,
-	HIGH_LVL,
-	STABILISATION,
-	SEND_DATA,
-	ERROR_HIGH_LEVEL
-}Low_Level_SM;
-
-//état pour la low lvl
-typedef enum{
 	ON_THE_GROUND,
 	MANUAL,
 	PARACHUTE,
@@ -42,7 +29,5 @@ typedef enum{
 	LEVELLED,
 	ACCRO
 }Stabilisation_SM;
-
-
 
 #endif /* MAE_H_ */

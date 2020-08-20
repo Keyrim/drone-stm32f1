@@ -11,6 +11,11 @@
 #include "stdio.h"
 #include "../../appli/IDs.h"
 #include "../appli/system_d.h"
+#include "scheduler/scheduler.h"
+
+
+#define TASK_TO_SEND TASK_IMU
+
 
 //voir le fichier adressage com drone pour les détails
 //Ainsi que IDs.h
@@ -29,6 +34,11 @@ void TELEMETRIE_send_double(float value, uint8_t id, uart_struct_e * uart);
 void TELEMETRIE_send_double_16b(float value, uint8_t id, uart_struct_e * uart);
 
 // ---------------------- Fonctions pour la sub télémétrie ------------------------
+//Période task
+void TELEMETRIE_send_periode_task(State_drone_t * drone);
+
+//Cpu used
+void TELEMETRIE_send_cpu_pourcentage(State_drone_t * drone);
 
 //Altitude
 void TELEMETRIE_send_altitude(State_drone_t * drone);

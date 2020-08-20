@@ -39,8 +39,8 @@ void LED_SEQUENCE_set_sequence(sequence_led_t * seq_led, int32_t seq){
 }
 
 //On change la sortie de la led par rapport à la séquence active
-void LED_SEQUENCE_play(sequence_led_t * seq_led){
-	if(SYSTICK_get_time_us() / 1000 > seq_led->previous_time + seq_led->periode){
+void LED_SEQUENCE_play(sequence_led_t * seq_led, uint32_t current_time_us){
+	if(current_time_us / 1000 > seq_led->previous_time + seq_led->periode){
 		seq_led->previous_time += seq_led->periode ;
 		//on récupère le niveau logique de la sortie
 		bool_e output = ((seq_led->sequence) >> ((seq_led->length_sequence - seq_led->compteur) - 1)) & 1 ;

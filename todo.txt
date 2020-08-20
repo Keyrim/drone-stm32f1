@@ -8,6 +8,7 @@ TODO MODIFS :
 	- controle par séquence sur switch (huat bas huat bas)			
 	- reset la consigne en throttle quand on passse en mode de vole 									
 	- transition high_lvl
+	- receive data => gérer l uart dans la sub, renvoyer vrai si uart lu
 	
 
 TODO AJOUTS :
