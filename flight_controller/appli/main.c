@@ -26,6 +26,7 @@
 
 
 
+
 //	-------------------------- Global variables ----------------------------------
 State_drone_t drone ;
 State_base_t base ;
@@ -47,8 +48,21 @@ int main(void)
 	//On laisse du temps à tout le monde pour bien démarer
 	HAL_Delay(100);
 	//------------------Init serial uart
-	uart_init(&drone.communication.uart_telem, UART_TELEMETRIE, 57600, 8);
+	uart_init(&drone.communication.uart_telem, UART_TELEMETRIE, 57600, 50);
 	SYS_set_std_usart(UART_TELEMETRIE, UART_TELEMETRIE, UART_TELEMETRIE);
+
+
+	//test sur l uart
+//	uint32_t previous = 0 ;
+//	uint32_t periode = 950 ;
+//
+//	uint8_t str[] = "abcdef\n";
+//	while(1){
+//		UART_puts_it(UART_TELEMETRIE, str, 7);
+//		while(SYSTICK_get_time_us() < previous + periode);
+//		previous += periode ;
+//	}
+
 
 	//Init du gps
 	//GPS_congif(UART_GPS);
@@ -58,6 +72,8 @@ int main(void)
 	//Si le mpu ne s'est pas init on démarre dans la high lvl imu non init
 	if(drone.capteurs.mpu.mpu_result)
 		drone.soft.state_flight_mode = IMU_FAILED_INIT ;
+	else
+		scheduler_enable_gyro();
 
 	//------------------Init ibus
 	IBUS_init(&drone.communication.ibus, UART_IBUS);

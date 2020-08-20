@@ -29,6 +29,7 @@ typedef enum{
 	ID_PC_STATE_FLYING = 					101,
 	ID_PC_EVERY_IS_OK =						102,
 	ID_PC_HIGH_LVL_TRANSITION =				103,
+	ID_PC_CPU_POURCENTAGE =					104,
 
 	ID_PC_ANGLE_X_Y =						120,
 	ID_PC_X_Y_BASE =						121,
@@ -42,6 +43,7 @@ typedef enum{
 	ID_PC_PITCH_KD =						129,
 
 	ID_PC_ANGLE_X_Y_Z_RATE = 				140,
+	ID_PC_TASK_PERIODE =					141,
 
 	ID_PC_MOTEUR_ALL = 						160,
 	ID_PC_CHAN_1_4 =						161,

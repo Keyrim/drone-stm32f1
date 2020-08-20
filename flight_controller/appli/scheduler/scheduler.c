@@ -9,6 +9,7 @@
 static task_t * task_queu[TASK_COUNT];
 static uint32_t task_queu_size = 0 ;
 static uint32_t task_queu_position = 0 ;
+static bool_e gyro_enabled = 0 ;
 
 void scheduler_init(State_drone_t * drone, State_base_t * base){
 	tasks_init(drone, base);
@@ -20,19 +21,18 @@ void scheduler(void){
 
 	//Tâches temps réel (de l'acquisition du gyro à l'envoit des consignes aux moteurs) ont la priorité absolue sur le reste
 	task_t * task_gyro = get_task(TASK_IMU) ;
-//	if(current_time_us >= task_gyro->last_execution_us + task_gyro->desired_period_us){
-//		current_time_us = task_execute(task_gyro, current_time_us);
-//		current_time_us = task_execute(get_task(TASK_STABILISATION), current_time_us);
-//	}
-//	else
-//		gyro_time_left = task_gyro->last_execution_us + task_gyro->desired_period_us - current_time_us ;
-
-
+	if(gyro_enabled){
+		if(current_time_us >= task_gyro->last_execution_us + task_gyro->desired_period_us){
+			current_time_us = task_execute(task_gyro, current_time_us);
+			current_time_us = task_execute(get_task(TASK_STABILISATION), current_time_us);
+		}
+		else
+			gyro_time_left = task_gyro->last_execution_us + task_gyro->desired_period_us - current_time_us ;
+	}
 	task_t * task = get_first_task();
 	while(task_queu_position < task_queu_size && task != NULL){
 
 		//TODO : Tâches par évennement
-
 		if(task->static_priority != PRIORITY_REAL_TIME)
 			if(current_time_us >= task->last_execution_us + task->desired_period_us)
 				if(task->execution_duration_us_worst < gyro_time_left)
@@ -70,6 +70,7 @@ uint32_t task_execute(task_t * task, uint32_t current_time_us){
 	task->function(current_time_us);
 	current_time_us = SYSTICK_get_time_us();
 
+
 	//Calcul du "burst time" avec une moyenne glissante
 	task->execution_duration_us_average_sum -= task->execution_duration_us_average_array[task->average_index];
 	task->execution_duration_us_average_array[task->average_index] = current_time_us - task->last_execution_us ;
@@ -88,6 +89,10 @@ void task_enable(task_ids_t id, bool_e enable){
 		queu_add(get_task(id));
 	else
 		queu_remove(get_task(id));
+}
+
+void scheduler_enable_gyro(){
+	gyro_enabled = TRUE ;
 }
 
 void task_reschedule(task_ids_t id, uint32_t new_period_us){

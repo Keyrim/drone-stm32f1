@@ -11,15 +11,14 @@ Répartitions des adresses
 		140-159	=> 3 octets 
 		160-179	=> 4 octets 
 		180-199	=> 5 octets 
-	200-255	=> pour la ground station
+	200-249	=> pour la ground station
 		200-209	=> 1 octet 
 		210-219	=> 2 octets 
 		220-229	=> 3 octets 
 		230-239	=> 4 octets 
 		240-249	=> 5 octets 
 
-Le nombre d'octect n'inclut pas l'octect envoyé, en effet on dois toujours avoir un un id plus un msg, mais un msg d'erreur par exemple doit être composé d'un id d'une donné 
-On supprime au passage les ids inutile (moteur et telecomande un par un etc)
+Le nombre d'octect n'inclut pas l'octect envoyé, en effet on dois toujours avoir un un id plus un msg, un msg d'erreur par exemple doit être composé d'un id d'une donné 
 
 Id pour le drone :
 	1 octect :
@@ -43,6 +42,7 @@ Id pour le pc :
 		ID_PC_STATE_FLYING		101
 		ID_PC_EVERY_IS_OK		102
 		ID_PC_HIGH_LVL_TRANSITION	103
+		ID_PC_CPU_POURCENTAGE		104
 	2 octects :
 		ID_PC_ANGLE_X_Y			120	
 		ID_PC_X_Y_BASE			121
@@ -56,6 +56,7 @@ Id pour le pc :
 		ID_PC_PITCH_KD			129
 	3 octects :
 		ID_PC_ANGLE_X_Y_Z_RATE		140
+		ID_PC_TASK_PERIODE		141
 	4 octects :
 		ID_PC_MOTEUR_ALL 		160
 		ID_PC_CHAN_1_4			161
