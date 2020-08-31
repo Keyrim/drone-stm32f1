@@ -95,6 +95,24 @@ int main(void)
 	PID_init(&drone.stabilisation.pid_pitch_rate, PID_SETTINGS_PITCH_ACCRO);
 	PID_init(&drone.stabilisation.pid_yaw_rate, PID_SETTINGS_YAW_ACCRO);
 
+	//Init des filtres pour les pids
+	FILTER_second_order_init(&drone.stabilisation.filter_pid_roll, FILTER_SETTINGS_ANGLE);
+	FILTER_second_order_init(&drone.stabilisation.filter_pid_pitch, FILTER_SETTINGS_ANGLE);
+	FILTER_second_order_init(&drone.stabilisation.filter_pid_yaw, FILTER_SETTINGS_ANGLE);
+	FILTER_second_order_init(&drone.stabilisation.filter_pid_roll_rate, FILTER_SETTINGS_ANGLE);
+	FILTER_second_order_init(&drone.stabilisation.filter_pid_pitch_rate, FILTER_SETTINGS_ANGLE);
+	FILTER_second_order_init(&drone.stabilisation.filter_pid_yaw_rate, FILTER_SETTINGS_ANGLE);
+
+	//Associations filtres / pids
+	PID_set_filter_d(&drone.stabilisation.pid_roll, &drone.stabilisation.filter_pid_roll);
+	PID_set_filter_d(&drone.stabilisation.pid_pitch, &drone.stabilisation.filter_pid_pitch);
+	PID_set_filter_d(&drone.stabilisation.pid_yaw, &drone.stabilisation.filter_pid_yaw);
+
+	PID_set_filter_p(&drone.stabilisation.pid_roll_rate, &drone.stabilisation.filter_pid_roll_rate);
+	PID_set_filter_p(&drone.stabilisation.pid_pitch_rate, &drone.stabilisation.filter_pid_pitch_rate);
+	PID_set_filter_p(&drone.stabilisation.pid_yaw_rate, &drone.stabilisation.filter_pid_yaw_rate);
+
+
 	ESCS_init(&drone.stabilisation.escs_timer, ESC_OUTPUT_ONE_SHOT_125);
 
 	HAL_Delay(50);

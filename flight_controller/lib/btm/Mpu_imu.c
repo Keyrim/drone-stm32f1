@@ -107,12 +107,12 @@ void Mpu_imu_update_angles(DRONE_mpu6050_t * angles){
 	if(acc_total != 0  ){
 		//On veut pas de asin (x) avec x >1
 		if(absolu(angles->x_acc) <= absolu(acc_total)){
-			angles->x_acc_angle = - asinf(angles->x_acc / acc_total ) * (float)57.32;
+			angles->x_acc_angle = - asinf(angles->x_acc / acc_total ) * 57.32f;
 		}
 
 		//On veut pas de asin (y) avec y >1
 		if(absolu(angles->y_acc) <= absolu(acc_total)){
-			angles->y_acc_angle =   asinf(angles->y_acc / acc_total ) * (float)57.32;
+			angles->y_acc_angle =   asinf(angles->y_acc / acc_total ) * 57.32f;
 		}
 
 		if(angles->z_acc < 0){
@@ -170,7 +170,7 @@ void Mpu_imu_init(DRONE_mpu6050_t * angles, MPU6050_Accelerometer_t acc, MPU6050
 	angles->x_gyro_offset = -2.77471852f ;
 	angles->y_gyro_offset = 0.390320688f ;
 	angles->z_gyro_offset = 0.586473227f ;
-	angles->x_acc_offset = 0.00647851545f ;
+	angles->x_acc_offset =  0.00647851545f ;
 	angles->y_acc_offset = -0.0312011726f ;
 	angles->z_acc_offset = -0.0675112307f ;
 

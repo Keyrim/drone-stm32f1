@@ -338,11 +338,10 @@ void HIGH_LVL_Manual(State_drone_t * drone){
 		LED_SEQUENCE_set_sequence(&drone->ihm.led_etat, SEQUENCE_LED_2);
 	}
 
-	drone->consigne.roll = ((double)(drone->communication.ibus.channels[ROLL]- 1500) / (double)500) * (double)SETPOINT_MAX_LVLED_PITCH_ROLL ;
-	drone->consigne.pitch = ((double)(drone->communication.ibus.channels[PITCH]- 1500) / (double)500) * (double)SETPOINT_MAX_LVLED_PITCH_ROLL ;
-	double yaw_consigne_degre_sec = ((double)(drone->communication.ibus.channels[YAW] - 1500) / (double)500) * (double)SETPOINT_MAX_ACCRO_YAW ;
-	drone->consigne.yaw += yaw_consigne_degre_sec / (double)250 ;
-	drone->consigne.throttle = (double)(drone->communication.ibus.channels[THROTTLE] - 1050)  ;
+	drone->consigne.roll = ((float)(drone->communication.ibus.channels[ROLL]- 1500) / (float)500) * (float)SETPOINT_MAX_LVLED_PITCH_ROLL ;
+	drone->consigne.pitch = ((float)(drone->communication.ibus.channels[PITCH]- 1500) / (float)500) * (float)SETPOINT_MAX_LVLED_PITCH_ROLL ;
+	drone->consigne.yaw_rate = (float)(drone->communication.ibus.channels[YAW] - 1500) * (float)SETPOINT_MAX_ACCRO_YAW / (float)500 ;
+	drone->consigne.throttle = (float)(drone->communication.ibus.channels[THROTTLE] - 1050)  ;
 
 	//			---------------------------- Condition de transition 	----------------------------------------
 	transition_high_lvl(drone);
@@ -357,10 +356,10 @@ void HIGH_LVL_Manual_Accro(State_drone_t * drone){
 	}
 
 	//			---------------------------- 		MAIN PART 			----------------------------------------
-	drone->consigne.roll_rate = (double)(drone->communication.ibus.channels[ROLL]- 1500) * (double)SETPOINT_MAX_ACCRO_PITCH_ROLL / (double)500 ;
-	drone->consigne.pitch_rate = (double)(drone->communication.ibus.channels[PITCH] - 1500) * (double)SETPOINT_MAX_ACCRO_PITCH_ROLL / (double)500 ;
-	drone->consigne.yaw_rate = (double)(drone->communication.ibus.channels[YAW] - 1500) * (double)SETPOINT_MAX_ACCRO_YAW / (double)500 ;
-	drone->consigne.throttle = (double)(drone->communication.ibus.channels[THROTTLE] - 1050) ;
+	drone->consigne.roll_rate = (float)(drone->communication.ibus.channels[ROLL]- 1500) * (float)SETPOINT_MAX_ACCRO_PITCH_ROLL / (float)500 ;
+	drone->consigne.pitch_rate = (float)(drone->communication.ibus.channels[PITCH] - 1500) * (float)SETPOINT_MAX_ACCRO_PITCH_ROLL / (float)500 ;
+	drone->consigne.yaw_rate = (float)(drone->communication.ibus.channels[YAW] - 1500) * (float)SETPOINT_MAX_ACCRO_YAW / (float)500 ;
+	drone->consigne.throttle = (float)(drone->communication.ibus.channels[THROTTLE] - 1050) ;
 
 	//			---------------------------- Condition de transition 	----------------------------------------
 	transition_high_lvl(drone);
@@ -374,8 +373,8 @@ void HIGH_LVL_Manual_Hand_Control(State_drone_t * drone, State_base_t * base){
 		LED_SEQUENCE_set_sequence(&drone->ihm.led_etat, SEQUENCE_LED_4);
 	}
 	//			---------------------------- 		MAIN PART 			----------------------------------------
-	drone->consigne.yaw = ((double)(drone->communication.ibus.channels[YAW] - 1500) / (double)500) * (double)SETPOINT_MAX_ACCRO_YAW ;
-	drone->consigne.throttle = (double)(drone->communication.ibus.channels[THROTTLE] - 1050)  ;
+	drone->consigne.yaw = ((float)(drone->communication.ibus.channels[YAW] - 1500) / (float)500) * (float)SETPOINT_MAX_ACCRO_YAW ;
+	drone->consigne.throttle = (float)(drone->communication.ibus.channels[THROTTLE] - 1050)  ;
 	drone->consigne.roll = base->angle_x ;
 	drone->consigne.pitch = base->angle_y ;
 
@@ -392,7 +391,7 @@ void HIGH_LVL_Parachute(State_drone_t * drone){
 	}
 
 	//			---------------------------- 		MAIN PART 			----------------------------------------
-	drone->consigne.throttle = (double)(drone->communication.ibus.channels[THROTTLE] - 1050)  ;
+	drone->consigne.throttle = (float)(drone->communication.ibus.channels[THROTTLE] - 1050)  ;
 	if(sub_parachute(drone) != IN_PROGRESS){
 		drone->soft.state_flight_mode = ON_THE_GROUND ;
 	}
@@ -464,8 +463,8 @@ void HIGH_LVL_Change_Pid_Settings(State_drone_t * drone){
 		pid_roll->settings[PID_KD] = MAX(pid_roll->settings[PID_KD], 0);
 
 		//Pas de valeur trop importantes non plus
-		pid_roll->settings[PID_KP] = MIN(pid_roll->settings[PID_KP], 3);
-		pid_roll->settings[PID_KD] = MIN(pid_roll->settings[PID_KD], 3);
+		pid_roll->settings[PID_KP] = MIN(pid_roll->settings[PID_KP], 15);
+		pid_roll->settings[PID_KD] = MIN(pid_roll->settings[PID_KD], 15);
 
 	}
 	else if(drone->communication.ibus.channels[SWITCH_3] > 1600){
@@ -480,8 +479,8 @@ void HIGH_LVL_Change_Pid_Settings(State_drone_t * drone){
 		pid_pitch->settings[PID_KD] = MAX(pid_pitch->settings[PID_KD], 0);
 
 		//Pas de valeur trop importantes non plus
-		pid_pitch->settings[PID_KP] = MIN(pid_pitch->settings[PID_KP], 3);
-		pid_pitch->settings[PID_KD] = MIN(pid_pitch->settings[PID_KD], 3);
+		pid_pitch->settings[PID_KP] = MIN(pid_pitch->settings[PID_KP], 15);
+		pid_pitch->settings[PID_KD] = MIN(pid_pitch->settings[PID_KD], 15);
 	}
 	transition_high_lvl(drone);
 

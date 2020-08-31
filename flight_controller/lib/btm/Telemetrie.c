@@ -46,7 +46,7 @@ void TELEMETRIE_send_double_16b(float value, uint8_t id, uart_struct_e * uart){
 
 //Altitude
 void TELEMETRIE_send_altitude(State_drone_t * drone){
-	TELEMETRIE_send_double(drone->capteurs.ms5611.altitude, ID_PC_ALTITUDE, &drone->communication.uart_telem);
+	TELEMETRIE_send_double((float)drone->capteurs.ms5611.altitude, ID_PC_ALTITUDE, &drone->communication.uart_telem);
 }
 //Accélération
 void TELEMETRIE_send_acc_z(State_drone_t * drone){
@@ -54,10 +54,10 @@ void TELEMETRIE_send_acc_z(State_drone_t * drone){
 }
 //Données gps
 void TELEMETRIE_send_lat(State_drone_t * drone){
-	TELEMETRIE_send_double(drone->capteurs.gps.lat_degrees, ID_PC_LATTITUDE, &drone->communication.uart_telem);
+	TELEMETRIE_send_double((float)drone->capteurs.gps.lat_degrees, ID_PC_LATTITUDE, &drone->communication.uart_telem);
 }
 void TELEMETRIE_send_long(State_drone_t * drone){
-	TELEMETRIE_send_double(drone->capteurs.gps.long_degrees, ID_PC_LONGITUDE, &drone->communication.uart_telem);
+	TELEMETRIE_send_double((float)drone->capteurs.gps.long_degrees, ID_PC_LONGITUDE, &drone->communication.uart_telem);
 }
 
 
@@ -77,7 +77,7 @@ void TELEMETRIE_send_pid_roll_p(State_drone_t * drone){
 	TELEMETRIE_send_double(drone->stabilisation.pid_roll_rate.P, ID_PC_PID_P_ROLL, &drone->communication.uart_telem);
 }
 void TELEMETRIE_send_pid_roll_d(State_drone_t * drone){
-	TELEMETRIE_send_double(drone->stabilisation.pid_roll_rate.D_filtered[0], ID_PC_PID_D_ROLL, &drone->communication.uart_telem);
+	TELEMETRIE_send_double(drone->stabilisation.pid_roll_rate.D, ID_PC_PID_D_ROLL, &drone->communication.uart_telem);
 }
 #else
 void TELEMETRIE_send_pid_roll(State_drone_t * drone){
@@ -93,7 +93,7 @@ void TELEMETRIE_send_pid_roll_p(State_drone_t * drone){
 	TELEMETRIE_send_double(drone->stabilisation.pid_roll.P, ID_PC_PID_P_ROLL, &drone->communication.uart_telem);
 }
 void TELEMETRIE_send_pid_roll_d(State_drone_t * drone){
-	TELEMETRIE_send_double(drone->stabilisation.pid_roll.D_filtered[0], ID_PC_PID_D_ROLL, &drone->communication.uart_telem);
+	TELEMETRIE_send_double(drone->stabilisation.pid_roll.D, ID_PC_PID_D_ROLL, &drone->communication.uart_telem);
 }
 #endif
 
@@ -143,7 +143,7 @@ void TELEMETRIE_send_pid_pitch_kd(State_drone_t * drone){
 //Période task
 void TELEMETRIE_send_periode_task(State_drone_t * drone){
 	uint8_t bytes[4] = {0};
-	uint32_t int_value = (uint32_t)( get_task(TASK_TO_SEND)->execution_duration_us);
+	uint32_t int_value = (uint32_t)( get_task(TASK_SEND_DATA)->real_period_us);
 	bytes[0] = ID_PC_TASK_PERIODE ;
 	bytes[1] = (uint8_t)((int_value >> 16) & 0b11111111) ;
 	bytes[2] = (uint8_t)((int_value >> 8) & 0b11111111) ;
@@ -163,10 +163,10 @@ void TELEMETRIE_send_cpu_pourcentage(State_drone_t * drone){
 void TELEMETRIE_send_moteur_all(State_drone_t * drone){
 	uint8_t  bytes[4] = {0} ;
 	bytes[0] = ID_PC_MOTEUR_ALL ;
-	bytes[1] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[0] - 1000) / 4 )  & 0b11111111);
-	bytes[2] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[1] - 1000) / 4 )  & 0b11111111);
-	bytes[3] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[2] - 1000) / 4 )  & 0b11111111);
-	bytes[4] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[3] - 1000) / 4 )  & 0b11111111);
+	bytes[1] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[ESC_1_CHANNEL] - 1000) / 4 )  & 0b11111111);
+	bytes[2] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[ESC_2_CHANNEL] - 1000) / 4 )  & 0b11111111);
+	bytes[3] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[ESC_3_CHANNEL] - 1000) / 4 )  & 0b11111111);
+	bytes[4] = (uint8_t)(((drone->stabilisation.escs_timer.Duty[ESC_4_CHANNEL] - 1000) / 4 )  & 0b11111111);
 	uart_add_few(&drone->communication.uart_telem, bytes, 5);
 }
 

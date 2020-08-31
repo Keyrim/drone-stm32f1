@@ -23,6 +23,7 @@
 #include "../lib/btm/Sequence_led.h"
 #include "../lib/btm/Uart_lib.h"
 #include "../lib/btm/esc_timer.h"
+#include "../lib/btm/Filters.h"
 
 #ifndef SYSTEM_D_H_
 #define SYSTEM_D_H_
@@ -43,10 +44,16 @@ typedef struct{
 	PID_t pid_roll ;
 	PID_t pid_pitch ;
 	PID_t pid_yaw ;
+	Filter_second_order_t filter_pid_roll ;
+	Filter_second_order_t filter_pid_pitch ;
+	Filter_second_order_t filter_pid_yaw ;
 	//Pid for accro mode
 	PID_t pid_roll_rate ;
 	PID_t pid_pitch_rate ;
 	PID_t pid_yaw_rate ;
+	Filter_second_order_t filter_pid_roll_rate ;
+	Filter_second_order_t filter_pid_pitch_rate ;
+	Filter_second_order_t filter_pid_yaw_rate ;
 	//Mode de stabilisation
 	Stabilisation_SM stab_mode ;
 }DRONE_stabilisation_t;
@@ -86,8 +93,8 @@ typedef struct{
 
 //Structure de la base
 typedef struct{
-	double angle_x ;
-	double angle_y ;
+	float angle_x ;
+	float angle_y ;
 }State_base_t;
 
 #endif /* SYSTEM_D_H_ */

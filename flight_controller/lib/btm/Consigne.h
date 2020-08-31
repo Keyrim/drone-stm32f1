@@ -10,15 +10,15 @@
 
 typedef struct{
 	//levelled mode
-	double roll;
-	double pitch;
-	double yaw;
+	float roll;
+	float pitch;
+	float yaw;
 	//Accro mode
-	double roll_rate;
-	double pitch_rate ;
-	double yaw_rate ;
+	float roll_rate;
+	float pitch_rate ;
+	float yaw_rate ;
 	//Throttle
-	double throttle;
+	float throttle;
 }DRONE_consigne_t;
 
 #endif /* LIB_PERSO_DRONE_CONISGNE_H_ */

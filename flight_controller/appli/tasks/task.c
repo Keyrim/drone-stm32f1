@@ -42,9 +42,10 @@ void task_function_imu(uint32_t current_time_us){
 void task_function_stabilisation(uint32_t current_time_us){
 	UNUSED(current_time_us);
 	//Si on vole, on stabilise le drone tel que le souhaite le mode de vol actuel
-	double roll_output = 0 ;
-	double pitch_output = 0 ;
-	double yaw_output	= 0 ;
+	float roll_output = 0 ;
+	float pitch_output = 0 ;
+	float yaw_output = 0 ;
+
 
 	//On peut stabiliser par rapprot à l'angle,  par rapport à la vitesse angulaire ou ne pas stabiliser (si le drone vole pas)
 	switch(drone->stabilisation.stab_mode){
@@ -56,9 +57,25 @@ void task_function_stabilisation(uint32_t current_time_us){
 
 		case LEVELLED :
 			//On calcule les consigne des moteurs selon les consignes d'angles
-			roll_output 	= PID_compute_SOF_d(&drone->stabilisation.pid_roll, drone->consigne.roll, drone->capteurs.mpu.y);
-			pitch_output 	= PID_compute_SOF_d(&drone->stabilisation.pid_pitch, drone->consigne.pitch, drone->capteurs.mpu.x);
-			yaw_output 		= PID_compute_FOF_d(&drone->stabilisation.pid_yaw, drone->consigne.yaw, drone->capteurs.mpu.z);
+			drone->consigne.roll_rate 	= -PID_compute(&drone->stabilisation.pid_roll, drone->consigne.roll, drone->capteurs.mpu.y);
+			drone->consigne.pitch_rate  = -PID_compute(&drone->stabilisation.pid_pitch, drone->consigne.pitch, drone->capteurs.mpu.x);
+			//drone->consigne.yaw_rate		= PID_compute(&drone->stabilisation.pid_yaw, drone->consigne.yaw, drone->capteurs.mpu.z);
+
+
+			//Filtage des pids
+//			roll_output		= FILTER_second_order_process(&drone->stabilisation.filter_pid_roll, roll_output);
+//			pitch_output	= FILTER_second_order_process(&drone->stabilisation.filter_pid_pitch, pitch_output);
+//			yaw_output		= FILTER_second_order_process(&drone->stabilisation.filter_pid_yaw, yaw_output);
+
+
+			//On calcule les consigne des moteurs selon les consignes d'angles
+			roll_output 	= PID_compute(&drone->stabilisation.pid_roll_rate, drone->consigne.roll_rate, drone->capteurs.mpu.y_gyro);
+			pitch_output 	= PID_compute(&drone->stabilisation.pid_pitch_rate, drone->consigne.pitch_rate, drone->capteurs.mpu.x_gyro);
+			yaw_output 		= PID_compute(&drone->stabilisation.pid_yaw_rate, drone->consigne.yaw_rate, drone->capteurs.mpu.z_gyro);
+			//Filtage des pids
+			roll_output		= FILTER_second_order_process(&drone->stabilisation.filter_pid_roll_rate, roll_output);
+			pitch_output	= FILTER_second_order_process(&drone->stabilisation.filter_pid_pitch_rate, pitch_output);
+			yaw_output		= FILTER_second_order_process(&drone->stabilisation.filter_pid_yaw_rate, yaw_output);
 			//Et on envoit aux moteurs en vérifiant qu'on ne dépasse les valeurs autorisées
 			ESCS_set_period((uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output + pitch_output - yaw_output)),
 							(uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output + pitch_output + yaw_output)),
@@ -70,8 +87,12 @@ void task_function_stabilisation(uint32_t current_time_us){
 		case ACCRO :
 			//On calcule les consigne des moteurs selon les consignes d'angles
 			roll_output 	= PID_compute(&drone->stabilisation.pid_roll_rate, drone->consigne.roll_rate, drone->capteurs.mpu.y_gyro);
-			pitch_output 	= PID_compute_FOF_d(&drone->stabilisation.pid_pitch_rate, drone->consigne.pitch_rate, drone->capteurs.mpu.x_gyro);
-			yaw_output 		= PID_compute_FOF_d(&drone->stabilisation.pid_yaw_rate, drone->consigne.yaw_rate, drone->capteurs.mpu.z_gyro);
+			pitch_output 	= PID_compute(&drone->stabilisation.pid_pitch_rate, drone->consigne.pitch_rate, drone->capteurs.mpu.x_gyro);
+			yaw_output 		= PID_compute(&drone->stabilisation.pid_yaw_rate, drone->consigne.yaw_rate, drone->capteurs.mpu.z_gyro);
+			//Filtage des pids
+			roll_output		= FILTER_second_order_process(&drone->stabilisation.filter_pid_roll_rate, roll_output);
+			pitch_output	= FILTER_second_order_process(&drone->stabilisation.filter_pid_pitch_rate, pitch_output);
+			yaw_output		= FILTER_second_order_process(&drone->stabilisation.filter_pid_yaw_rate, yaw_output);
 			//Et on envoit aux moteurs en vérifiant qu'on ne dépasse les valeurs autorisées
 			ESCS_set_period((uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output + pitch_output - yaw_output)),
 							(uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output + pitch_output + yaw_output)),
@@ -82,6 +103,9 @@ void task_function_stabilisation(uint32_t current_time_us){
 		default:
 			break;
 	}
+
+
+
 }
 
 void task_function_high_lvl(uint32_t current_time_us){
@@ -154,8 +178,8 @@ void task_function_printf(uint32_t current_time_us){
 void task_function_ibus(uint32_t current_time_us){
 	UNUSED(current_time_us);
 	uint32_t compteur = 0 ;
-	//On peut lire jusqu à X octets par appel de la tâche (soit 85 µs max environ)
-	while(IBUS_check_data(&drone->communication.ibus) && compteur < 18)
+	//On peut lire jusqu à X octets par appel de la tâche (soit 100 µs max environ)
+	while(IBUS_check_data(&drone->communication.ibus) && compteur < 25)
 		compteur ++ ;
 }
 
@@ -220,7 +244,7 @@ void task_function_led(uint32_t current_time_us){
 task_t tasks [TASK_COUNT] ={
 		[TASK_IMU] = 			DEFINE_TASK(TASK_IMU ,				PRIORITY_REAL_TIME, 	task_function_imu, 				PERIOD_US_FROM_HERTZ(250)),
 		[TASK_PRINTF] = 		DEFINE_TASK(TASK_PRINTF, 			PRIORITY_LOW, 			task_function_printf, 			PERIOD_US_FROM_HERTZ(40)),
-		[TASK_IBUS] = 			DEFINE_TASK(TASK_IBUS, 				PRIORITY_HIGH, 			task_function_ibus, 			PERIOD_US_FROM_HERTZ(500)),
+		[TASK_IBUS] = 			DEFINE_TASK(TASK_IBUS, 				PRIORITY_HIGH, 			task_function_ibus, 			PERIOD_US_FROM_HERTZ(1000)),
 		[TASK_ESCS_IBUS_TEST] = DEFINE_TASK(TASK_ESCS_IBUS_TEST, 	PRIORITY_HIGH, 			task_function_escs_ibus_test, 	PERIOD_US_FROM_HERTZ(250)),
 		[TASK_SEND_DATA] = 		DEFINE_TASK(TASK_SEND_DATA, 		PRIORITY_MEDIUM, 		task_function_send_data, 		PERIOD_US_FROM_HERTZ(250)),
 		[TASK_RECEIVE_DATA] = 	DEFINE_TASK(TASK_RECEIVE_DATA, 		PRIORITY_MEDIUM, 		task_function_receive_data, 	PERIOD_US_FROM_HERTZ(500)),
