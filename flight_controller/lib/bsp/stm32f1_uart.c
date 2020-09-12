@@ -70,7 +70,7 @@
 //Les buffers de réception accumulent les données reçues, dans la limite de leur taille.
 //Les emplacement occupés par les octets reçus sont libérés dès qu'on les consulte.
 #define BUFFER_RX_SIZE	128
-#define BUFFER_TX_SIZE	500
+#define BUFFER_TX_SIZE	128
 
 static UART_HandleTypeDef UART_HandleStructure[UART_ID_NB];	//Ce tableau contient les structures qui sont utilisées pour piloter chaque UART avec la librairie HAL.
 static const USART_TypeDef * instance_array[UART_ID_NB] = {USART1, USART2, USART3};
@@ -85,14 +85,14 @@ static volatile bool_e buffer_rx_data_ready[UART_ID_NB] = {FALSE};
 
 //Buffers Tx
 static uint8_t buffer_tx[UART_ID_NB][BUFFER_TX_SIZE];
-static uint8_t buffer_tx_write_index[UART_ID_NB] = {0};
-static uint8_t buffer_tx_read_index[UART_ID_NB] = {0};
+static uint32_t buffer_tx_write_index[UART_ID_NB] = {0};
+static uint32_t buffer_tx_read_index[UART_ID_NB] = {0};
 static bool_e buffer_tx_data_sent[UART_ID_NB] = {FALSE};
 
 //Uart initialized ?
 static volatile bool_e uart_initialized[UART_ID_NB] = {FALSE};
 
-
+static void UART_process_irq(uart_id_e uart_id);
 
 /**
  * @brief	Initialise l'USARTx - 8N1 - vitesse des bits (baudrate) indiqué en paramètre
@@ -328,30 +328,24 @@ bool_e UART_puts(uart_id_e uart_id, uint8_t * str, uint32_t len)
 }
 
 void UART_putc_it(uart_id_e uart_id, uint8_t c){
-	buffer_tx[uart_id][buffer_tx_write_index[uart_id]] = c ;
-	buffer_tx_write_index[uart_id] = (uint8_t)((buffer_tx_write_index[uart_id] + 1) % BUFFER_TX_SIZE );
-	//On relance le mécanisme d envoit si besoin
-	if(buffer_tx_data_sent[uart_id]){
-		HAL_StatusTypeDef hal_state;
-		hal_state = HAL_UART_Transmit_IT(&UART_HandleStructure[uart_id],&buffer_tx[uart_id][buffer_tx_read_index[uart_id]],1);		//Envoit le prochaine caractère
-		if(hal_state == HAL_OK)							//Si on a envoyé, on déplace le curseur
-			buffer_tx_read_index[uart_id] = (uint8_t)((buffer_tx_read_index[uart_id] + 1) % BUFFER_RX_SIZE);				//Déplacement pointeur en lecture
-	}
+	//On vérifie si que le buffer est pas plein
+	if(buffer_tx_write_index[uart_id] + 1 > buffer_tx_write_index[uart_id] + BUFFER_TX_SIZE)
+		return ;
 
-
+	buffer_tx[uart_id][buffer_tx_write_index[uart_id]++ % BUFFER_TX_SIZE] = c ;
+	__HAL_UART_ENABLE_IT(&UART_HandleStructure[uart_id], UART_IT_TXE);
 }
 
 void UART_puts_it(uart_id_e uart_id, uint8_t * str, uint16_t len){
+	//On vérifie si que le buffer est pas plein
+	if(buffer_tx_write_index[uart_id] + len > buffer_tx_write_index[uart_id] + BUFFER_TX_SIZE)
+		return ;
+
 	for(uint32_t c = 0; c < len; c++ )
 		buffer_tx[uart_id][(buffer_tx_write_index[uart_id] + c) % BUFFER_TX_SIZE] = str[c] ;
-	buffer_tx_write_index[uart_id] = (uint8_t)((buffer_tx_write_index[uart_id] + len) % BUFFER_TX_SIZE ) ;
+	buffer_tx_write_index[uart_id] = buffer_tx_write_index[uart_id] + len ;
 
-	if(buffer_tx_data_sent[uart_id]){
-		HAL_StatusTypeDef hal_state;
-		hal_state = HAL_UART_Transmit_IT(&UART_HandleStructure[uart_id],&buffer_tx[uart_id][buffer_tx_read_index[uart_id]],len);		//Envoit le prochaine caractère
-		if(hal_state == HAL_OK)							//Si on a envoyé, on déplace le curseur
-			buffer_tx_read_index[uart_id] = (uint8_t)((buffer_tx_read_index[uart_id] + len) % BUFFER_RX_SIZE);				//Déplacement pointeur en lecture
-	}
+	__HAL_UART_ENABLE_IT(&UART_HandleStructure[uart_id], UART_IT_TXE);
 }
 
 //ecriture impolie forcée bloquante sur l'UART (à utiliser en IT, en cas d'extrême recours)
@@ -383,7 +377,7 @@ void USART2_IRQHandler(void)
 
 void USART3_IRQHandler(void)
 {
-	HAL_UART_IRQHandler(&UART_HandleStructure[UART3_ID]);
+	UART_process_irq(UART3_ID);
 }
 
 
@@ -393,6 +387,28 @@ void USART3_IRQHandler(void)
  * @post	L'octet reçu est rangé dans le buffer correspondant.
  * @post	La réception en IT du prochain octet est ré-activée.
  */
+
+
+
+static void UART_process_irq(uart_id_e uart_id){
+	USART_TypeDef * usart = UART_HandleStructure[uart_id].Instance ;
+	while(usart->SR & USART_FLAG_RXNE){
+		//Octet reçu
+		buffer_rx_data_ready[uart_id] = TRUE;	//Le buffer n'est pas (ou plus) vide.
+		buffer_rx_write_index[uart_id] = (uint8_t)((buffer_rx_write_index[uart_id] + 1) % BUFFER_RX_SIZE);						//Déplacement pointeur en écriture
+		buffer_rx[uart_id][buffer_rx_write_index[uart_id]] = (uint8_t)usart->DR ;
+	}
+
+	if(usart->SR & USART_FLAG_TXE){
+		//Buffer envoit vide it
+		if(buffer_tx_read_index[uart_id] < buffer_tx_write_index[uart_id]){												//Si on a des cacractères à envoyer
+			usart->DR = buffer_tx[uart_id][(buffer_tx_read_index[uart_id]++ % BUFFER_RX_SIZE)] ;
+			if(buffer_tx_read_index[uart_id] == buffer_tx_write_index[uart_id])
+				usart->CR1 &= ~USART_CR1_TXEIE;
+		}
+	}
+}
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	uint8_t uart_id;
@@ -405,7 +421,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	buffer_rx_write_index[uart_id] = (uint8_t)((buffer_rx_write_index[uart_id] + 1) % BUFFER_RX_SIZE);						//Déplacement pointeur en écriture
 	HAL_UART_Receive_IT(&UART_HandleStructure[uart_id],&buffer_rx[uart_id][buffer_rx_write_index[uart_id]],1);	//Réactivation de la réception d'un caractère
 }
-
+//
 //void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 //{
 //	uint8_t uart_id;
@@ -414,14 +430,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 //	else if(huart->Instance == USART3)	uart_id = UART3_ID;
 //	else return ;
 //
-//	if(buffer_tx_read_index[uart_id] != buffer_tx_write_index[uart_id]){												//Si on a des cacractères à envoyer
+//	if(buffer_tx_read_index[uart_id] < buffer_tx_write_index[uart_id]){												//Si on a des cacractères à envoyer
 //		HAL_UART_Transmit_IT(&UART_HandleStructure[uart_id],&buffer_tx[uart_id][buffer_tx_read_index[uart_id]],1);		//Envoit le prochaine caractère
 //		buffer_tx_read_index[uart_id] = (uint8_t)((buffer_tx_read_index[uart_id] + 1) % BUFFER_RX_SIZE);				//Déplacement pointeur en lecture
 //		buffer_tx_data_sent[uart_id] = FALSE ;
 //	}
 //	else
 //		buffer_tx_data_sent[uart_id] = TRUE ;
-//
 //
 //}
 

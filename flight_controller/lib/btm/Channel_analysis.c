@@ -19,8 +19,12 @@ bool_e channel_analysis_init(channel_analysis_t * channels, int32_t nb_channel, 
 	//Configuration des channels par défault, à savoir les 4 première en "joystick"
 	for(uint8_t ch = 0 ; ch < 4; ch ++){
 		channels->channel_type[ch] = JOYSTICK ;
-		channels->analysis_mode[ch] = NO_ANALYSIS ;
+		channels->analysis_mode[ch] = JOYSTICK_DEAD_BAND ;
 	}
+
+	//Pour le joyctick des gaz on ne veut pas de dead band
+	channels->analysis_mode[3] = NO_ANALYSIS ;
+
 	//Les autres ont dit que c'est des switchs
 	for(uint8_t ch = 4 ; ch < 10; ch ++){
 		channels->channel_type[ch] = SWITCH_3_POS ;
@@ -37,6 +41,13 @@ void channel_analysis_process(channel_analysis_t * channels){
 			case NO_ANALYSIS:
 				//On fait R
 				break;
+
+			case JOYSTICK_DEAD_BAND :
+				if(abs(channels->channels[ch] - 1500) < 30)
+					channels->channels[ch] = 1500 ;
+				break;
+
+
 			case SEQUENCE_ANALYSIS:
 				//todo aanlyse de séquences sur les switchs
 				break;

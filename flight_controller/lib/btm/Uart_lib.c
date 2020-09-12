@@ -55,10 +55,10 @@ bool_e uart_add_few(uart_struct_e * uart, uint8_t * str, uint16_t len){
 void uart_send(uart_struct_e * uart, uint32_t current_time_us){
 	//On check si le temps recquis est passé et si le tableau n'est pas vide
 	if((current_time_us / 1000 > uart->last_time_sent + uart->periode_send && uart->index_buffer)){
-		if(UART_puts(uart->uart_id, uart->tx_buffer, uart->index_buffer)){
-			uart->last_time_sent += uart->periode_send ;
-			uart->index_buffer = 0 ;
-		}
+		UART_puts_it(uart->uart_id, uart->tx_buffer, uart->index_buffer);
+		uart->last_time_sent += uart->periode_send ;
+		uart->index_buffer = 0 ;
+
 
 	}
 }

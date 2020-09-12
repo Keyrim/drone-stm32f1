@@ -23,6 +23,7 @@
 #include "../lib/btm/Sequence_led.h"
 #include "../lib/btm/Uart_lib.h"
 #include "../lib/btm/esc_timer.h"
+#include "../lib/btm/Filters.h"
 
 #ifndef SYSTEM_D_H_
 #define SYSTEM_D_H_
@@ -34,6 +35,19 @@ typedef struct{
 	DRONE_mpu6050_t mpu ;
 	ms5611_t ms5611 ;
 }DRONE_capteurs_t;
+
+//Structure fitler
+typedef struct{
+	//PID angle
+	Filter_second_order_t pid_roll ;
+	Filter_second_order_t pid_pitch ;
+	Filter_second_order_t pid_yaw ;
+
+	//Pid accro
+	Filter_second_order_t pid_roll_rate ;
+	Filter_second_order_t pid_pitch_rate ;
+	Filter_second_order_t pid_yaw_rate ;
+}DRONE_filters;
 
 //Structure stabilisation
 typedef struct{
@@ -54,7 +68,7 @@ typedef struct{
 //Structure communication
 typedef struct{
 	ibus_t ibus;
-	uart_struct_e uart_telem ;
+	uart_id_e uart_telem ;
 	channel_analysis_t ch_analysis ;
 }DRONE_communication_t;
 
@@ -81,13 +95,14 @@ typedef struct{
 	DRONE_communication_t communication ;
 	DRONE_soft_t soft ;
 	DRONE_ihm_t ihm ;
+	DRONE_filters filters ;
 
 }State_drone_t;
 
 //Structure de la base
 typedef struct{
-	double angle_x ;
-	double angle_y ;
+	float angle_x ;
+	float angle_y ;
 }State_base_t;
 
 #endif /* SYSTEM_D_H_ */

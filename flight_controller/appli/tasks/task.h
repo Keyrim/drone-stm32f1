@@ -32,6 +32,7 @@ typedef enum task_states{
 
 typedef enum task_ids {
 	TASK_IMU,
+	TASK_GYRO_FILTERING,
 	TASK_IBUS,
 	TASK_ESCS_IBUS_TEST,
 	TASK_PRINTF,
@@ -66,6 +67,6 @@ typedef struct task{
 }task_t;
 
 void tasks_init(State_drone_t * drone_, State_base_t * base_);
-task_t * get_task(task_ids_t id);
+task_t * TASK_get_task(task_ids_t id);
 
 #endif /* TASKS_TASK_H_ */

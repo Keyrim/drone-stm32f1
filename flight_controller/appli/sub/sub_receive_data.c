@@ -73,8 +73,8 @@ void sub_receive_data(uint8_t c, State_drone_t * drone, State_base_t * base){
 				SAVE_AND_INCREASE ;
 				//Si le compteur == 2, on a nos deux valeurs
 				if(compteur == 2){
-					base->angle_x = (double)(buffer[0] - 90)  ;
-					base->angle_y = (double)(buffer[1] - 90)  ;
+					base->angle_x = (float)(buffer[0] - 90)  ;
+					base->angle_y = (float)(buffer[1] - 90)  ;
 					new_data = 1 ;
 				}
 				break;
@@ -88,7 +88,7 @@ void sub_receive_data(uint8_t c, State_drone_t * drone, State_base_t * base){
 					k += (int32_t)buffer[2] << 8;
 					k += (int32_t)buffer[3] ;
 
-					pid_roll->settings[PID_KP] = (double)k / (double)1000000;
+					pid_roll->settings[PID_KP] = (float)k / (float)1000000;
 				}
 				break;
 			case ID_DRONE_ROLL_KI :
@@ -99,7 +99,7 @@ void sub_receive_data(uint8_t c, State_drone_t * drone, State_base_t * base){
 					k += (int32_t)buffer[1] << 16;
 					k += (int32_t)buffer[2] << 8;
 					k += (int32_t)buffer[3] ;
-					pid_roll->settings[PID_KI] = (double)k / (double)1000000;
+					pid_roll->settings[PID_KI] = (float)k / (float)1000000;
 				}
 				break;
 
@@ -111,7 +111,7 @@ void sub_receive_data(uint8_t c, State_drone_t * drone, State_base_t * base){
 					k += (int32_t)buffer[1] << 16;
 					k += (int32_t)buffer[2] << 8;
 					k += (int32_t)buffer[3] ;
-					pid_roll->settings[PID_KD] = (double)k / (double)1000000;
+					pid_roll->settings[PID_KD] = (float)k / (float)1000000;
 				}
 				break;
 			case ID_DRONE_PITCH_KP :
@@ -122,7 +122,7 @@ void sub_receive_data(uint8_t c, State_drone_t * drone, State_base_t * base){
 					k += (int32_t)buffer[1] << 16;
 					k += (int32_t)buffer[2] << 8;
 					k += (int32_t)buffer[3] ;
-					pid_pitch->settings[PID_KP] = (double)k / (double)1000000;
+					pid_pitch->settings[PID_KP] = (float)k / (float)1000000;
 				}
 				break;
 			case ID_DRONE_PITCH_KI :
@@ -133,7 +133,7 @@ void sub_receive_data(uint8_t c, State_drone_t * drone, State_base_t * base){
 					k += (int32_t)buffer[1] << 16;
 					k += (int32_t)buffer[2] << 8;
 					k += (int32_t)buffer[3] ;
-					pid_pitch->settings[PID_KI] = (double)k / (double)1000000;
+					pid_pitch->settings[PID_KI] = (float)k / (float)1000000;
 				}
 				break;
 			case ID_DRONE_PITCH_KD :
@@ -144,7 +144,7 @@ void sub_receive_data(uint8_t c, State_drone_t * drone, State_base_t * base){
 					k += (int32_t)buffer[1] << 16;
 					k += (int32_t)buffer[2] << 8;
 					k += (int32_t)buffer[3] ;
-					pid_pitch->settings[PID_KD] = (double)k / (double)1000000;
+					pid_pitch->settings[PID_KD] = (float)k / (float)1000000;
 				}
 				break;
 

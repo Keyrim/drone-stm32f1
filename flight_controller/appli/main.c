@@ -21,7 +21,7 @@
 #include "settings.h"
 #include "pid_config.h"
 #include "../ressources/sequences_led.h"
-
+#include "../lib/btm/telem_2.h"
 
 
 
@@ -48,19 +48,26 @@ int main(void)
 	//On laisse du temps à tout le monde pour bien démarer
 	HAL_Delay(100);
 	//------------------Init serial uart
-	uart_init(&drone.communication.uart_telem, UART_TELEMETRIE, 57600, 50);
+	drone.communication.uart_telem = UART_TELEMETRIE ;
+	UART_init(UART_TELEMETRIE, 57600);
+	//uart_init(&drone.communication.uart_telem, UART_TELEMETRIE, 57600, 2);
 	SYS_set_std_usart(UART_TELEMETRIE, UART_TELEMETRIE, UART_TELEMETRIE);
 
 
-	//test sur l uart
+	//test sur la telem
 //	uint32_t previous = 0 ;
-//	uint32_t periode = 950 ;
+//	uint32_t periode = 1300 ;
 //
-//	uint8_t str[] = "abcdef\n";
+//	uint8_t str[] = "test";
 //	while(1){
-//		UART_puts_it(UART_TELEMETRIE, str, 7);
-//		while(SYSTICK_get_time_us() < previous + periode);
-//		previous += periode ;
+//		uint32_t time = SYSTICK_get_time_us()  ;
+//		uint32_t clock = time  ;
+//		clock = clock % 4000 ;
+//		if((time > previous + periode) & (clock > 0)){
+//			TELEM2_send_data(69, str, 4);
+//			previous += periode ;
+//		}
+//
 //	}
 
 
@@ -94,6 +101,30 @@ int main(void)
 	PID_init(&drone.stabilisation.pid_roll_rate, PID_SETTINGS_ROLL_ACCRO);
 	PID_init(&drone.stabilisation.pid_pitch_rate, PID_SETTINGS_PITCH_ACCRO);
 	PID_init(&drone.stabilisation.pid_yaw_rate, PID_SETTINGS_YAW_ACCRO);
+
+	//Init des filtres pour les pids
+	FILTER_second_order_init(&drone.filters.pid_roll, FILTER_SETTINGS_ANGLE);
+	FILTER_second_order_init(&drone.filters.pid_pitch, FILTER_SETTINGS_ANGLE);
+	FILTER_second_order_init(&drone.filters.pid_yaw, FILTER_SETTINGS_ANGLE);
+	FILTER_second_order_init(&drone.filters.pid_roll_rate, FILTER_SETTINGS_ANGLE);
+	FILTER_second_order_init(&drone.filters.pid_pitch_rate, FILTER_SETTINGS_ANGLE);
+	FILTER_second_order_init(&drone.filters.pid_yaw_rate, FILTER_SETTINGS_ANGLE);
+
+	//Filtres gyro
+	FILTER_second_order_init(&drone.capteurs.mpu.gyro_x_filter, FILTER_SETTINGS_GYRO);
+	FILTER_second_order_init(&drone.capteurs.mpu.gyro_y_filter, FILTER_SETTINGS_GYRO);
+	FILTER_second_order_init(&drone.capteurs.mpu.gyro_z_filter, FILTER_SETTINGS_GYRO);
+
+
+	//Associations filtres / pids
+	PID_set_filter_d(&drone.stabilisation.pid_roll, &drone.filters.pid_roll);
+	PID_set_filter_d(&drone.stabilisation.pid_pitch, &drone.filters.pid_pitch);
+	PID_set_filter_d(&drone.stabilisation.pid_yaw, &drone.filters.pid_yaw);
+
+	PID_set_filter_p(&drone.stabilisation.pid_roll_rate, &drone.filters.pid_roll_rate);
+	PID_set_filter_p(&drone.stabilisation.pid_pitch_rate, &drone.filters.pid_pitch_rate);
+	PID_set_filter_p(&drone.stabilisation.pid_yaw_rate, &drone.filters.pid_yaw_rate);
+
 
 	ESCS_init(&drone.stabilisation.escs_timer, ESC_OUTPUT_ONE_SHOT_125);
 

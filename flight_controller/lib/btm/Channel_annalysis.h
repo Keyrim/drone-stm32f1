@@ -14,6 +14,7 @@
 
 typedef enum{
 	NO_ANALYSIS,
+	JOYSTICK_DEAD_BAND,
 	SEQUENCE_ANALYSIS,
 	INSTANT_ANALYSIS
 }analysis_mode_t;

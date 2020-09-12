@@ -107,12 +107,12 @@ void Mpu_imu_update_angles(DRONE_mpu6050_t * angles){
 	if(acc_total != 0  ){
 		//On veut pas de asin (x) avec x >1
 		if(absolu(angles->x_acc) <= absolu(acc_total)){
-			angles->x_acc_angle = - asinf(angles->x_acc / acc_total ) * (float)57.32;
+			angles->x_acc_angle = - asinf(angles->x_acc / acc_total ) * 57.32f;
 		}
 
 		//On veut pas de asin (y) avec y >1
 		if(absolu(angles->y_acc) <= absolu(acc_total)){
-			angles->y_acc_angle =   asinf(angles->y_acc / acc_total ) * (float)57.32;
+			angles->y_acc_angle =   asinf(angles->y_acc / acc_total ) * 57.32f;
 		}
 
 		if(angles->z_acc < 0){
@@ -167,12 +167,12 @@ void Mpu_imu_init(DRONE_mpu6050_t * angles, MPU6050_Accelerometer_t acc, MPU6050
 	angles->alpha = alpha ;
 	angles->frequency = frequency ;
 	angles->periode = (float)1 / (float)frequency ;
-//	angles->x_gyro_offset = -0.0088028702290076522 ;
-//	angles->y_gyro_offset = 0.0010219236641221378 ;
-//	angles->z_gyro_offset = 0.0012052519083969487 ;
-//	angles->x_acc_offset = -0.053146484374999997 ;
-//	angles->y_acc_offset = -0.01163623046875 ;
-//	angles->z_acc_offset = -0.072118652343750006 ;
+	angles->x_gyro_offset = -2.77471852f ;
+	angles->y_gyro_offset = 0.390320688f ;
+	angles->z_gyro_offset = 0.586473227f ;
+	angles->x_acc_offset =  0.00647851545f ;
+	angles->y_acc_offset = -0.0312011726f ;
+	angles->z_acc_offset = -0.0675112307f ;
 
 
 	switch(acc){
@@ -205,5 +205,13 @@ void Mpu_imu_init(DRONE_mpu6050_t * angles, MPU6050_Accelerometer_t acc, MPU6050
 	}
 }
 
+void Mpu_gyro_filtering(DRONE_mpu6050_t * angles){
+	angles->x_gyro_unfiltered = angles->x_gyro ;
+	angles->y_gyro_unfiltered = angles->y_gyro ;
+	angles->z_gyro_unfiltered = angles->z_gyro ;
+	angles->x_gyro = FILTER_second_order_process(&angles->gyro_x_filter, angles->x_gyro);
+	angles->y_gyro = FILTER_second_order_process(&angles->gyro_y_filter, angles->y_gyro);
+	angles->z_gyro = FILTER_second_order_process(&angles->gyro_z_filter, angles->z_gyro);
 
+}
 

@@ -20,11 +20,12 @@ void scheduler(void){
 	static uint32_t gyro_time_left = 5000 ;
 
 	//Tâches temps réel (de l'acquisition du gyro à l'envoit des consignes aux moteurs) ont la priorité absolue sur le reste
-	task_t * task_gyro = get_task(TASK_IMU) ;
+	task_t * task_gyro = TASK_get_task(TASK_IMU) ;
 	if(gyro_enabled){
 		if(current_time_us >= task_gyro->last_execution_us + task_gyro->desired_period_us){
 			current_time_us = task_execute(task_gyro, current_time_us);
-			current_time_us = task_execute(get_task(TASK_STABILISATION), current_time_us);
+			current_time_us = task_execute(TASK_get_task(TASK_GYRO_FILTERING), current_time_us);
+			current_time_us = task_execute(TASK_get_task(TASK_STABILISATION), current_time_us);
 		}
 		else
 			gyro_time_left = task_gyro->last_execution_us + task_gyro->desired_period_us - current_time_us ;
@@ -86,9 +87,9 @@ uint32_t task_execute(task_t * task, uint32_t current_time_us){
 //Activation ou désactivation par ajout ou suppression dans la queu dans la queu
 void task_enable(task_ids_t id, bool_e enable){
 	if(enable && id < TASK_COUNT)
-		queu_add(get_task(id));
+		queu_add(TASK_get_task(id));
 	else
-		queu_remove(get_task(id));
+		queu_remove(TASK_get_task(id));
 }
 
 void scheduler_enable_gyro(){
@@ -96,7 +97,7 @@ void scheduler_enable_gyro(){
 }
 
 void task_reschedule(task_ids_t id, uint32_t new_period_us){
-	get_task(id)->desired_period_us = new_period_us ;
+	TASK_get_task(id)->desired_period_us = new_period_us ;
 }
 
 void queu_clear(void){
