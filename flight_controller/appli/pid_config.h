@@ -30,8 +30,8 @@ float  PID_SETTINGS_YAW [PID_NB_SETTINGS] = {6.0f, 0.0f, 2.0f, PID_ANGLE_FREQUEN
 
 //Paramètres pid "accro/angle rate"
 #define PID_ANGLE_RATE	250
-float PID_SETTINGS_ROLL_ACCRO[PID_NB_SETTINGS] = {0.8f, 0.5f, 0.00f, PID_ANGLE_RATE, 250};
-float PID_SETTINGS_PITCH_ACCRO[PID_NB_SETTINGS] = {0.5f, 0.5f, 0.00f, PID_ANGLE_RATE, 250};
+float PID_SETTINGS_ROLL_ACCRO[PID_NB_SETTINGS] = {0.6f, 0.5f, 0.0015f, PID_ANGLE_RATE, 250};
+float PID_SETTINGS_PITCH_ACCRO[PID_NB_SETTINGS] = {0.5f, 0.5f, 0.001f, PID_ANGLE_RATE, 250};
 float PID_SETTINGS_YAW_ACCRO[PID_NB_SETTINGS] = {1.0f, 1.0f, 0.0f, PID_ANGLE_RATE, 250};
 
 //Settings filters pid angle$
@@ -40,8 +40,8 @@ float FILTER_SETTINGS_ANGLE[3] = {alpha, beta, gamma};
 
 //Settings fitlers gyro
 // https://docs.google.com/spreadsheets/d/10sJPc1aYeCNcukzN5P1F0smk6_KCdXfGAj5ekmFCErw/edit#gid=0
-//float FILTER_SETTINGS_GYRO[3] = {0.1142857143f, 1.6f, -0.7142857143f}; 				//(dt 0.004 w0 100 ksi 0.3 )	//plus lisse donc un peu de latence
-float FILTER_SETTINGS_GYRO[3] = {0.1836734694f, 1.326530612f, -0.5102040816f}; 	//(dt 0.004 w0 150 ksi 0.5 )	//moins lisse, moins de latence
+float FILTER_SETTINGS_GYRO[3] = {0.1142857143f, 1.6f, -0.7142857143f}; 				//(dt 0.004 w0 100 ksi 0.3 )	//plus lisse donc un peu de latence
+//float FILTER_SETTINGS_GYRO[3] = {0.1836734694f, 1.326530612f, -0.5102040816f}; 	//(dt 0.004 w0 150 ksi 0.5 )	//moins lisse, moins de latence
 
 
 

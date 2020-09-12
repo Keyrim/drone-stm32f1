@@ -6,7 +6,7 @@
  */
 
 #include "Channel_annalysis.h"
-
+#include "stdlib.h"
 
 bool_e channel_analysis_init(channel_analysis_t * channels, int32_t nb_channel, int32_t * channels_array){
 
