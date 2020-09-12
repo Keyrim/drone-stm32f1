@@ -119,7 +119,7 @@ int32_t test_imu_init(State_drone_t * drone, int32_t is_init){
 bool_e check_parachute_request(State_drone_t * drone){
 	if(drone->communication.ibus.channels[SWITCH_2] > 1650){
 		drone->soft.state_flight_mode = PARACHUTE ;
-		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_SWITCH, &drone->communication.uart_telem);
+		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_SWITCH, drone->communication.uart_telem);
 		return TRUE;
 	}
 	else
@@ -129,7 +129,7 @@ bool_e check_manual_hand_control_request(State_drone_t * drone){
 	return FALSE ;
 	if(drone->communication.ibus.channels[SWITCH_2] > 1350 && drone->communication.ibus.channels[SWITCH_2] < 1650){
 		drone->soft.state_flight_mode = MANUAL_HAND_CONTROL ;
-		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_SWITCH, &drone->communication.uart_telem);
+		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_SWITCH, drone->communication.uart_telem);
 		return TRUE ;
 	}
 	else
@@ -138,7 +138,7 @@ bool_e check_manual_hand_control_request(State_drone_t * drone){
 bool_e check_manual_request(State_drone_t * drone){
 	if(drone->communication.ibus.channels[SWITCH_2] < 1350){
 		drone->soft.state_flight_mode = MANUAL ;
-		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_SWITCH, &drone->communication.uart_telem);
+		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_SWITCH, drone->communication.uart_telem);
 		return TRUE ;
 	}
 	else
@@ -147,7 +147,7 @@ bool_e check_manual_request(State_drone_t * drone){
 bool_e check_manual_accro_request(State_drone_t * drone){
 	if(drone->communication.ibus.channels[SWITCH_2] > 1350 && drone->communication.ibus.channels[SWITCH_2] < 1650 ){
 		drone->soft.state_flight_mode = MANUAL_ACCRO ;
-		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_SWITCH, &drone->communication.uart_telem);
+		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_SWITCH, drone->communication.uart_telem);
 		return TRUE;
 	}
 	else
@@ -157,7 +157,7 @@ bool_e check_calibrate_mpu_request(State_drone_t * drone){
 	if(drone->soft.flags[FLAG_CALIB_MPU]){
 		drone->soft.flags[FLAG_CALIB_MPU] = 0 ;
 		drone->soft.state_flight_mode = CALIBRATE_MPU6050 ;
-		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_PC_REQUEST, &drone->communication.uart_telem);
+		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_PC_REQUEST, drone->communication.uart_telem);
 		return TRUE ;
 	}
 	else
@@ -167,7 +167,7 @@ bool_e check_manual_pc_request(State_drone_t * drone){
 	if(drone->soft.flags[FLAG_MANUAL_PC]){
 		drone->soft.flags[FLAG_MANUAL_PC] = FALSE ;
 		drone->soft.state_flight_mode = MANUAL_PC ;
-		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_PC_REQUEST, &drone->communication.uart_telem);
+		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_PC_REQUEST, drone->communication.uart_telem);
 		return TRUE;
 	}
 	else
@@ -177,7 +177,7 @@ bool_e check_stop_motor_request(State_drone_t * drone){
 	if(drone->soft.flags[FLAG_STOP_MOTOR]){
 		drone->soft.flags[FLAG_STOP_MOTOR] = 0 ;
 		drone->soft.state_flight_mode = ON_THE_GROUND ;
-		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_PC_REQUEST, &drone->communication.uart_telem);
+		TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_PC_REQUEST, drone->communication.uart_telem);
 		return TRUE ;
 	}
 	else
@@ -229,17 +229,17 @@ void transition_high_lvl(State_drone_t * drone){
 		case MANUAL :
 			if(test_ppm(drone, FALSE)){
 				drone->soft.state_flight_mode = ON_THE_GROUND ;
-				TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_PPM_ISNT_OK, &drone->communication.uart_telem);
+				TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_PPM_ISNT_OK, drone->communication.uart_telem);
 			}
 
 			else if(TRANSITION_test(&arm_switch_test, drone, FALSE, 5)){
 				drone->soft.state_flight_mode = ON_THE_GROUND ;
-				TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_ARM_SWITCH, &drone->communication.uart_telem);
+				TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_ARM_SWITCH, drone->communication.uart_telem);
 			}
 
 			else if(TRANSITION_test(&throttle_really_low_test, drone, FALSE, 5)){
 				drone->soft.state_flight_mode = ON_THE_GROUND ;
-				TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_THROTTLE_LOW, &drone->communication.uart_telem);
+				TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_THROTTLE_LOW, drone->communication.uart_telem);
 			}
 			else if(check_stop_motor_request(drone))
 				break;
@@ -253,17 +253,17 @@ void transition_high_lvl(State_drone_t * drone){
 		case MANUAL_ACCRO :
 			if(test_ppm(drone, FALSE)){
 				drone->soft.state_flight_mode = ON_THE_GROUND ;
-				TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_PPM_ISNT_OK, &drone->communication.uart_telem);
+				TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_PPM_ISNT_OK, drone->communication.uart_telem);
 			}
 
 			else if(TRANSITION_test(&arm_switch_test, drone, FALSE, 5)){
 				drone->soft.state_flight_mode = ON_THE_GROUND ;
-				TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_ARM_SWITCH, &drone->communication.uart_telem);
+				TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_ARM_SWITCH, drone->communication.uart_telem);
 			}
 
 			else if(TRANSITION_test(&throttle_really_low_test, drone, FALSE, 5)){
 				drone->soft.state_flight_mode = ON_THE_GROUND ;
-				TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_THROTTLE_LOW, &drone->communication.uart_telem);
+				TELEMETRIE_send_high_lvl_transi(SUB_ID_PC_HIGH_LVL_TRANSITION_THROTTLE_LOW, drone->communication.uart_telem);
 			}
 			else if(check_stop_motor_request(drone))
 				break;
@@ -369,7 +369,7 @@ void HIGH_LVL_Manual_Accro(State_drone_t * drone){
 void HIGH_LVL_Manual_Hand_Control(State_drone_t * drone, State_base_t * base){
 	if(drone->soft.entrance_flight_mode){
 		drone->stabilisation.stab_mode = LEVELLED ;
-		TELEMETRIE_send_consigne_base(SUB_ID_BASE_CONSIGNE_START_SENDING_ANGLES, &drone->communication.uart_telem);
+		TELEMETRIE_send_consigne_base(SUB_ID_BASE_CONSIGNE_START_SENDING_ANGLES, drone->communication.uart_telem);
 		LED_SEQUENCE_set_sequence(&drone->ihm.led_etat, SEQUENCE_LED_4);
 	}
 	//			---------------------------- 		MAIN PART 			----------------------------------------

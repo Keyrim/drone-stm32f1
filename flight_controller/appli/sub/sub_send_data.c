@@ -9,7 +9,7 @@
 
 #include "../../lib/btm/Telemetrie.h"
 
-#define NB_OCTECT_MAX 15	//On envoit au plus 20 octects par loop
+#define NB_OCTECT_MAX 30	//On envoit au plus 20 octects par loop
 
 typedef struct{
 	int32_t nb_octet;
@@ -63,11 +63,11 @@ typedef enum{
 
 Data_group_t data_groups[DATA_GROUP_COUNT] = {
 		//PIDS
-		[DATA_PID_ROLL] = DEFINE_DATA_GROUP(		5, 			0, 			TELEMETRIE_send_pid_roll),
-		[DATA_PID_PITCH] = DEFINE_DATA_GROUP(		5, 			0, 			TELEMETRIE_send_pid_pitch),
-		[DATA_PID_YAW] = DEFINE_DATA_GROUP(			5, 			0, 			TELEMETRIE_send_pid_yaw),
-		[DATA_PID_ROLL_P] = DEFINE_DATA_GROUP(		5, 			0, 			TELEMETRIE_send_pid_roll_p),
-		[DATA_PID_ROLL_D] = DEFINE_DATA_GROUP(		5, 			0, 			TELEMETRIE_send_pid_roll_d),
+		[DATA_PID_ROLL] = DEFINE_DATA_GROUP(		5, 			0, 		TELEMETRIE_send_pid_roll),
+		[DATA_PID_PITCH] = DEFINE_DATA_GROUP(		5, 			0, 		TELEMETRIE_send_pid_pitch),
+		[DATA_PID_YAW] = DEFINE_DATA_GROUP(			5, 			3, 			TELEMETRIE_send_pid_yaw),	//Utilisé pour Gy Roll atm
+		[DATA_PID_ROLL_P] = DEFINE_DATA_GROUP(		5, 			3, 			TELEMETRIE_send_pid_roll_p),
+		[DATA_PID_ROLL_D] = DEFINE_DATA_GROUP(		5, 			3, 			TELEMETRIE_send_pid_roll_d),
 		//Pids coefs
 		[DATA_ROLL_KP] = DEFINE_DATA_GROUP(			3, 			0, 			TELEMETRIE_send_pid_roll_kp),
 		[DATA_ROLL_KI] = DEFINE_DATA_GROUP(			3, 			0, 			TELEMETRIE_send_pid_roll_ki),
@@ -78,27 +78,27 @@ Data_group_t data_groups[DATA_GROUP_COUNT] = {
 		//Altitude
 		[DATA_ALTITUDE] = DEFINE_DATA_GROUP(		5, 			0, 			TELEMETRIE_send_altitude),
 		//Angles
-		[DATA_ANGLES] = DEFINE_DATA_GROUP(			3, 			10, 			TELEMETRIE_send_angle_x_y_as_int),
-		[DATA_ANGLE_Z] = DEFINE_DATA_GROUP(			3, 			0, 			TELEMETRIE_send_angle_z_as_int),
-		[DATA_ANGLES_ACC] = DEFINE_DATA_GROUP(		3, 			0, 			TELEMETRIE_send_angle_x_y_acc_as_int),
-		[DATA_X_Y_Z_RATE] = DEFINE_DATA_GROUP(		4, 			10, 			TELEMETRIE_send_angle_x_y_z_rate_as_int),
+		[DATA_ANGLES] = DEFINE_DATA_GROUP(			3, 			0, 		TELEMETRIE_send_angle_x_y_as_int),
+		[DATA_ANGLE_Z] = DEFINE_DATA_GROUP(			3, 			0, 		TELEMETRIE_send_angle_z_as_int),
+		[DATA_ANGLES_ACC] = DEFINE_DATA_GROUP(		3, 			0, 		TELEMETRIE_send_angle_x_y_acc_as_int),
+		[DATA_X_Y_Z_RATE] = DEFINE_DATA_GROUP(		4, 			0, 		TELEMETRIE_send_angle_x_y_z_rate_as_int),
 		//Latitude & longitude
 		[DATA_LATTITUDE] = DEFINE_DATA_GROUP(		5, 			0, 			TELEMETRIE_send_lat),
 		[DATA_LONGITUDE] = DEFINE_DATA_GROUP(		5, 			0, 			TELEMETRIE_send_long),
 		//Accï¿½lï¿½ration
 		[DATA_ACC_Z] = DEFINE_DATA_GROUP(			5, 			0, 			TELEMETRIE_send_acc_z),
 		//Radios
-		[DATA_RADIO_1] = DEFINE_DATA_GROUP(			5, 			10, 			TELEMETRIE_send_channel_all_1_4),
-		[DATA_RADIO_2] = DEFINE_DATA_GROUP(			5, 			100, 			TELEMETRIE_send_channel_all_5_8),
+		[DATA_RADIO_1] = DEFINE_DATA_GROUP(			5, 			0, 	TELEMETRIE_send_channel_all_1_4),
+		[DATA_RADIO_2] = DEFINE_DATA_GROUP(			5, 			0, 		TELEMETRIE_send_channel_all_5_8),
 		//States
-		[DATA_FLIGHT_MODE] = DEFINE_DATA_GROUP(		2, 			50, 			TELEMETRIE_send_state_flying),
-		[DATA_BATTERIE] = DEFINE_DATA_GROUP(		2, 			100, 			TELEMETRIE_send_v_bat),
-		[DATA_EVERY_IS_OK] = DEFINE_DATA_GROUP(		2, 			50, 			TELEMETRIE_send_every_is_ok),
+		[DATA_FLIGHT_MODE] = DEFINE_DATA_GROUP(		2, 			0, 		TELEMETRIE_send_state_flying),
+		[DATA_BATTERIE] = DEFINE_DATA_GROUP(		2, 			1000, 		TELEMETRIE_send_v_bat),
+		[DATA_EVERY_IS_OK] = DEFINE_DATA_GROUP(		2, 			0, 		TELEMETRIE_send_every_is_ok),
 		//Moteurs
-		[DATA_MOTEURS] = DEFINE_DATA_GROUP(			5, 			1, 			TELEMETRIE_send_moteur_all),
+		[DATA_MOTEURS] = DEFINE_DATA_GROUP(			5, 			3, 			TELEMETRIE_send_moteur_all),
 		//Cpu used
-		[DATA_CPU_USED] = DEFINE_DATA_GROUP(		2, 			100, 			TELEMETRIE_send_cpu_pourcentage),
-		[DATA_TASK_PERIODE] = DEFINE_DATA_GROUP(	4, 			100, 			TELEMETRIE_send_periode_task)
+		[DATA_CPU_USED] = DEFINE_DATA_GROUP(		2, 			0, 		TELEMETRIE_send_cpu_pourcentage),
+		[DATA_TASK_PERIODE] = DEFINE_DATA_GROUP(	4, 			0, 		TELEMETRIE_send_periode_task)
 };
 
 //Sub qui envoit des donnï¿½es par tï¿½lï¿½mï¿½trie ï¿½ qui veut l'entendre ^^

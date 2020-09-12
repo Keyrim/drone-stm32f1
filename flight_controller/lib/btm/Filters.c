@@ -12,7 +12,7 @@ void FILTER_second_order_init(Filter_second_order_t * filter, float settings[3])
 }
 
 float FILTER_first_order_process(Filter_second_order_t * filter, float new_value){
-	filter->values[0] = new_value * filter->settings[0] + filter->values[1] * filter->values[0] ;
+	filter->values[0] = new_value * filter->settings[0] + filter->values[1] * filter->settings[1] ;
 	return filter->values[0];
 };
 

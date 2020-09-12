@@ -205,5 +205,13 @@ void Mpu_imu_init(DRONE_mpu6050_t * angles, MPU6050_Accelerometer_t acc, MPU6050
 	}
 }
 
+void Mpu_gyro_filtering(DRONE_mpu6050_t * angles){
+	angles->x_gyro_unfiltered = angles->x_gyro ;
+	angles->y_gyro_unfiltered = angles->y_gyro ;
+	angles->z_gyro_unfiltered = angles->z_gyro ;
+	angles->x_gyro = FILTER_second_order_process(&angles->gyro_x_filter, angles->x_gyro);
+	angles->y_gyro = FILTER_second_order_process(&angles->gyro_y_filter, angles->y_gyro);
+	angles->z_gyro = FILTER_second_order_process(&angles->gyro_z_filter, angles->z_gyro);
 
+}
 

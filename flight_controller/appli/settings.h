@@ -22,7 +22,7 @@
 
 //On puet modifer les coefs des pids depuis la base
 //Ici on choisit si on modifi les pids "angle rate" ou "angle"
-#define SET_COEF_ON_RATE_PID 0
+#define SET_COEF_ON_RATE_PID 1
 
 
 //Id des flags pour les requête de changement d'état

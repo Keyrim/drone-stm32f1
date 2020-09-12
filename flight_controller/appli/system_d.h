@@ -36,6 +36,19 @@ typedef struct{
 	ms5611_t ms5611 ;
 }DRONE_capteurs_t;
 
+//Structure fitler
+typedef struct{
+	//PID angle
+	Filter_second_order_t pid_roll ;
+	Filter_second_order_t pid_pitch ;
+	Filter_second_order_t pid_yaw ;
+
+	//Pid accro
+	Filter_second_order_t pid_roll_rate ;
+	Filter_second_order_t pid_pitch_rate ;
+	Filter_second_order_t pid_yaw_rate ;
+}DRONE_filters;
+
 //Structure stabilisation
 typedef struct{
 	ESC_e escs[4];
@@ -44,16 +57,10 @@ typedef struct{
 	PID_t pid_roll ;
 	PID_t pid_pitch ;
 	PID_t pid_yaw ;
-	Filter_second_order_t filter_pid_roll ;
-	Filter_second_order_t filter_pid_pitch ;
-	Filter_second_order_t filter_pid_yaw ;
 	//Pid for accro mode
 	PID_t pid_roll_rate ;
 	PID_t pid_pitch_rate ;
 	PID_t pid_yaw_rate ;
-	Filter_second_order_t filter_pid_roll_rate ;
-	Filter_second_order_t filter_pid_pitch_rate ;
-	Filter_second_order_t filter_pid_yaw_rate ;
 	//Mode de stabilisation
 	Stabilisation_SM stab_mode ;
 }DRONE_stabilisation_t;
@@ -61,7 +68,7 @@ typedef struct{
 //Structure communication
 typedef struct{
 	ibus_t ibus;
-	uart_struct_e uart_telem ;
+	uart_id_e uart_telem ;
 	channel_analysis_t ch_analysis ;
 }DRONE_communication_t;
 
@@ -88,6 +95,7 @@ typedef struct{
 	DRONE_communication_t communication ;
 	DRONE_soft_t soft ;
 	DRONE_ihm_t ihm ;
+	DRONE_filters filters ;
 
 }State_drone_t;
 
