@@ -7,68 +7,65 @@
 
 #include "events.h"
 //Ensemble des flags
-#define NB_FLAG 2
-uint32_t flags[2] = {0} ;
+Mask_t flags ;
 
-
-//Lève un flag et return true si le flag était baissé
-bool_e EVENT_set_flag(Flags_t flag_set){
-
-	uint32_t actual_flag = flag_set / 32 ;
-	uint32_t flag_bit = (uint32_t)(1 << (flag_set % 32)) ;
-	if(flags[actual_flag] & flag_bit)
-	//Si le flag est déjà activè on renvoit faux
-		return FALSE ;
-	//Sinon on lève le flag et on renvoit true
-	flags[actual_flag] |= flag_bit ;
-	return TRUE ;
-}
-
-//Baisse un flag et renvoit vrai si il était levé
-bool_e EVENT_clean_flag(Flags_t flag_clean){
-	uint32_t actual_flag = flag_clean / 32 ;
-	uint32_t flag_bit = (uint32_t)(1 << (flag_clean % 32)) ;
-	if(flags[actual_flag] & flag_bit){
-		//Si le flag est levé on le baisse et renvoit vrai
-		flags[actual_flag] &= ~ flag_bit ;
-		return TRUE ;
-	}
-	return FALSE ;
-}
-
-//Renvoit true si le flag est levé, false sinon
-bool_e EVENT_read_flag(Flags_t flag_read){
-	uint32_t actual_flag = flag_read / 32 ;
-	uint32_t flag_bit = (uint32_t)(1 << (flag_read % 32)) ;
-	if(flags[actual_flag] & flag_bit)
-		//Si le flag est levé on renvoit vrai
-		return TRUE ;
-	return FALSE ;
-}
-
-
+//Etats du drone, recquiert par les fonctions d'event
+State_drone_t * drone ;
 
 static void event_function_timeout_ppm(void){
 
 }
 
-#define DEFINE_EVENT(mask_param, event_function_param){  \
-		.mask = mask_param ,							 \
-		.event_function = event_function_param 			 \
+#define DEFINE_EVENT( event_function_param){  	\
+		.function = event_function_param 		\
 }
 
+//Définitions des events
 Event_t events[EVENT_COUNT] ={
-		[EVENT_TIMEOUT_PPM] = DEFINE_EVENT(FLAG_TIMEOUT_PPM, event_function_timeout_ppm)
+		[EVENT_TRANSIT_ON_THE_GROUND] = DEFINE_EVENT(event_function_timeout_ppm)
 };
 
 
-//On test le masque pour l event
-//Et on execute la fonction
+//Définitions des mask pour les events
+
+//Pour chaque event présent dans la liste
+//On test le mask and : le mask de condition
+//Si il est validé
+//On regarde le mask ou qui permet de déclencher l'event
 void EVENT_process_events(){
+	//Pout chaque event
 	for(uint32_t e = 0; e < EVENT_COUNT; e ++){
-		if((events[e].mask & flags) == events[e].mask)
-			events[e].event_function();
+		uint32_t m = 0 ;
+		bool_e function_did_run_once = FALSE ;
+		//Pour chaque masques pour les events
+		while(m < events[e].nb_mask && !function_did_run_once){
+			if(Mask_test_and(events[e].mask_and[m], flags)){
+				if(Mask_test_or(events[e].mask_or[m], flags)){
+					events[e].function();
+					function_did_run_once = TRUE ;
+				}
+			}
+			m++ ;
+		}
 	}
+}
+
+void EVENT_add_mask(Event_t * event, Mask_t mask_and, Mask_t mask_or){
+	if(event->nb_mask < EVENT_NB_MASK_PER_EVENT_MAX){
+		event->mask_and[event->nb_mask] = mask_and ;
+			event->mask_or[event->nb_mask] = mask_or ;
+			event->nb_mask ++ ;
+	}
+}
+
+void EVENT_init_module(State_drone_t * drone_){
+	//On enregistre la structure de donnée pour le drone
+	drone = drone_ ;
+
+	//Def des mask pour tous les events
+	//Appelle des fonctions de confifuration des masques pour chaques event
+
+
 }
 
 
