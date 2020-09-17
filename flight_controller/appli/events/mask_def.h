@@ -11,5 +11,6 @@
 #include "events.h"
 
 void mask_def_on_the_ground(Event_t * event);
+void mask_def_manual(Event_t * event);
 
 #endif /* EVENTS_MASK_DEF_H_ */
