@@ -27,4 +27,6 @@ bool_e MASK_clean_flag(Mask_t * mask, Flags_t flag);
 bool_e Mask_test_and(Mask_t mask_test, Mask_t mask_ref);
 bool_e Mask_test_or(Mask_t mask_test, Mask_t mask_ref);
 
+
+
 #endif /* EVENTS_MASK_H_ */

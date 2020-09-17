@@ -12,17 +12,22 @@ Mask_t flags ;
 //Etats du drone, recquiert par les fonctions d'event
 State_drone_t * drone ;
 
-static void event_function_timeout_ppm(void){
+static void event_function_on_the_ground(void){
 
 }
 
-#define DEFINE_EVENT( event_function_param){  	\
-		.function = event_function_param 		\
+#define DEFINE_EVENT(event_function_param, nb_mask_param){  	\
+		.function = event_function_param ,						\
+		.nb_mask = nb_mask_param 								\
 }
 
 //Définitions des events
 Event_t events[EVENT_COUNT] ={
-		[EVENT_TRANSIT_ON_THE_GROUND] = DEFINE_EVENT(event_function_timeout_ppm)
+		[EVENT_TRANSIT_ON_THE_GROUND] 			= DEFINE_EVENT(event_function_on_the_ground, 1),
+		[EVENT_TRANSIT_MANUAL] 					= DEFINE_EVENT(event_function_on_the_ground, 1),
+		[EVENT_TRANSIT_MANUAL_HAND_CONTROL]		= DEFINE_EVENT(event_function_on_the_ground, 1),
+		[EVENT_TRANSIT_MANUAL_ACCRO] 			= DEFINE_EVENT(event_function_on_the_ground, 1),
+		[EVENT_TRANSIT_CALIBRATE_MPU] 			= DEFINE_EVENT(event_function_on_the_ground, 1)
 };
 
 
@@ -50,13 +55,6 @@ void EVENT_process_events(){
 	}
 }
 
-void EVENT_add_mask(Event_t * event, Mask_t mask_and, Mask_t mask_or){
-	if(event->nb_mask < EVENT_NB_MASK_PER_EVENT_MAX){
-		event->mask_and[event->nb_mask] = mask_and ;
-			event->mask_or[event->nb_mask] = mask_or ;
-			event->nb_mask ++ ;
-	}
-}
 
 void EVENT_init_module(State_drone_t * drone_){
 	//On enregistre la structure de donnée pour le drone

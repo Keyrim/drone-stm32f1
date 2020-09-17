@@ -40,7 +40,6 @@ typedef struct{
 
 void EVENT_process_events();
 void EVENT_init_module(State_drone_t * drone_);
-//void EVENT_add_mask(Event_t * event, Mask_t mask_and, Mask_t mask_or);
 
 
 
