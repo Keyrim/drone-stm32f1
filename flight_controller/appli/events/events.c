@@ -6,14 +6,50 @@
  */
 
 #include "events.h"
+#include "mask_def.h"
+
+#define CLEAR_FLAG_FLIGHT_MODE flags = MASK_and(flags, mask_flight_mode_clear)
+
 //Ensemble des flags
 Mask_t flags ;
 
-//Etats du drone, recquiert par les fonctions d'event
+//Etats du drone, recquis par les fonctions d'event
 State_drone_t * drone ;
 
-static void event_function_on_the_ground(void){
+//Si false, init du module event
+bool_e initialized = FALSE ;
 
+//Masks flight mode clear
+Mask_t mask_flight_mode_clear ;
+Flags_t flags_flight_mode_clear [9] = {FLAG_STATE_ON_THE_GROUND,
+		FLAG_STATE_MANUAL,
+		FLAG_STATE_MANUAL_PC,
+		FLAG_STATE_MANUAL_HAND_CONTROL,
+		FLAG_STATE_MANUAL_ACCRO,
+		FLAG_STATE_PARACHUTE,
+		FLAG_STATE_CALIBRATE_MPU,
+		FLAG_STATE_ERROR_SENSOR,
+		FLAG_STATE_CHANGE_PID_SETTINGS};
+
+static void EVENT_init(){
+	initialized = TRUE ;
+	mask_flight_mode_clear = MASK_not(MASK_create(flags_flight_mode_clear, 9));
+}
+
+
+
+
+
+static void event_function_on_the_ground(void){
+	CLEAR_FLAG_FLIGHT_MODE ;
+	EVENT_Set_flag(FLAG_STATE_ON_THE_GROUND);
+	drone->soft.state_flight_mode = ON_THE_GROUND ;
+}
+
+static void event_function_manual(void){
+	CLEAR_FLAG_FLIGHT_MODE ;
+	EVENT_Set_flag(FLAG_STATE_MANUAL);
+	drone->soft.state_flight_mode = MANUAL ;
 }
 
 
@@ -25,21 +61,23 @@ static void event_function_on_the_ground(void){
 
 //Définitions des events
 Event_t events[EVENT_COUNT] ={
-		[EVENT_TRANSIT_ON_THE_GROUND] 			= DEFINE_EVENT(event_function_on_the_ground, 1),
-		[EVENT_TRANSIT_MANUAL] 					= DEFINE_EVENT(event_function_on_the_ground, 1),
-		[EVENT_TRANSIT_MANUAL_HAND_CONTROL]		= DEFINE_EVENT(event_function_on_the_ground, 1),
-		[EVENT_TRANSIT_MANUAL_ACCRO] 			= DEFINE_EVENT(event_function_on_the_ground, 1),
-		[EVENT_TRANSIT_CALIBRATE_MPU] 			= DEFINE_EVENT(event_function_on_the_ground, 1)
+		[EVENT_TRANSIT_ON_THE_GROUND] 			= DEFINE_EVENT(event_function_on_the_ground, 2),
+		[EVENT_TRANSIT_MANUAL] 					= DEFINE_EVENT(event_function_manual, 1),
+		//Fonctions pas def pour l instant
+		[EVENT_TRANSIT_MANUAL_HAND_CONTROL]		= DEFINE_EVENT(event_function_on_the_ground, 0),
+		[EVENT_TRANSIT_MANUAL_ACCRO] 			= DEFINE_EVENT(event_function_on_the_ground, 0),
+		[EVENT_TRANSIT_CALIBRATE_MPU] 			= DEFINE_EVENT(event_function_on_the_ground, 0)
 };
 
 
-//Définitions des mask pour les events
 
-//Pour chaque event présent dans la liste
-//On test le mask and : le mask de condition
-//Si il est validé
-//On regarde le mask ou qui permet de déclencher l'event
+
+//Déclenchement des event
 void EVENT_process_events(){
+	if(!initialized)
+		EVENT_init();
+
+
 	//Pout chaque event
 	for(uint32_t e = 0; e < EVENT_COUNT; e ++){
 		uint32_t m = 0 ;
@@ -70,7 +108,8 @@ void EVENT_init_module(State_drone_t * drone_){
 
 	//Def des mask pour tous les events
 	//Appelle des fonctions de confifuration des masques pour chaques event
-
+	mask_def_manual(&events[EVENT_TRANSIT_MANUAL]);
+	mask_def_on_the_ground(&events[EVENT_TRANSIT_ON_THE_GROUND]);
 
 }
 

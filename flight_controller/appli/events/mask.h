@@ -27,6 +27,13 @@ bool_e MASK_clean_flag(Mask_t * mask, Flags_t flag);
 bool_e Mask_test_and(Mask_t mask_test, Mask_t mask_ref);
 bool_e Mask_test_or(Mask_t mask_test, Mask_t mask_ref);
 
+//Opérations sur les mask
+Mask_t MASK_and(Mask_t mask1, Mask_t mask2);
+Mask_t MASK_or(Mask_t mask1, Mask_t mask2);
+Mask_t MASK_not(Mask_t mask);
+
+//Créer un mask à partir d'un tableau de flag
+Mask_t MASK_create(Flags_t * flag_array, int32_t len);
 
 
 #endif /* EVENTS_MASK_H_ */

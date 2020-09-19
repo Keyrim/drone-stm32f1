@@ -55,3 +55,35 @@ bool_e MASK_clean_flag(Mask_t * mask, Flags_t flag){
 }
 
 
+//Opérations sur les mask
+Mask_t MASK_and(Mask_t mask1, Mask_t mask2){
+	Mask_t mask_return ;
+	for(int32_t m = 0; m < NB_ARRAY_MASK; m++)
+		mask_return.array[m] = mask1.array[m] & mask2.array[m] ;
+
+	return mask_return ;
+}
+Mask_t MASK_or(Mask_t mask1, Mask_t mask2){
+	Mask_t mask_return ;
+	for(int32_t m = 0; m < NB_ARRAY_MASK; m++)
+		mask_return.array[m] = mask1.array[m] | mask2.array[m] ;
+
+	return mask_return ;
+}
+
+Mask_t MASK_not(Mask_t mask){
+	Mask_t mask_return ;
+	for(int32_t m = 0; m < NB_ARRAY_MASK; m++)
+		mask_return.array[m] = ~mask.array[m] ;
+
+	return mask_return ;
+}
+
+//Créer un mask à partir d'un tableau de flag
+Mask_t MASK_create(Flags_t * flag_array, int32_t len){
+	Mask_t mask_return ;
+	for(int32_t f = 0; f < len; f++)
+		MASK_set_flag(&mask_return, flag_array[f]);
+
+	return mask_return ;
+}

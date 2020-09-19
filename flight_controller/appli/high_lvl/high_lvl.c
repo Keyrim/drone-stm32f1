@@ -186,6 +186,8 @@ void HIGH_LVL_Switch(State_drone_t * drone, State_base_t * base){
 		drone->soft.entrance_flight_mode = drone->soft.state_flight_mode != previous_state_flight_mode ;
 		previous_state_flight_mode = drone->soft.state_flight_mode ;
 
+		//Si changement mode de vol suite à
+
 		//Switch sur les différents états de la high lvl
 		switch(drone->soft.state_flight_mode){
 			case ON_THE_GROUND :
