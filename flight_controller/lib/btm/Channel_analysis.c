@@ -51,11 +51,11 @@ void channel_analysis_process(channel_analysis_t * channels){
 
 			case ANALYSIS_STICK_LVL :
 				if(channels->channels[ch] > 1000 && channels->channels[ch] <= 1070)
-					channels->throttle_lvl = THROTTLE_NULL ;
+					channels->throttle_lvl[ch] = THROTTLE_NULL ;
 				else if(channels->channels[ch] > 1070 && channels->channels[ch] <= 1120)
-					channels->throttle_lvl = THROTTLE_LOW ;
+					channels->throttle_lvl[ch] = THROTTLE_LOW ;
 				else if(channels->channels[ch] > 1120 && channels->channels[ch] < 2000)
-					channels->throttle_lvl = THROTTLE_LOW ;
+					channels->throttle_lvl[ch] = THROTTLE_LOW ;
 				break;
 
 
@@ -65,13 +65,13 @@ void channel_analysis_process(channel_analysis_t * channels){
 
 			case ANALYSIS_SWITCH_MODE:
 				if(channels->channels[ch] < 1300)
-					channels->pos[ch] = SWITCH_POS_1 ;
+					channels->switch_pos[ch] = SWITCH_POS_1 ;
 				else if(channels->channels[ch] > 1300 && channels->channels[ch] < 1600)
-					channels->pos[ch] = SWITCH_POS_2 ;
+					channels->switch_pos[ch] = SWITCH_POS_2 ;
 				else if(channels->channels[ch] > 1600)
-					channels->pos[ch] = SWITCH_POS_3 ;
+					channels->switch_pos[ch] = SWITCH_POS_3 ;
 				else
-					channels->pos[ch] = SWITCH_POS_ERROR ;
+					channels->switch_pos[ch] = SWITCH_POS_ERROR ;
 				break;
 			default:
 				break;

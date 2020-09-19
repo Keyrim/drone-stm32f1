@@ -8,12 +8,11 @@
 */
 
 //Include de base pour la stm
+#include <high_lvl/high_lvl.h>
 #include "stm32f1xx_hal.h"
 #include "stm32f1_sys.h"
 
 //Include des deux machines à état principales (qui elles include bcp de choses)
-#include "high_lvl/high_lvl_cases.h"
-
 #include "scheduler/scheduler.h"
 
 //Fichier de ref pour les configurations / branchements

@@ -16,6 +16,8 @@ static void event_function_on_the_ground(void){
 
 }
 
+
+
 #define DEFINE_EVENT(event_function_param, nb_mask_param){  	\
 		.function = event_function_param ,						\
 		.nb_mask = nb_mask_param 								\
@@ -55,6 +57,12 @@ void EVENT_process_events(){
 	}
 }
 
+bool_e EVENT_Set_flag(Flags_t flag){
+	return MASK_set_flag(&flags, flag);
+}
+bool_e EVENT_Clean_flag(Flags_t flag){
+	return MASK_clean_flag(&flags, flag);
+}
 
 void EVENT_init_module(State_drone_t * drone_){
 	//On enregistre la structure de donnée pour le drone

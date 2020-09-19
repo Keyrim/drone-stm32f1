@@ -4,10 +4,10 @@
  *  Created on: 13 août 2020
  *      Author: Théo
  */
+#include <high_lvl/high_lvl.h>
 #include "task.h"
 #include "scheduler/scheduler.h"
 #include "../sub/sub_action.h"
-#include "../high_lvl/high_lvl_cases.h"
 
 
 static State_drone_t * drone ;
@@ -114,70 +114,20 @@ void task_function_stabilisation(uint32_t current_time_us){
 }
 
 
-//Se décompose en trois parties
-//	mise a jours des flags
-//	appels de la fonctions lié au mode de vol
+//Tâche qui s'occupe du haut niveau dans le drone
 void task_function_high_lvl(uint32_t current_time_us){
 	UNUSED(current_time_us);
-	//Détermine un changement de mode de vol
-	static Flight_Mode_SM previous_state_flight_mode = PARACHUTE ;
-	drone->soft.entrance_flight_mode = drone->soft.state_flight_mode != previous_state_flight_mode ;
-	previous_state_flight_mode = drone->soft.state_flight_mode ;
 
-	//Switch sur les différents états de la high lvl
-	switch(drone->soft.state_flight_mode){
+	//Mise à jour des flags
+	HIGH_LVL_Update_Flags(drone);
 
-		case ON_THE_GROUND :
-			HIGH_LVL_On_The_Ground(drone);
-			break;
+	//Appels fonction gestion des events (transition et erreur haut niveau)
+	EVENT_process_events();
 
-		case MANUAL :
-			HIGH_LVL_Manual(drone);
-			break;
-
-		case MANUAL_HAND_CONTROL:
-			HIGH_LVL_Manual_Hand_Control(drone, base);
-			break;
-
-		case PARACHUTE :
-			HIGH_LVL_Parachute(drone);
-			break;
-
-		case CALIBRATE_MPU6050:
-			HIGH_LVL_Calibrate_MPU(drone);
-			break;
-
-		case MANUAL_PC:
-			HIGH_LVL_Manual_Pc(drone);
-			break;
-
-		case MANUAL_ACCRO :
-			HIGH_LVL_Manual_Accro(drone);
-			break;
-
-		case IMU_FAILED_INIT:
-			HIGH_LVL_IMU_Failed_Init(drone);
-			break;
-
-		case PID_CHANGE_SETTINGS:
-			HIGH_LVL_Change_Pid_Settings(drone);
-			break;
-
-		case POSITION_HOLD:
-			//TODO Position hold function
-			break;
-		case ALTITUDE_HOLD:
-			//TODO Altitude hold function
-			break;
-	}
+	//Appel fonction mode de vol actuel
+	HIGH_LVL_Switch(drone, base);
 }
 
-//void task_function_uart_send(uint32_t current_time_us){
-//	UNUSED(current_time_us);
-//	//On envoit les données en buffer vers l'uart de telemétrie
-//	uart_send(&drone->communication.uart_telem, current_time_us);
-//
-//}
 
 void task_function_printf(uint32_t current_time_us){
 	UNUSED(current_time_us);

@@ -41,6 +41,10 @@ typedef struct{
 void EVENT_process_events();
 void EVENT_init_module(State_drone_t * drone_);
 
+//Set and clean flags
+bool_e EVENT_Set_flag(Flags_t flag);
+bool_e EVENT_Clean_flag(Flags_t flag);
+
 
 
 #endif /* EVENTS_EVENTS_H_ */

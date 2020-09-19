@@ -39,7 +39,7 @@ typedef struct{
 	int32_t * channels ;
 	int32_t nb_channels ;
 	bool_e is_init ;
-	switch_pos_t pos [NB_CHANNEL_MAX] ; //For buttons etc (0 = 1000, 1 = 1500, 2= 2000)
+	switch_pos_t switch_pos [NB_CHANNEL_MAX] ; //For buttons etc (0 = 1000, 1 = 1500, 2= 2000)
 	throttle_lvl_t throttle_lvl [NB_CHANNEL_MAX] ;
 	analysis_mode_t analysis_mode [NB_CHANNEL_MAX];
 
