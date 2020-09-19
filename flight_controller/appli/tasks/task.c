@@ -113,6 +113,10 @@ void task_function_stabilisation(uint32_t current_time_us){
 
 }
 
+
+//Se décompose en trois parties
+//	mise a jours des flags
+//	appels de la fonctions lié au mode de vol
 void task_function_high_lvl(uint32_t current_time_us){
 	UNUSED(current_time_us);
 	//Détermine un changement de mode de vol

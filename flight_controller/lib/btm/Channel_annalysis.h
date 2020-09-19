@@ -13,26 +13,35 @@
 #define NB_CHANNEL_MAX 10
 
 typedef enum{
-	NO_ANALYSIS,
-	JOYSTICK_DEAD_BAND,
-	SEQUENCE_ANALYSIS,
-	INSTANT_ANALYSIS
+	ANALYSIS_NONE,
+	ANALYSIS_STICK_DEAD_BAND,
+	ANALYSIS_STICK_LVL,
+	ANALYSIS_SEQUENCE,
+	ANALYSIS_SWITCH_MODE
 }analysis_mode_t;
 
+
 typedef enum{
-	JOYSTICK,
-	SWITCH_2_POS,
-	SWITCH_3_POS
-}channel_type_t;
+	THROTTLE_NULL,
+	THROTTLE_LOW,
+	THROTTLE_HIGH
+}throttle_lvl_t;
+
+typedef enum{
+	SWITCH_POS_1,
+	SWITCH_POS_2,
+	SWITCH_POS_3,
+	SWITCH_POS_ERROR
+}switch_pos_t;
 
 
 typedef struct{
 	int32_t * channels ;
 	int32_t nb_channels ;
 	bool_e is_init ;
-	int8_t pos [NB_CHANNEL_MAX] ; //For buttons etc (0 = 1000, 1 = 1500, 2= 2000)
+	switch_pos_t pos [NB_CHANNEL_MAX] ; //For buttons etc (0 = 1000, 1 = 1500, 2= 2000)
+	throttle_lvl_t throttle_lvl [NB_CHANNEL_MAX] ;
 	analysis_mode_t analysis_mode [NB_CHANNEL_MAX];
-	channel_type_t channel_type [NB_CHANNEL_MAX];
 
 }channel_analysis_t;
 
