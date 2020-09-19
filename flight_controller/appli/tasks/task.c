@@ -169,10 +169,19 @@ void task_function_receive_data(uint32_t current_time_us){
 void task_function_verif_system(uint32_t current_time_us){
 
 	//Time out sur l ibus
-	if(current_time_us > drone->communication.ibus.last_update + TIME_OUT_IBUS)
+
+	if(current_time_us > drone->communication.ibus.last_update + TIME_OUT_IBUS){
 		drone->communication.ibus.is_ok = FALSE ;
-	else
-		drone->communication.ibus.is_ok = TRUE ;
+		EVENT_Set_flag(FLAG_TIMEOUT_PPM);
+		EVENT_Clean_flag(FLAG_PPM_OK);
+	}
+	else{
+		drone->communication.ibus.is_ok = FALSE ;
+		EVENT_Clean_flag(FLAG_TIMEOUT_PPM);
+		EVENT_Set_flag(FLAG_PPM_OK);
+
+	}
+
 
 	//Time out du gps
 	if(current_time_us > drone->capteurs.gps.last_time_read_gps + TIME_OUT_GPS)
@@ -181,7 +190,44 @@ void task_function_verif_system(uint32_t current_time_us){
 		drone->capteurs.gps.is_ok = TRUE ;
 
 	//Mesure batterie
-	Batterie_update(&drone->capteurs.batterie);
+	BATTERIE_update(&drone->capteurs.batterie);
+	switch(drone->capteurs.batterie.batterie_lvl){
+		case BATTERIE_LVL_HIGH :
+			EVENT_Set_flag(FLAG_BATTERY_HIGH);
+			EVENT_Clean_flag(FLAG_BATTERY_MEDIUM);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW_CUTOF);
+			EVENT_Clean_flag(FLAG_BATTERY_NO_BATT);
+			break;
+		case BATTERIE_LVL_MEDIUM :
+			EVENT_Clean_flag(FLAG_BATTERY_HIGH);
+			EVENT_Set_flag(FLAG_BATTERY_MEDIUM);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW_CUTOF);
+			EVENT_Clean_flag(FLAG_BATTERY_NO_BATT);
+			break;
+		case BATTERIE_LVL_LOW :
+			EVENT_Clean_flag(FLAG_BATTERY_HIGH);
+			EVENT_Clean_flag(FLAG_BATTERY_MEDIUM);
+			EVENT_Set_flag(FLAG_BATTERY_LOW);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW_CUTOF);
+			EVENT_Clean_flag(FLAG_BATTERY_NO_BATT);
+			break;
+		case BATTERIE_LVL_LOW_CUTOF :
+			EVENT_Clean_flag(FLAG_BATTERY_HIGH);
+			EVENT_Clean_flag(FLAG_BATTERY_MEDIUM);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW);
+			EVENT_Set_flag(FLAG_BATTERY_LOW_CUTOF);
+			EVENT_Clean_flag(FLAG_BATTERY_NO_BATT);
+			break;
+		case BATTERIE_LVL_NULL :
+			EVENT_Clean_flag(FLAG_BATTERY_HIGH);
+			EVENT_Clean_flag(FLAG_BATTERY_MEDIUM);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW_CUTOF);
+			EVENT_Set_flag(FLAG_BATTERY_NO_BATT);
+			break;
+	}
 
 }
 

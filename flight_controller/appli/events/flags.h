@@ -51,6 +51,7 @@ typedef enum{
 	FLAG_BATTERY_LOW,
 	FLAG_BATTERY_MEDIUM,
 	FLAG_BATTERY_HIGH,
+	FLAG_BATTERY_NO_BATT,
 
 	//Flags pour l'état de la high lvl
 	FLAG_STATE_ON_THE_GROUND,

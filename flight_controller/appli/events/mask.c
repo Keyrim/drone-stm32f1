@@ -32,11 +32,12 @@ bool_e Mask_test_or(Mask_t mask_test, Mask_t mask_ref){
 bool_e MASK_set_flag(Mask_t * mask, Flags_t flag){
 	uint32_t array_nb = flag / 32 ;
 	uint32_t flag_pos = flag % 32 ;
+	uint32_t flag_mask = (uint32_t)(1 << flag_pos) ;
 	//On vérifi si le flag est pas déjà haut
-	if(mask->array[array_nb] & (1 << flag_pos) == (1 << flag_pos))
+	if((mask->array[array_nb] & flag_mask) == flag_mask)
 		return FALSE ;
 	//Et on passe à létat haut sinon
-	mask->array[array_nb] |= 1 << flag_pos ;
+	mask->array[array_nb] |= flag_mask ;
 	return TRUE ;
 }
 
@@ -44,9 +45,10 @@ bool_e MASK_set_flag(Mask_t * mask, Flags_t flag){
 bool_e MASK_clean_flag(Mask_t * mask, Flags_t flag){
 	uint32_t array_nb = flag / 32 ;
 	uint32_t flag_pos = flag % 32 ;
+	uint32_t flag_mask = (uint32_t)(1 << flag_pos) ;
 	//On  vérifi si le flag est bien levé
-	if(mask->array[array_nb] & (1 << flag_pos) == (1 << flag_pos)){
-		mask->array[array_nb] -= (1 << flag_pos) ;
+	if((mask->array[array_nb] & flag_mask ) == flag_mask){
+		mask->array[array_nb] -= flag_mask ;
 		return TRUE ;
 	}
 	return FALSE ;

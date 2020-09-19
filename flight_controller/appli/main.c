@@ -38,7 +38,7 @@ int main(void)
 
 	//	-------------------------------------------- Setup -----------------------------------------------------------
 	HAL_Init();
-	Batterie_init(&drone.capteurs.batterie, BATTERIE_ADC_VOLTAGE, BATTERIE_RESISTANCES_COEF);
+	BATTERIE_init(&drone.capteurs.batterie, BATTERIE_ADC_VOLTAGE, BATTERIE_RESISTANCES_COEF);
 
 
 	//Init sequence led
