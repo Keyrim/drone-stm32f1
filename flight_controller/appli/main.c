@@ -91,6 +91,9 @@ int main(void)
 	HAL_Delay(50);
 	MS5611_get_calibration_values(&drone.capteurs.ms5611, FALSE);
 
+	//Init module events
+	EVENT_init(&drone);
+
 	//Init pids pour le mode "angle / levelled "
 	PID_init(&drone.stabilisation.pid_roll, PID_SETTINGS_ROLL);
 	PID_init(&drone.stabilisation.pid_pitch,  PID_SETTINGS_PITCH);

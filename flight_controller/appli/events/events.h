@@ -12,7 +12,7 @@
 #include "mask.h"
 
 
-#define EVENT_NB_MASK_PER_EVENT_MAX 10
+#define EVENT_NB_MASK_PER_EVENT_MAX 2
 
 typedef enum{
 
@@ -40,7 +40,7 @@ typedef struct{
 
 
 void EVENT_process_events();
-void EVENT_init_module(State_drone_t * drone_);
+void EVENT_init(State_drone_t * drone_);
 
 //Set and clean flags
 bool_e EVENT_Set_flag(Flags_t flag);

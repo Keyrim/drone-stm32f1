@@ -28,7 +28,7 @@ void mask_def_manual(Event_t * event){
 	//Mask 1: from on the ground : flag on_the_ground and flag switch 1 pos 3 and battery at least medium
 	MASK_set_flag(&event->mask_and[0], FLAG_STATE_ON_THE_GROUND);
 	MASK_set_flag(&event->mask_and[0], FLAG_CHAN_5_POS_3);
-	MASK_set_flag(&event->mask_and[0], FLAG_BATTERY_MEDIUM);
+	//MASK_set_flag(&event->mask_and[0], FLAG_BATTERY_MEDIUM);
 
 	MASK_set_flag(&event->mask_or[0], FLAG_THROTTLE_LOW);
 }

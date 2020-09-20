@@ -55,7 +55,7 @@ void channel_analysis_process(channel_analysis_t * channels){
 				else if(channels->channels[ch] > 1070 && channels->channels[ch] <= 1120)
 					channels->throttle_lvl[ch] = THROTTLE_LOW ;
 				else if(channels->channels[ch] > 1120 && channels->channels[ch] < 2000)
-					channels->throttle_lvl[ch] = THROTTLE_LOW ;
+					channels->throttle_lvl[ch] = THROTTLE_HIGH ;
 				break;
 
 

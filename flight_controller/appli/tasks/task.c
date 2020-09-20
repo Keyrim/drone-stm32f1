@@ -176,7 +176,7 @@ void task_function_verif_system(uint32_t current_time_us){
 		EVENT_Clean_flag(FLAG_PPM_OK);
 	}
 	else{
-		drone->communication.ibus.is_ok = FALSE ;
+		drone->communication.ibus.is_ok = TRUE ;
 		EVENT_Clean_flag(FLAG_TIMEOUT_PPM);
 		EVENT_Set_flag(FLAG_PPM_OK);
 

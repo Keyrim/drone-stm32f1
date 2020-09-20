@@ -11,13 +11,13 @@
 #define CLEAR_FLAG_FLIGHT_MODE flags = MASK_and(flags, mask_flight_mode_clear)
 
 //Ensemble des flags
-Mask_t flags ;
+static Mask_t flags ;
 
 //Etats du drone, recquis par les fonctions d'event
-State_drone_t * drone ;
+static State_drone_t * drone ;
 
 //Si false, init du module event
-bool_e initialized = FALSE ;
+static bool_e initialized = FALSE ;
 
 //Masks flight mode clear
 Mask_t mask_flight_mode_clear ;
@@ -30,15 +30,6 @@ Flags_t flags_flight_mode_clear [9] = {FLAG_STATE_ON_THE_GROUND,
 		FLAG_STATE_CALIBRATE_MPU,
 		FLAG_STATE_ERROR_SENSOR,
 		FLAG_STATE_CHANGE_PID_SETTINGS};
-
-static void EVENT_init(){
-	initialized = TRUE ;
-	mask_flight_mode_clear = MASK_not(MASK_create(flags_flight_mode_clear, 9));
-}
-
-
-
-
 
 static void event_function_on_the_ground(void){
 	CLEAR_FLAG_FLIGHT_MODE ;
@@ -74,23 +65,21 @@ Event_t events[EVENT_COUNT] ={
 
 //Déclenchement des event
 void EVENT_process_events(){
-	if(!initialized)
-		EVENT_init();
-
-
+	if(initialized){
 	//Pout chaque event
-	for(uint32_t e = 0; e < EVENT_COUNT; e ++){
-		uint32_t m = 0 ;
-		bool_e function_did_run_once = FALSE ;
-		//Pour chaque masques pour les events
-		while(m < events[e].nb_mask && !function_did_run_once){
-			if(Mask_test_and(events[e].mask_and[m], flags)){
-				if(Mask_test_or(events[e].mask_or[m], flags)){
-					events[e].function();
-					function_did_run_once = TRUE ;
+		for(uint32_t e = 0; e < EVENT_COUNT; e ++){
+			uint32_t m = 0 ;
+			bool_e function_did_run_once = FALSE ;
+			//Pour chaque masques pour les events
+			while(m < events[e].nb_mask && !function_did_run_once){
+				if(Mask_test_and(events[e].mask_and[m], flags)){
+					if(Mask_test_or(events[e].mask_or[m], flags)){
+						events[e].function();
+						function_did_run_once = TRUE ;
+					}
 				}
+				m++ ;
 			}
-			m++ ;
 		}
 	}
 }
@@ -102,14 +91,21 @@ bool_e EVENT_Clean_flag(Flags_t flag){
 	return MASK_clean_flag(&flags, flag);
 }
 
-void EVENT_init_module(State_drone_t * drone_){
+void EVENT_init(State_drone_t * drone_){
+	initialized = TRUE ;
+
 	//On enregistre la structure de donnée pour le drone
 	drone = drone_ ;
+
+	//On commence en mode on the ground
+	EVENT_Set_flag(FLAG_STATE_ON_THE_GROUND);
 
 	//Def des mask pour tous les events
 	//Appelle des fonctions de confifuration des masques pour chaques event
 	mask_def_manual(&events[EVENT_TRANSIT_MANUAL]);
 	mask_def_on_the_ground(&events[EVENT_TRANSIT_ON_THE_GROUND]);
+
+	mask_flight_mode_clear = MASK_not(MASK_create(flags_flight_mode_clear, 9));
 
 }
 
