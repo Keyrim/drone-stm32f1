@@ -90,7 +90,7 @@ void HIGH_LVL_Parachute(State_drone_t * drone){
 	//			---------------------------- 		MAIN PART 			----------------------------------------
 	drone->consigne.throttle = (float)(drone->communication.ibus.channels[THROTTLE] - 1050)  ;
 	if(sub_parachute(drone) != IN_PROGRESS){
-		drone->soft.state_flight_mode = ON_THE_GROUND ;
+		EVENT_Set_flag(FLAG_SUB_PARACHUTE_OVER);
 	}
 
 }
@@ -105,7 +105,7 @@ void HIGH_LVL_Calibrate_MPU(State_drone_t * drone){
 
 	//			---------------------------- 		MAIN PART 			----------------------------------------
 	if(Mpu_imu_calibrate(&drone->capteurs.mpu, 1000)){
-		drone->soft.state_flight_mode = ON_THE_GROUND ;
+		EVENT_Set_flag(FLAG_IMU_DONE_CALIB);
 	}
 }
 

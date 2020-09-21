@@ -31,9 +31,11 @@ Flags_t flags_flight_mode_clear [9] = {FLAG_STATE_ON_THE_GROUND,
 		FLAG_STATE_ERROR_SENSOR,
 		FLAG_STATE_CHANGE_PID_SETTINGS};
 
+
 static void event_function_on_the_ground(void){
 	CLEAR_FLAG_FLIGHT_MODE ;
 	EVENT_Set_flag(FLAG_STATE_ON_THE_GROUND);
+	EVENT_Clean_flag(FLAG_REQUEST_STOP_MOTORS);
 	drone->soft.state_flight_mode = ON_THE_GROUND ;
 }
 
@@ -43,6 +45,22 @@ static void event_function_manual(void){
 	drone->soft.state_flight_mode = MANUAL ;
 }
 
+static void event_function_manual_pc(void){
+	CLEAR_FLAG_FLIGHT_MODE ;
+	EVENT_Set_flag(FLAG_STATE_MANUAL_PC);
+	EVENT_Clean_flag(FLAG_REQUEST_MANUAL_PC);
+	drone->soft.state_flight_mode = MANUAL_PC ;
+}
+
+static void event_function_manual_hand_control(void){
+	//Pas censé arriver là pour l instant
+}
+
+static void event_function_manual_accro(void){
+	CLEAR_FLAG_FLIGHT_MODE ;
+	EVENT_Set_flag(FLAG_STATE_MANUAL_ACCRO);
+	drone->soft.state_flight_mode = MANUAL_ACCRO ;
+}
 
 
 #define DEFINE_EVENT(event_function_param, nb_mask_param){  	\
@@ -52,12 +70,16 @@ static void event_function_manual(void){
 
 //Définitions des events
 Event_t events[EVENT_COUNT] ={
-		[EVENT_TRANSIT_ON_THE_GROUND] 			= DEFINE_EVENT(event_function_on_the_ground, 2),
-		[EVENT_TRANSIT_MANUAL] 					= DEFINE_EVENT(event_function_manual, 1),
-		//Fonctions pas def pour l instant
-		[EVENT_TRANSIT_MANUAL_HAND_CONTROL]		= DEFINE_EVENT(event_function_on_the_ground, 0),
-		[EVENT_TRANSIT_MANUAL_ACCRO] 			= DEFINE_EVENT(event_function_on_the_ground, 0),
-		[EVENT_TRANSIT_CALIBRATE_MPU] 			= DEFINE_EVENT(event_function_on_the_ground, 0)
+		[EVENT_TRANSIT_ON_THE_GROUND] 			= DEFINE_EVENT(event_function_on_the_ground, 7),
+		[EVENT_TRANSIT_MANUAL] 					= DEFINE_EVENT(event_function_manual, 4),
+		[EVENT_TRANSIT_MANUAL_PC] 				= DEFINE_EVENT(event_function_manual_pc, 1),
+		[EVENT_TRANSIT_MANUAL_HAND_CONTROL]		= DEFINE_EVENT(event_function_manual_hand_control, 0),	//TODO : Hand control
+		[EVENT_TRANSIT_MANUAL_ACCRO] 			= DEFINE_EVENT(event_function_manual_accro, 4),
+
+		[EVENT_TRANSIT_PARACHUTE] 				= DEFINE_EVENT(event_function_on_the_ground, 0),
+		[EVENT_TRANSIT_CALIBRATE_MPU] 			= DEFINE_EVENT(event_function_on_the_ground, 0),
+		[EVENT_TRANSIT_ERROR_SENSOR] 			= DEFINE_EVENT(event_function_on_the_ground, 0),
+		[EVENT_TRANSIT_CHANGE_PID_SETTINGS] 	= DEFINE_EVENT(event_function_on_the_ground, 0)
 };
 
 
@@ -102,8 +124,16 @@ void EVENT_init(State_drone_t * drone_){
 
 	//Def des mask pour tous les events
 	//Appelle des fonctions de confifuration des masques pour chaques event
-	mask_def_manual(&events[EVENT_TRANSIT_MANUAL]);
 	mask_def_on_the_ground(&events[EVENT_TRANSIT_ON_THE_GROUND]);
+	mask_def_manual(&events[EVENT_TRANSIT_MANUAL]);
+	mask_def_manual_pc(&events[EVENT_TRANSIT_MANUAL_PC]);
+
+	mask_def_manual_hand_control(&events[EVENT_TRANSIT_MANUAL_HAND_CONTROL]);
+	mask_def_manual_accro(&events[EVENT_TRANSIT_MANUAL_ACCRO]);
+	mask_def_parachute(&events[EVENT_TRANSIT_PARACHUTE]);
+	mask_def_calibrate_mpu(&events[EVENT_TRANSIT_CALIBRATE_MPU]);
+	mask_def_error_sensors(&events[EVENT_TRANSIT_ERROR_SENSOR]);
+	mask_def_change_pid_settings(&events[EVENT_TRANSIT_CHANGE_PID_SETTINGS]);
 
 	mask_flight_mode_clear = MASK_not(MASK_create(flags_flight_mode_clear, 9));
 

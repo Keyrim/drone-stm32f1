@@ -40,6 +40,9 @@ typedef enum{
 	FLAG_REQUEST_MANUAL_HAND,
 	FLAG_REQUEST_STOP_MOTORS,
 
+	//Flags subs
+	FLAG_SUB_PARACHUTE_OVER,
+
 	//Flags état périphérique
 	FLAG_IMU_FAIL,
 	FLAG_IMU_DONE_CALIB,
