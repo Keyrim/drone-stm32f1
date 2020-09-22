@@ -38,6 +38,7 @@ bool_e channel_analysis_init(channel_analysis_t * channels, int32_t nb_channel, 
 //Analyse de chaque channel en fonction du mode d'analyse attribué
 void channel_analysis_process(channel_analysis_t * channels){
 	//Analyse des channels
+	bool_e button_state ;
 	for(int8_t ch = 0; ch < channels->nb_channels; ch++ ){
 		switch (channels->analysis_mode[ch]) {
 			case ANALYSIS_NONE:
@@ -60,10 +61,10 @@ void channel_analysis_process(channel_analysis_t * channels){
 
 			case ANALYSIS_BUTTON_ON_OFF :
 				//Buton state
-				bool_e button_state = channels->channels[ch] > 1500 ;
+				button_state = channels->channels[ch] > 1500 ;
 				//If different from previous state
 				if(button_state != channels->button_state[ch]){
-					channels->button_on_off[ch]
+					channels->button_on_off[ch] = 1 - channels->button_on_off[ch] ;
 				}
 				channels->button_state[ch] = button_state ;
 				break;

@@ -22,11 +22,6 @@ void HIGH_LVL_On_The_Ground(State_drone_t * drone){
 		drone->stabilisation.stab_mode = STAB_OFF ;
 		LED_SEQUENCE_set_sequence(&drone->ihm.led_etat, SEQUENCE_LED_1);
 	}
-	//Si on est au sol on met la consigne des moteurs à zéro
-	drone->stabilisation.escs[0].pulsation = PULSATION_MIN ;
-	drone->stabilisation.escs[1].pulsation = PULSATION_MIN ;
-	drone->stabilisation.escs[2].pulsation = PULSATION_MIN ;
-	drone->stabilisation.escs[3].pulsation = PULSATION_MIN ;
 
 }
 
