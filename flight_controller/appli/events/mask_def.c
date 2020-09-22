@@ -88,6 +88,7 @@ void mask_def_manual_pc(Event_t * event){
 	MASK_set_flag(&event->mask_or[0], FLAG_REQUEST_MANUAL_PC);
 }
 void mask_def_manual_hand_control(Event_t * event){
+	UNUSED(event);
 	//Pas activable pour le moment
 }
 void mask_def_manual_accro(Event_t * event){
@@ -117,14 +118,15 @@ void mask_def_manual_accro(Event_t * event){
 	MASK_set_flag(&event->mask_or[3], FLAG_CHAN_6_POS_2);
 }
 void mask_def_parachute(Event_t * event){
-
+	//Mask 1 : from manual if we put the switch
+	MASK_set_flag(&event->mask_and[0], FLAG_STATE_ON_THE_GROUND);
 }
 void mask_def_calibrate_mpu(Event_t * event){
-
+	UNUSED(event);
 }
 void mask_def_error_sensors(Event_t * event){
-
+	UNUSED(event);
 }
 void mask_def_change_pid_settings(Event_t * event){
-
+	UNUSED(event);
 }

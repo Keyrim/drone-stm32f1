@@ -58,6 +58,16 @@ void channel_analysis_process(channel_analysis_t * channels){
 					channels->throttle_lvl[ch] = THROTTLE_HIGH ;
 				break;
 
+			case ANALYSIS_BUTTON_ON_OFF :
+				//Buton state
+				bool_e button_state = channels->channels[ch] > 1500 ;
+				//If different from previous state
+				if(button_state != channels->button_state[ch]){
+					channels->button_on_off[ch]
+				}
+				channels->button_state[ch] = button_state ;
+				break;
+
 
 			case ANALYSIS_SEQUENCE:
 				//todo analyse de séquences sur les switchs
