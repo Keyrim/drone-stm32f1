@@ -28,8 +28,8 @@ bool_e channel_analysis_init(channel_analysis_t * channels, int32_t nb_channel, 
 	channels->analysis_mode[5] = ANALYSIS_SWITCH_MODE ;
 	channels->analysis_mode[6] = ANALYSIS_SWITCH_MODE ;
 	channels->analysis_mode[7] = ANALYSIS_SWITCH_MODE ;
-	channels->analysis_mode[8] = ANALYSIS_NONE ;
-	channels->analysis_mode[9] = ANALYSIS_NONE ;
+	channels->analysis_mode[8] = ANALYSIS_BUTTON_PUSH ;
+	channels->analysis_mode[9] = ANALYSIS_BUTTON_ON_OFF ;
 
 	channels->is_init = TRUE ;
 	return 0 ;
@@ -69,6 +69,15 @@ void channel_analysis_process(channel_analysis_t * channels){
 				channels->button_state[ch] = button_state ;
 				break;
 
+			case ANALYSIS_BUTTON_PUSH :
+				//Buton state
+				button_state = channels->channels[ch] > 1500 ;
+				//If different from previous state and previous was low
+				if(button_state != channels->button_state[ch] && channels->button_state[ch] == 0){
+					channels->button_on_off[ch] = 1 ;
+				}
+				channels->button_state[ch] = button_state ;
+				break;
 
 			case ANALYSIS_SEQUENCE:
 				//todo analyse de séquences sur les switchs

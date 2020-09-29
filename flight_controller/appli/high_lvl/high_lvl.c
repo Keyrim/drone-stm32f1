@@ -304,6 +304,38 @@ static void Flag_channel_analysis(State_drone_t * drone){
 		EVENT_Clean_flag(FLAG_THROTTLE_LOW);
 		EVENT_Set_flag(FLAG_THROTTLE_HIGH);
 	}
+
+	//Button 1
+	if(ch_analysis->analysis_mode[8]==ANALYSIS_BUTTON_ON_OFF){
+		if(ch_analysis->button_on_off[8] == BUTTON_ON){
+			EVENT_Set_flag(FLAG_CHAN_9_ON);
+			EVENT_Clean_flag(FLAG_CHAN_9_OFF);
+		}
+		else{
+			EVENT_Set_flag(FLAG_CHAN_9_OFF);
+			EVENT_Clean_flag(FLAG_CHAN_9_ON);
+		}
+	}
+	if(ch_analysis->button_press[8] == BUTTON_PRESSED){
+		ch_analysis->button_press[8] = BUTTON_NOT_PRESSED ;
+		EVENT_Set_flag(FLAG_CHAN_9_PUSH);
+	}
+
+	//Button 2
+	if(ch_analysis->analysis_mode[9]==ANALYSIS_BUTTON_ON_OFF){
+		if(ch_analysis->button_on_off[9] == BUTTON_ON){
+			EVENT_Set_flag(FLAG_CHAN_10_ON);
+			EVENT_Clean_flag(FLAG_CHAN_10_OFF);
+		}
+		else{
+			EVENT_Set_flag(FLAG_CHAN_10_OFF);
+			EVENT_Clean_flag(FLAG_CHAN_10_ON);
+		}
+	}
+	if(ch_analysis->button_press[9] == BUTTON_PRESSED){
+		ch_analysis->button_press[9] = BUTTON_NOT_PRESSED ;
+		EVENT_Set_flag(FLAG_CHAN_10_PUSH);
+	}
 }
 
 

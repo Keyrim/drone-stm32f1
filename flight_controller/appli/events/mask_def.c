@@ -52,10 +52,11 @@ void mask_def_on_the_ground(Event_t * event){
 	MASK_set_flag(&event->mask_or[6], FLAG_CHAN_7_POS_1);
 }
 void mask_def_manual(Event_t * event){
-	//Mask 1: from on the ground : flag on_the_ground and flag switch 1 pos 3 and battery at least medium
+	//Mask 1: from on the ground : flag on_the_ground and flag switch 1 pos 3, button right OFF and battery at least medium
 	MASK_set_flag(&event->mask_and[0], FLAG_STATE_ON_THE_GROUND);
 	MASK_set_flag(&event->mask_and[0], FLAG_CHAN_5_POS_3);
 	MASK_set_flag(&event->mask_and[0], FLAG_CHAN_6_POS_1);
+	MASK_set_flag(&event->mask_and[0], FLAG_CHAN_9_OFF);
 #if USE_BATTERIE_CHECK
 	MASK_set_flag(&event->mask_and[0], FLAG_BATTERY_MEDIUM);
 #endif
@@ -96,6 +97,7 @@ void mask_def_manual_accro(Event_t * event){
 	MASK_set_flag(&event->mask_and[0], FLAG_STATE_ON_THE_GROUND);
 	MASK_set_flag(&event->mask_and[0], FLAG_CHAN_5_POS_3);
 	MASK_set_flag(&event->mask_and[0], FLAG_CHAN_6_POS_2);
+	MASK_set_flag(&event->mask_and[0], FLAG_CHAN_9_OFF);
 #if USE_BATTERIE_CHECK
 	MASK_set_flag(&event->mask_and[0], FLAG_BATTERY_MEDIUM);
 #endif
