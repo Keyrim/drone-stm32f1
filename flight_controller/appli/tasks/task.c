@@ -131,7 +131,7 @@ void task_function_high_lvl(uint32_t current_time_us){
 
 void task_function_printf(uint32_t current_time_us){
 	UNUSED(current_time_us);
-	printf("%lu\t%lu\n", TASK_get_task(TASK_UART_SEND)->real_period_us, get_cpu_load());
+	printf("%lu\t%lu\n", TASK_get_task(TASK_HIGH_LVL)->execution_duration_us, get_cpu_load());
 }
 
 void task_function_ibus(uint32_t current_time_us){
@@ -251,7 +251,7 @@ void task_function_led(uint32_t current_time_us){
 task_t tasks [TASK_COUNT] ={
 		[TASK_IMU] = 			DEFINE_TASK(TASK_IMU ,				PRIORITY_REAL_TIME, 	task_function_imu, 				PERIOD_US_FROM_HERTZ(250)),
 		[TASK_GYRO_FILTERING] = DEFINE_TASK(TASK_GYRO_FILTERING ,	PRIORITY_REAL_TIME, 	task_function_gyro_filtering, 				PERIOD_US_FROM_HERTZ(250)),
-		[TASK_PRINTF] = 		DEFINE_TASK(TASK_PRINTF, 			PRIORITY_LOW, 			task_function_printf, 			PERIOD_US_FROM_HERTZ(40)),
+		[TASK_PRINTF] = 		DEFINE_TASK(TASK_PRINTF, 			PRIORITY_HIGH, 			task_function_printf, 			PERIOD_US_FROM_HERTZ(40)),
 		[TASK_IBUS] = 			DEFINE_TASK(TASK_IBUS, 				PRIORITY_HIGH, 			task_function_ibus, 			PERIOD_US_FROM_HERTZ(1000)),
 		[TASK_ESCS_IBUS_TEST] = DEFINE_TASK(TASK_ESCS_IBUS_TEST, 	PRIORITY_HIGH, 			task_function_escs_ibus_test, 	PERIOD_US_FROM_HERTZ(250)),
 		[TASK_SEND_DATA] = 		DEFINE_TASK(TASK_SEND_DATA, 		PRIORITY_MEDIUM, 		task_function_send_data, 		PERIOD_US_FROM_HERTZ(250)),

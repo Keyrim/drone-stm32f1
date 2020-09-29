@@ -97,7 +97,7 @@ Data_group_t data_groups[DATA_GROUP_COUNT] = {
 		//Moteurs
 		[DATA_MOTEURS] = DEFINE_DATA_GROUP(			5, 			10, 			TELEMETRIE_send_moteur_all),
 		//Cpu used
-		[DATA_CPU_USED] = DEFINE_DATA_GROUP(		2, 			0, 		TELEMETRIE_send_cpu_pourcentage),
+		[DATA_CPU_USED] = DEFINE_DATA_GROUP(		2, 			10, 		TELEMETRIE_send_cpu_pourcentage),
 		[DATA_TASK_PERIODE] = DEFINE_DATA_GROUP(	4, 			0, 		TELEMETRIE_send_periode_task)
 };
 

@@ -76,6 +76,7 @@ static void event_function_parachute(void){
 }
 
 //Définitions des events
+//Attention !!!! nb_mask < EVENT_NB_MASK_PER_EVENT_MAX sinon dérapage :)
 Event_t events[EVENT_COUNT] ={
 		[EVENT_TRANSIT_ON_THE_GROUND] 			= DEFINE_EVENT(event_function_on_the_ground, 7),
 		[EVENT_TRANSIT_MANUAL] 					= DEFINE_EVENT(event_function_manual, 4),

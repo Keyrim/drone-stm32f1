@@ -12,7 +12,7 @@
 #include "mask.h"
 
 
-#define EVENT_NB_MASK_PER_EVENT_MAX 2
+#define EVENT_NB_MASK_PER_EVENT_MAX 7
 
 typedef enum{
 

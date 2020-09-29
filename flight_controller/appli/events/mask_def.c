@@ -66,17 +66,17 @@ void mask_def_manual(Event_t * event){
 	//Mask 2 : from_manual_hand_control, if the right switch is in the right position
 	MASK_set_flag(&event->mask_and[1], FLAG_STATE_MANUAL_HAND_CONTROL);
 
-	MASK_set_flag(&event->mask_or[1], FLAG_CHAN_5_POS_1);
+	MASK_set_flag(&event->mask_or[1], FLAG_CHAN_6_POS_1);
 
 	//Mask 3 : from_manual accro, same idea as hand control
 	MASK_set_flag(&event->mask_and[2], FLAG_STATE_MANUAL_ACCRO);
 
-	MASK_set_flag(&event->mask_or[2], FLAG_CHAN_5_POS_1);
+	MASK_set_flag(&event->mask_or[2], FLAG_CHAN_6_POS_1);
 
 	//Mask 4 : from parachute, same idea
 	MASK_set_flag(&event->mask_and[3], FLAG_STATE_PARACHUTE);
 
-	MASK_set_flag(&event->mask_or[3], FLAG_CHAN_5_POS_1);
+	MASK_set_flag(&event->mask_or[3], FLAG_CHAN_6_POS_1);
 }
 void mask_def_manual_pc(Event_t * event){
 	//Mask 1 : from on the ground : flag on the ground switch 1 pos 3 v_bat medium et manual pc request
