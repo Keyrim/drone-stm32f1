@@ -87,3 +87,9 @@ Mask_t MASK_create(Flags_t * flag_array, int32_t len){
 
 	return mask_return ;
 }
+
+Mask_t MASK_create_single(Flags_t flag){
+	Mask_t mask_return ;
+	MASK_set_flag(&mask_return, flag);
+	return mask_return ;
+}

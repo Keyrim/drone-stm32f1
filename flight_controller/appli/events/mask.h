@@ -34,6 +34,7 @@ Mask_t MASK_not(Mask_t mask);
 
 //Créer un mask à partir d'un tableau de flag
 Mask_t MASK_create(Flags_t * flag_array, int32_t len);
+Mask_t MASK_create_single(Flags_t flag);
 
 
 #endif /* EVENTS_MASK_H_ */

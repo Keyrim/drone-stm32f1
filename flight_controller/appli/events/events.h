@@ -30,10 +30,17 @@ typedef enum{
 	EVENT_COUNT
 }Id_Events_t;
 
+typedef enum{
+	EVENT_TYPE_HIGH_LVL,
+	EVENT_TYPE_ERROR
+}Event_type_t;
+
 typedef struct{
-	Mask_t mask_and[EVENT_NB_MASK_PER_EVENT_MAX] ;
-	Mask_t mask_or[EVENT_NB_MASK_PER_EVENT_MAX] ;
-	uint32_t nb_mask ;
+	Mask_t mask_and[EVENT_NB_MASK_PER_EVENT_MAX] ;	//Masques de conditions
+	Mask_t mask_or[EVENT_NB_MASK_PER_EVENT_MAX] ;	//Masques de déclenchement
+	uint32_t nb_mask ;								//Nombre de paires de masque
+	Event_type_t type ;								//Type d'évenement
+	Mask_t high_lvl_state ;							//Pour un event de type high lvl, flag qui correspond à l'état vers le quel vas l'event (pour éviter de test une transition si on est déjà dans l event)
 	void (*function)(void);
 }Event_t;
 
