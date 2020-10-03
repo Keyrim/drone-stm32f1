@@ -61,6 +61,7 @@ static void event_function_manual_accro(void){
 }
 static void event_function_parachute(void){
 	CLEAR_FLAG_FLIGHT_MODE ;
+	EVENT_Clean_flag(FLAG_CHAN_9_PUSH);
 	EVENT_Set_flag(FLAG_STATE_PARACHUTE);
 	drone->soft.state_flight_mode = PARACHUTE ;
 }
@@ -76,12 +77,12 @@ static void event_function_parachute(void){
 //Attention !!!! nb_mask < EVENT_NB_MASK_PER_EVENT_MAX sinon dérapage :)
 Event_t events[EVENT_COUNT] ={
 		[EVENT_TRANSIT_ON_THE_GROUND] 			= DEFINE_EVENT(event_function_on_the_ground, 		7, EVENT_TYPE_HIGH_LVL),
-		[EVENT_TRANSIT_MANUAL] 					= DEFINE_EVENT(event_function_manual, 				4, EVENT_TYPE_HIGH_LVL),
+		[EVENT_TRANSIT_MANUAL] 					= DEFINE_EVENT(event_function_manual, 				3, EVENT_TYPE_HIGH_LVL),
 		[EVENT_TRANSIT_MANUAL_PC] 				= DEFINE_EVENT(event_function_manual_pc, 			1, EVENT_TYPE_HIGH_LVL),
 		[EVENT_TRANSIT_MANUAL_HAND_CONTROL]		= DEFINE_EVENT(event_function_manual_hand_control, 	0, EVENT_TYPE_HIGH_LVL),	//TODO : Hand control
-		[EVENT_TRANSIT_MANUAL_ACCRO] 			= DEFINE_EVENT(event_function_manual_accro, 		4, EVENT_TYPE_HIGH_LVL),
+		[EVENT_TRANSIT_MANUAL_ACCRO] 			= DEFINE_EVENT(event_function_manual_accro, 		3, EVENT_TYPE_HIGH_LVL),
 
-		[EVENT_TRANSIT_PARACHUTE] 				= DEFINE_EVENT(event_function_parachute, 			0, EVENT_TYPE_HIGH_LVL),
+		[EVENT_TRANSIT_PARACHUTE] 				= DEFINE_EVENT(event_function_parachute, 			1, EVENT_TYPE_HIGH_LVL),
 		[EVENT_TRANSIT_CALIBRATE_MPU] 			= DEFINE_EVENT(event_function_on_the_ground, 		0, EVENT_TYPE_HIGH_LVL),
 		[EVENT_TRANSIT_ERROR_SENSOR] 			= DEFINE_EVENT(event_function_on_the_ground, 		0, EVENT_TYPE_HIGH_LVL),
 		[EVENT_TRANSIT_CHANGE_PID_SETTINGS] 	= DEFINE_EVENT(event_function_on_the_ground, 		0, EVENT_TYPE_HIGH_LVL)

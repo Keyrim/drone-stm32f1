@@ -27,5 +27,6 @@ void TELEM2_send_data(Ids_t id, uint8_t * data, uint8_t len){
 	UART_puts_it(UART_TELEMETRIE, bytes, (uint8_t)(3 + len));
 }
 void TELEM2_send_float(Ids_t id, float value){
-
+	UNUSED(id);
+	UNUSED(value);
 }

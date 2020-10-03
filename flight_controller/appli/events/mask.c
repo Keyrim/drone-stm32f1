@@ -7,6 +7,19 @@
 
 #include "mask.h"
 
+//Renvoit un mask vide
+Mask_t MASK_get_empty_mask(){
+	Mask_t mask_return ;
+	for(int32_t m = 0; m < NB_ARRAY_MASK; m++)
+		mask_return.array[m] = 0 ;
+	return mask_return ;
+}
+//Clean tous les flags d un mask
+Mask_t MASK_clean_every_flags(Mask_t * mask){
+	for(int m = 0; m < NB_ARRAY_MASK; m++)
+		mask->array[m] = 0 ;
+}
+
 //Fonction qui compare si tous les bits du mask de test sont présent dans le mask de ref
 bool_e Mask_test_and(Mask_t mask_test, Mask_t mask_ref){
 	//On cherche à savoir si les bits du mask sont présent dans le mask de ref
@@ -57,14 +70,14 @@ bool_e MASK_clean_flag(Mask_t * mask, Flags_t flag){
 
 //Opérations sur les mask
 Mask_t MASK_and(Mask_t mask1, Mask_t mask2){
-	Mask_t mask_return ;
+	Mask_t mask_return = MASK_get_empty_mask() ;
 	for(int32_t m = 0; m < NB_ARRAY_MASK; m++)
 		mask_return.array[m] = mask1.array[m] & mask2.array[m] ;
 
 	return mask_return ;
 }
 Mask_t MASK_or(Mask_t mask1, Mask_t mask2){
-	Mask_t mask_return ;
+	Mask_t mask_return = MASK_get_empty_mask() ;
 	for(int32_t m = 0; m < NB_ARRAY_MASK; m++)
 		mask_return.array[m] = mask1.array[m] | mask2.array[m] ;
 
@@ -72,16 +85,18 @@ Mask_t MASK_or(Mask_t mask1, Mask_t mask2){
 }
 
 Mask_t MASK_not(Mask_t mask){
-	Mask_t mask_return ;
+	Mask_t mask_return = MASK_get_empty_mask() ;
 	for(int32_t m = 0; m < NB_ARRAY_MASK; m++)
 		mask_return.array[m] = ~mask.array[m] ;
 
 	return mask_return ;
 }
 
+
+
 //Créer un mask à partir d'un tableau de flag
 Mask_t MASK_create(Flags_t * flag_array, int32_t len){
-	Mask_t mask_return ;
+	Mask_t mask_return = MASK_get_empty_mask() ;
 	for(int32_t f = 0; f < len; f++)
 		MASK_set_flag(&mask_return, flag_array[f]);
 
@@ -89,7 +104,9 @@ Mask_t MASK_create(Flags_t * flag_array, int32_t len){
 }
 
 Mask_t MASK_create_single(Flags_t flag){
-	Mask_t mask_return ;
+	Mask_t mask_return = MASK_get_empty_mask() ;
 	MASK_set_flag(&mask_return, flag);
 	return mask_return ;
 }
+
+

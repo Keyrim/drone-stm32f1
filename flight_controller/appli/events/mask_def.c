@@ -56,7 +56,7 @@ void mask_def_manual(Event_t * event){
 	MASK_set_flag(&event->mask_and[0], FLAG_STATE_ON_THE_GROUND);
 	MASK_set_flag(&event->mask_and[0], FLAG_CHAN_5_POS_3);
 	MASK_set_flag(&event->mask_and[0], FLAG_CHAN_6_POS_1);
-	MASK_set_flag(&event->mask_and[0], FLAG_CHAN_9_OFF);
+	MASK_set_flag(&event->mask_and[0], FLAG_CHAN_10_OFF);
 #if USE_BATTERIE_CHECK
 	MASK_set_flag(&event->mask_and[0], FLAG_BATTERY_MEDIUM);
 #endif
@@ -73,10 +73,10 @@ void mask_def_manual(Event_t * event){
 
 	MASK_set_flag(&event->mask_or[2], FLAG_CHAN_6_POS_1);
 
-	//Mask 4 : from parachute, same idea
-	MASK_set_flag(&event->mask_and[3], FLAG_STATE_PARACHUTE);
-
-	MASK_set_flag(&event->mask_or[3], FLAG_CHAN_6_POS_1);
+//	//Mask 4 : from parachute, same idea
+//	MASK_set_flag(&event->mask_and[3], FLAG_STATE_PARACHUTE);
+//
+//	MASK_set_flag(&event->mask_or[3], FLAG_CHAN_6_POS_1);
 }
 void mask_def_manual_pc(Event_t * event){
 	//Mask 1 : from on the ground : flag on the ground switch 1 pos 3 v_bat medium et manual pc request
@@ -114,14 +114,16 @@ void mask_def_manual_accro(Event_t * event){
 
 	MASK_set_flag(&event->mask_or[2], FLAG_CHAN_6_POS_2);
 
-	//Mask 4 : From parachute, if the switch right way
-	MASK_set_flag(&event->mask_and[3], FLAG_STATE_PARACHUTE);
-
-	MASK_set_flag(&event->mask_or[3], FLAG_CHAN_6_POS_2);
+//	//Mask 4 : From parachute, if the switch right way
+//	MASK_set_flag(&event->mask_and[3], FLAG_STATE_PARACHUTE);
+//
+//	MASK_set_flag(&event->mask_or[3], FLAG_CHAN_6_POS_2);
 }
 void mask_def_parachute(Event_t * event){
-	//Mask 1 : from manual if we put the switch
-	MASK_set_flag(&event->mask_and[0], FLAG_STATE_ON_THE_GROUND);
+	//Mask 1 : from manual if we press the left button
+	MASK_set_flag(&event->mask_and[0], FLAG_STATE_MANUAL);
+
+	MASK_set_flag(&event->mask_or[0], FLAG_CHAN_9_PUSH);
 }
 void mask_def_calibrate_mpu(Event_t * event){
 	UNUSED(event);

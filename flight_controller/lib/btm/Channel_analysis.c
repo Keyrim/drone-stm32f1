@@ -60,22 +60,33 @@ void channel_analysis_process(channel_analysis_t * channels){
 				break;
 
 			case ANALYSIS_BUTTON_ON_OFF :
-				//Buton state
-				button_state = channels->channels[ch] > 1500 ;
-				//If different from previous state
-				if(button_state != channels->button_state[ch]){
-					channels->button_on_off[ch] = 1 - channels->button_on_off[ch] ;
-				}
-				channels->button_state[ch] = button_state ;
-				break;
-
-			case ANALYSIS_BUTTON_PUSH :
+				//Active le boutton dans le code
+				if(!channels->button_on_off[ch])
+					channels->button_on_off[ch] = BUTTON_OFF ;
 				//Buton state
 				button_state = channels->channels[ch] > 1500 ;
 				//If different from previous state and previous was low
 				if(button_state != channels->button_state[ch] && channels->button_state[ch] == 0){
-					channels->button_on_off[ch] = 1 ;
+					if(channels->button_on_off[ch] == BUTTON_ON)
+						channels->button_on_off[ch] = BUTTON_OFF ;
+					else
+						channels->button_on_off[ch] = BUTTON_ON ;
 				}
+
+				channels->button_state[ch] = button_state ;
+				break;
+
+			case ANALYSIS_BUTTON_PUSH :
+				//Active le boutton dans le code
+				if(!channels->button_pushed[ch])
+					channels->button_pushed[ch] = BUTTON_PUSHED_NO_REQUEST ;
+				//Buton state
+				button_state = channels->channels[ch] > 1500 ;
+				//If different from previous state and previous was low
+				if(button_state != channels->button_state[ch] && channels->button_state[ch] == 0){
+					channels->button_pushed[ch] = BUTTON_PUSHED_REQUEST ;
+				}
+
 				channels->button_state[ch] = button_state ;
 				break;
 

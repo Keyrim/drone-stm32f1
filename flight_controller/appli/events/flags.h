@@ -56,6 +56,7 @@ typedef enum{
 	//Flag batterie
 	FLAG_BATTERY_LOW_CUTOF,
 	FLAG_BATTERY_LOW,
+							//Fin premier int32
 	FLAG_BATTERY_MEDIUM,
 	FLAG_BATTERY_HIGH,
 	FLAG_BATTERY_NO_BATT,

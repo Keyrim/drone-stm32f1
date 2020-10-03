@@ -36,20 +36,24 @@ typedef enum{
 	SWITCH_POS_ERROR
 }switch_pos_t;
 
+//état direct du button (appuyé ou pas)
 typedef enum{
-	BUTTON_ON,
-	BUTTON_OFF
+	BUTTON_STATE_NOT_PRESSED,
+	BUTTON_STATE_PRESSED
+}button_state_t;
+
+//Fonctionne comme un interupteur => une pression change l'état
+typedef enum{
+	BUTTON_ON_OFF_NOT_USED,
+	BUTTON_OFF,
+	BUTTON_ON
 }button_on_off_t;
 
 typedef enum{
-	BUTTON_PRESSED,
-	BUTTON_NOT_PRESSED
-}button_state_t;
-
-typedef enum{
-	BUTTON_PRESS_REQUEST,
-	BUTTON_PRESS_NO_REQUEST
-}button_press_t;
+	BUTTON_PUSHED_NOT_USED,
+	BUTTON_PUSHED_NO_REQUEST,
+	BUTTON_PUSHED_REQUEST
+}button_pushed_t;
 
 
 typedef struct{
@@ -58,7 +62,7 @@ typedef struct{
 	bool_e is_init ;
 	switch_pos_t switch_pos [NB_CHANNEL_MAX] ; //For buttons etc (0 = 1000, 1 = 1500, 2= 2000)
 	throttle_lvl_t throttle_lvl [NB_CHANNEL_MAX] ;
-	button_press_t button_press [NB_CHANNEL_MAX];
+	button_pushed_t button_pushed [NB_CHANNEL_MAX];
 	button_on_off_t button_on_off [NB_CHANNEL_MAX];
 	button_state_t button_state [NB_CHANNEL_MAX];
 	analysis_mode_t analysis_mode [NB_CHANNEL_MAX];

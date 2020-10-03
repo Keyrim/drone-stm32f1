@@ -36,5 +36,9 @@ Mask_t MASK_not(Mask_t mask);
 Mask_t MASK_create(Flags_t * flag_array, int32_t len);
 Mask_t MASK_create_single(Flags_t flag);
 
+//Renvoit un mask vide
+Mask_t MASK_get_empty_mask();
+//Clean tous les flags d un mask
+Mask_t MASK_clean_every_flags(Mask_t * mask);
 
 #endif /* EVENTS_MASK_H_ */
