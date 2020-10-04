@@ -1,0 +1,41 @@
+/*
+ * mask_def_enum.h
+ *
+ *  Created on: 4 oct. 2020
+ *      Author: Théo
+ */
+
+#ifndef EVENTS_MASK_DEF_ENUM_H_
+#define EVENTS_MASK_DEF_ENUM_H_
+
+typedef enum{
+	//On the ground
+	ON_THE_GROUND_MANUAL,
+	ON_THE_GROUND_STOP_MOTORS_REQUEST,
+	ON_THE_GROUND_MANUAL_ACCRO,
+	ON_THE_GROUND_PARACHUTE,
+	ON_THE_GROUND_IMU_CALIB,
+	ON_THE_GROUND_MASK_COUNT,
+
+	//Manual
+	MANUAL_ON_THE_GROUND = 0,
+	MANUAL_MANUAL_ACCRO,
+	MANUAL_MASK_COUNT,
+
+	//Manual pc
+	MANUAL_PC_ON_THE_GROUND = 0,
+	MANUAL_PC_MASK_COUNT,
+
+	//Manual accro
+	MANUAL_ACCRO_ON_THE_GROUND = 0,
+	MANUAL_ACCRO_MANUAL,
+	MANUAL_ACCRO_MASK_COUNT,
+
+	//Parachute
+	PARACHUTE_MANUAL = 0,
+	PARACHUTE_COUNT
+
+
+}mask_def_ids_t;
+
+#endif /* EVENTS_MASK_DEF_ENUM_H_ */

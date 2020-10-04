@@ -33,34 +33,47 @@ Flags_t flags_flight_mode_clear [9] = {FLAG_STATE_ON_THE_GROUND,
 
 
 //Fonctions liées aux events
-static void event_function_on_the_ground(void){
+static void event_function_on_the_ground(mask_def_ids_t mask_id){
 	CLEAR_FLAG_FLIGHT_MODE ;
 	EVENT_Set_flag(FLAG_STATE_ON_THE_GROUND);
-	EVENT_Clean_flag(FLAG_REQUEST_STOP_MOTORS);
-	EVENT_Clean_flag(FLAG_SUB_PARACHUTE_OVER);
+	switch(mask_id){
+		case  ON_THE_GROUND_STOP_MOTORS_REQUEST :
+			EVENT_Clean_flag(FLAG_REQUEST_STOP_MOTORS);
+			break;
+		case ON_THE_GROUND_PARACHUTE :
+			EVENT_Clean_flag(FLAG_SUB_PARACHUTE_OVER);
+			break;
+		default :
+			break;
+	}
 	drone->soft.state_flight_mode = ON_THE_GROUND ;
 }
-static void event_function_manual(void){
+static void event_function_manual(mask_def_ids_t mask_id){
+	UNUSED(mask_id);
 	CLEAR_FLAG_FLIGHT_MODE ;
 	EVENT_Set_flag(FLAG_STATE_MANUAL);
 	drone->soft.state_flight_mode = MANUAL ;
 }
-static void event_function_manual_pc(void){
+static void event_function_manual_pc(mask_def_ids_t mask_id){
 	CLEAR_FLAG_FLIGHT_MODE ;
+	UNUSED(mask_id);
 	EVENT_Set_flag(FLAG_STATE_MANUAL_PC);
 	EVENT_Clean_flag(FLAG_REQUEST_MANUAL_PC);
 	drone->soft.state_flight_mode = MANUAL_PC ;
 }
-static void event_function_manual_hand_control(void){
+static void event_function_manual_hand_control(mask_def_ids_t mask_id){
 	//Pas censé arriver là pour l instant
+	UNUSED(mask_id);
 }
-static void event_function_manual_accro(void){
+static void event_function_manual_accro(mask_def_ids_t mask_id){
 	CLEAR_FLAG_FLIGHT_MODE ;
+	UNUSED(mask_id);
 	EVENT_Set_flag(FLAG_STATE_MANUAL_ACCRO);
 	drone->soft.state_flight_mode = MANUAL_ACCRO ;
 }
-static void event_function_parachute(void){
+static void event_function_parachute(mask_def_ids_t mask_id){
 	CLEAR_FLAG_FLIGHT_MODE ;
+	UNUSED(mask_id);
 	EVENT_Clean_flag(FLAG_CHAN_9_PUSH);
 	EVENT_Set_flag(FLAG_STATE_PARACHUTE);
 	drone->soft.state_flight_mode = PARACHUTE ;
@@ -76,16 +89,15 @@ static void event_function_parachute(void){
 //Définitions des events
 //Attention !!!! nb_mask < EVENT_NB_MASK_PER_EVENT_MAX sinon dérapage :)
 Event_t events[EVENT_COUNT] ={
-		[EVENT_TRANSIT_ON_THE_GROUND] 			= DEFINE_EVENT(event_function_on_the_ground, 		7, EVENT_TYPE_HIGH_LVL),
-		[EVENT_TRANSIT_MANUAL] 					= DEFINE_EVENT(event_function_manual, 				3, EVENT_TYPE_HIGH_LVL),
-		[EVENT_TRANSIT_MANUAL_PC] 				= DEFINE_EVENT(event_function_manual_pc, 			1, EVENT_TYPE_HIGH_LVL),
-		[EVENT_TRANSIT_MANUAL_HAND_CONTROL]		= DEFINE_EVENT(event_function_manual_hand_control, 	0, EVENT_TYPE_HIGH_LVL),	//TODO : Hand control
-		[EVENT_TRANSIT_MANUAL_ACCRO] 			= DEFINE_EVENT(event_function_manual_accro, 		3, EVENT_TYPE_HIGH_LVL),
-
-		[EVENT_TRANSIT_PARACHUTE] 				= DEFINE_EVENT(event_function_parachute, 			1, EVENT_TYPE_HIGH_LVL),
-		[EVENT_TRANSIT_CALIBRATE_MPU] 			= DEFINE_EVENT(event_function_on_the_ground, 		0, EVENT_TYPE_HIGH_LVL),
-		[EVENT_TRANSIT_ERROR_SENSOR] 			= DEFINE_EVENT(event_function_on_the_ground, 		0, EVENT_TYPE_HIGH_LVL),
-		[EVENT_TRANSIT_CHANGE_PID_SETTINGS] 	= DEFINE_EVENT(event_function_on_the_ground, 		0, EVENT_TYPE_HIGH_LVL)
+		[EVENT_TRANSIT_ON_THE_GROUND] 			= DEFINE_EVENT(event_function_on_the_ground, 		ON_THE_GROUND_MASK_COUNT, 	EVENT_TYPE_HIGH_LVL),
+		[EVENT_TRANSIT_MANUAL] 					= DEFINE_EVENT(event_function_manual, 				MANUAL_MASK_COUNT, 			EVENT_TYPE_HIGH_LVL),
+		[EVENT_TRANSIT_MANUAL_PC] 				= DEFINE_EVENT(event_function_manual_pc, 			MANUAL_PC_MASK_COUNT, 		EVENT_TYPE_HIGH_LVL),
+		[EVENT_TRANSIT_MANUAL_HAND_CONTROL]		= DEFINE_EVENT(event_function_manual_hand_control, 	0, 							EVENT_TYPE_HIGH_LVL),	//TODO : Hand control
+		[EVENT_TRANSIT_MANUAL_ACCRO] 			= DEFINE_EVENT(event_function_manual_accro, 		MANUAL_ACCRO_MASK_COUNT, 	EVENT_TYPE_HIGH_LVL),
+		[EVENT_TRANSIT_PARACHUTE] 				= DEFINE_EVENT(event_function_parachute, 			PARACHUTE_COUNT, 			EVENT_TYPE_HIGH_LVL),
+		[EVENT_TRANSIT_CALIBRATE_MPU] 			= DEFINE_EVENT(event_function_on_the_ground, 		0, 							EVENT_TYPE_HIGH_LVL),
+		[EVENT_TRANSIT_ERROR_SENSOR] 			= DEFINE_EVENT(event_function_on_the_ground, 		0, 							EVENT_TYPE_HIGH_LVL),
+		[EVENT_TRANSIT_CHANGE_PID_SETTINGS] 	= DEFINE_EVENT(event_function_on_the_ground, 		0, 							EVENT_TYPE_HIGH_LVL)
 };
 
 //Définis les mask "high_lvl_state" pour les events
@@ -102,7 +114,7 @@ static void EVENT_init_high_lvl_state_mask(void){
 }
 
 
-//Déclenchement des event
+//Déclenchement des events
 void EVENT_process_events(){
 	if(initialized){
 	//Pout chaque event
@@ -117,7 +129,7 @@ void EVENT_process_events(){
 					while(m < events[e].nb_mask && !function_did_run_once){
 						if(Mask_test_and(events[e].mask_and[m], flags)){
 							if(Mask_test_or(events[e].mask_or[m], flags)){
-								events[e].function();
+								events[e].function(m);
 								function_did_run_once = TRUE ;
 							}
 						}

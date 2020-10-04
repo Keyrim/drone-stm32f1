@@ -9,6 +9,7 @@
 #define EVENTS_EVENTS_H_
 
 #include "../system_d.h"
+#include "mask_def_enum.h"
 #include "mask.h"
 
 
@@ -41,7 +42,7 @@ typedef struct{
 	uint32_t nb_mask ;								//Nombre de paires de masque
 	Event_type_t type ;								//Type d'évenement
 	Mask_t high_lvl_state ;							//Pour un event de type high lvl, flag qui correspond à l'état vers le quel vas l'event (pour éviter de test une transition si on est déjà dans l event)
-	void (*function)(void);
+	void (*function)(mask_def_ids_t mask_id);
 }Event_t;
 
 
