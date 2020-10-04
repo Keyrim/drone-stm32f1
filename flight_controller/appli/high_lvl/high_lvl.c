@@ -107,7 +107,7 @@ void HIGH_LVL_Calibrate_MPU(State_drone_t * drone){
 //Mode "manual_pc" : stabilisation levelled, on control le "throttle" depuis le pc
 void HIGH_LVL_Manual_Pc(State_drone_t * drone){
 	if(drone->soft.entrance_flight_mode){
-		drone->stabilisation.stab_mode = LEVELLED ;
+		drone->stabilisation.stab_mode = ACCRO ;
 		drone->consigne.throttle = 1000 ;
 		LED_SEQUENCE_set_sequence(&drone->ihm.led_etat, SEQUENCE_LED_5);
 	}

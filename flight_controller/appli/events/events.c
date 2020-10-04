@@ -37,11 +37,14 @@ static void event_function_on_the_ground(mask_def_ids_t mask_id){
 	CLEAR_FLAG_FLIGHT_MODE ;
 	EVENT_Set_flag(FLAG_STATE_ON_THE_GROUND);
 	switch(mask_id){
-		case  ON_THE_GROUND_STOP_MOTORS_REQUEST :
+		case ON_THE_GROUND_STOP_MOTORS_REQUEST :
 			EVENT_Clean_flag(FLAG_REQUEST_STOP_MOTORS);
 			break;
 		case ON_THE_GROUND_PARACHUTE :
 			EVENT_Clean_flag(FLAG_SUB_PARACHUTE_OVER);
+			break;
+		case ON_THE_GROUND_CHANGE_PID_SETTINGS :
+			EVENT_Clean_flag(FLAG_CHAN_9_PUSH);
 			break;
 		default :
 			break;
@@ -79,6 +82,29 @@ static void event_function_parachute(mask_def_ids_t mask_id){
 	drone->soft.state_flight_mode = PARACHUTE ;
 }
 
+static void event_function_calibration_mpu(mask_def_ids_t mask_id){
+	CLEAR_FLAG_FLIGHT_MODE ;
+	switch(mask_id){
+		case CALIBRATE_MPU_PC_REQUEST:
+			EVENT_Clean_flag(FLAG_REQUEST_MPU_CALIBRATION);
+			break;
+		case CALIBRATE_MPU_RADIO_REQUEST:
+			EVENT_Clean_flag(FLAG_CHAN_9_PUSH);
+			break;
+		default:
+			break;
+	}
+	EVENT_Set_flag(FLAG_STATE_CALIBRATE_MPU);
+	drone->soft.state_flight_mode = CALIBRATE_MPU6050 ;
+}
+static void event_function_change_pid_settings(mask_def_ids_t mask_id){
+	CLEAR_FLAG_FLIGHT_MODE ;
+	UNUSED(mask_id);
+	EVENT_Clean_flag(FLAG_CHAN_9_PUSH);
+	EVENT_Set_flag(FLAG_STATE_CHANGE_PID_SETTINGS);
+	drone->soft.state_flight_mode = PID_CHANGE_SETTINGS ;
+}
+
 
 #define DEFINE_EVENT(event_function_param, nb_mask_param, event_type_param){  	\
 		.function = event_function_param ,						\
@@ -95,9 +121,9 @@ Event_t events[EVENT_COUNT] ={
 		[EVENT_TRANSIT_MANUAL_HAND_CONTROL]		= DEFINE_EVENT(event_function_manual_hand_control, 	0, 							EVENT_TYPE_HIGH_LVL),	//TODO : Hand control
 		[EVENT_TRANSIT_MANUAL_ACCRO] 			= DEFINE_EVENT(event_function_manual_accro, 		MANUAL_ACCRO_MASK_COUNT, 	EVENT_TYPE_HIGH_LVL),
 		[EVENT_TRANSIT_PARACHUTE] 				= DEFINE_EVENT(event_function_parachute, 			PARACHUTE_COUNT, 			EVENT_TYPE_HIGH_LVL),
-		[EVENT_TRANSIT_CALIBRATE_MPU] 			= DEFINE_EVENT(event_function_on_the_ground, 		0, 							EVENT_TYPE_HIGH_LVL),
+		[EVENT_TRANSIT_CALIBRATE_MPU] 			= DEFINE_EVENT(event_function_calibration_mpu, 		CALIBRATE_MPU_COUNT, 		EVENT_TYPE_HIGH_LVL),
 		[EVENT_TRANSIT_ERROR_SENSOR] 			= DEFINE_EVENT(event_function_on_the_ground, 		0, 							EVENT_TYPE_HIGH_LVL),
-		[EVENT_TRANSIT_CHANGE_PID_SETTINGS] 	= DEFINE_EVENT(event_function_on_the_ground, 		0, 							EVENT_TYPE_HIGH_LVL)
+		[EVENT_TRANSIT_CHANGE_PID_SETTINGS] 	= DEFINE_EVENT(event_function_change_pid_settings, 	CHANGE_PID_SETTINGS_COUNT, 	EVENT_TYPE_HIGH_LVL)
 };
 
 //Définis les mask "high_lvl_state" pour les events
