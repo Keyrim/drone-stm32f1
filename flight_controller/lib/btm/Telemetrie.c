@@ -17,6 +17,7 @@ void TELEMETRIE_send_consigne_base(uint8_t consigne,  uart_id_e uart){
 	bytes[0] = ID_BASE_CONSIGNE_BASE ;
 	bytes[1] = consigne ;
 	//UART_puts_it(uart, bytes, 2);
+	UNUSED(uart);
 	TELEM2_send_data(ID_BASE_CONSIGNE_BASE, &bytes[1], 1);
 }
 
@@ -25,11 +26,13 @@ void TELEMETRIE_send_high_lvl_transi(uint8_t transi, uart_id_e uart){
 	bytes[0] = ID_PC_HIGH_LVL_TRANSITION ;
 	bytes[1] = transi ;
 	//UART_puts_it(uart, bytes, 2);
+	UNUSED(uart);
 	TELEM2_send_data(ID_PC_HIGH_LVL_TRANSITION, &bytes[1], 1);
 }
 
 //Double
 void TELEMETRIE_send_double(float value, uint8_t id,uart_id_e uart){
+	UNUSED(uart);
 	uint8_t bytes[5] = {0};
 	int32_t int_value = (int32_t)( value * (float) 1000000);
 	bytes[0] = id ;
@@ -41,6 +44,7 @@ void TELEMETRIE_send_double(float value, uint8_t id,uart_id_e uart){
 	//UART_puts_it(uart, bytes, 5);
 }
 void TELEMETRIE_send_double_16b(float value, uint8_t id, uart_id_e uart){
+	UNUSED(uart);
 	uint8_t  bytes[3] = {0} ;
 	int16_t int_value =  (int16_t)( value * (double) 100);
 	bytes[0] = id ;
@@ -151,6 +155,7 @@ void TELEMETRIE_send_pid_pitch_kd(State_drone_t * drone){
 
 //Période task
 void TELEMETRIE_send_periode_task(State_drone_t * drone){
+	UNUSED(drone);
 	uint8_t bytes[4] = {0};
 	uint32_t int_value = (uint32_t)( TASK_get_task(TASK_GYRO_FILTERING)->real_period_us);
 	bytes[0] = ID_PC_TASK_PERIODE ;
@@ -163,6 +168,7 @@ void TELEMETRIE_send_periode_task(State_drone_t * drone){
 
 //Cpu used
 void TELEMETRIE_send_cpu_pourcentage(State_drone_t * drone){
+	UNUSED(drone);
 	uint8_t bytes[2] = {0};
 	bytes[0] = ID_PC_CPU_POURCENTAGE ;
 	bytes[1] = (uint8_t)get_cpu_load() ;

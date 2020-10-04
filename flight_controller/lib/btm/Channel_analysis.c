@@ -8,61 +8,127 @@
 #include "Channel_annalysis.h"
 #include "stdlib.h"
 
+#define JOYCTICK_DEAD_BAND 30
+
+
 bool_e channel_analysis_init(channel_analysis_t * channels, int32_t nb_channel, int32_t * channels_array){
 
 	if(nb_channel > NB_CHANNEL_MAX)
-		//Si on la struct à des tableaux trop petit on laisse tomber
+		//Si la struct à des tableaux trop petit on laisse tomber
 		return 1 ;
 	channels->nb_channels = nb_channel ;
 	channels->channels = channels_array ;
 
-	//Configuration des channels par défault, à savoir les 4 première en "joystick"
-	for(uint8_t ch = 0 ; ch < 4; ch ++){
-		channels->channel_type[ch] = JOYSTICK ;
-		channels->analysis_mode[ch] = JOYSTICK_DEAD_BAND ;
-	}
-
-	//Pour le joyctick des gaz on ne veut pas de dead band
-	channels->analysis_mode[3] = NO_ANALYSIS ;
-
-	//Les autres ont dit que c'est des switchs
-	for(uint8_t ch = 4 ; ch < 10; ch ++){
-		channels->channel_type[ch] = SWITCH_3_POS ;
-		channels->analysis_mode[ch] = NO_ANALYSIS ;
-	}
+	//Définition du mode d'analyse pour chaque channel
+	channels->analysis_mode[0] = ANALYSIS_STICK_DEAD_BAND ;
+	channels->analysis_mode[1] = ANALYSIS_STICK_DEAD_BAND ;
+	channels->analysis_mode[2] = ANALYSIS_STICK_LVL ;
+	channels->analysis_mode[3] = ANALYSIS_STICK_DEAD_BAND ;
+	channels->analysis_mode[4] = ANALYSIS_SWITCH_MODE ;
+	channels->analysis_mode[5] = ANALYSIS_SWITCH_MODE ;
+	channels->analysis_mode[6] = ANALYSIS_SWITCH_MODE ;
+	channels->analysis_mode[7] = ANALYSIS_SWITCH_MODE ;
+	channels->analysis_mode[8] = ANALYSIS_BUTTON_PUSH ;
+	channels->analysis_mode[9] = ANALYSIS_BUTTON_ON_OFF ;
 
 	channels->is_init = TRUE ;
 	return 0 ;
 }
 
+//Analyse de chaque channel en fonction du mode d'analyse attribué
 void channel_analysis_process(channel_analysis_t * channels){
+	//Analyse des channels
+	bool_e button_state ;
 	for(int8_t ch = 0; ch < channels->nb_channels; ch++ ){
 		switch (channels->analysis_mode[ch]) {
-			case NO_ANALYSIS:
+			case ANALYSIS_NONE:
 				//On fait R
 				break;
 
-			case JOYSTICK_DEAD_BAND :
-				if(abs(channels->channels[ch] - 1500) < 30)
+			case ANALYSIS_STICK_DEAD_BAND :
+				if(abs(channels->channels[ch] - 1500) < JOYCTICK_DEAD_BAND)
 					channels->channels[ch] = 1500 ;
 				break;
 
-
-			case SEQUENCE_ANALYSIS:
-				//todo aanlyse de séquences sur les switchs
+			case ANALYSIS_STICK_LVL :
+				if(channels->channels[ch] > 1000 && channels->channels[ch] <= 1070)
+					channels->throttle_lvl[ch] = THROTTLE_NULL ;
+				else if(channels->channels[ch] > 1070 && channels->channels[ch] <= 1120)
+					channels->throttle_lvl[ch] = THROTTLE_LOW ;
+				else if(channels->channels[ch] > 1120 && channels->channels[ch] < 2000)
+					channels->throttle_lvl[ch] = THROTTLE_HIGH ;
 				break;
-			case INSTANT_ANALYSIS:
+
+			case ANALYSIS_BUTTON_ON_OFF :
+				//Active le boutton dans le code
+				if(!channels->button_on_off[ch])
+					channels->button_on_off[ch] = BUTTON_OFF ;
+				//Buton state
+				button_state = channels->channels[ch] > 1500 ;
+				//If different from previous state and previous was low
+				if(button_state != channels->button_state[ch] && channels->button_state[ch] == 0){
+					if(channels->button_on_off[ch] == BUTTON_ON)
+						channels->button_on_off[ch] = BUTTON_OFF ;
+					else
+						channels->button_on_off[ch] = BUTTON_ON ;
+				}
+
+				channels->button_state[ch] = button_state ;
+				break;
+
+			case ANALYSIS_BUTTON_PUSH :
+				//Active le boutton dans le code
+				if(!channels->button_pushed[ch])
+					channels->button_pushed[ch] = BUTTON_PUSHED_NO_REQUEST ;
+				//Buton state
+				button_state = channels->channels[ch] > 1500 ;
+				//If different from previous state and previous was low
+				if(button_state != channels->button_state[ch] && channels->button_state[ch] == 0){
+					channels->button_pushed[ch] = BUTTON_PUSHED_REQUEST ;
+				}
+
+				channels->button_state[ch] = button_state ;
+				break;
+
+			case ANALYSIS_SEQUENCE:
+				//todo analyse de séquences sur les switchs
+				break;
+
+			case ANALYSIS_SWITCH_MODE:
 				if(channels->channels[ch] < 1300)
-					channels->pos[ch] = 0 ;
+					channels->switch_pos[ch] = SWITCH_POS_1 ;
 				else if(channels->channels[ch] > 1300 && channels->channels[ch] < 1600)
-					channels->pos[ch] = 1 ;
+					channels->switch_pos[ch] = SWITCH_POS_2 ;
 				else if(channels->channels[ch] > 1600)
-					channels->pos[ch] = 2 ;
+					channels->switch_pos[ch] = SWITCH_POS_3 ;
 				else
-					channels->pos[ch] = -1 ;
+					channels->switch_pos[ch] = SWITCH_POS_ERROR ;
 				break;
 			default:
 				break;
 		}
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -8,12 +8,11 @@
 */
 
 //Include de base pour la stm
+#include <high_lvl/high_lvl.h>
 #include "stm32f1xx_hal.h"
 #include "stm32f1_sys.h"
 
 //Include des deux machines à état principales (qui elles include bcp de choses)
-#include "high_lvl/high_lvl_cases.h"
-
 #include "scheduler/scheduler.h"
 
 //Fichier de ref pour les configurations / branchements
@@ -39,7 +38,7 @@ int main(void)
 
 	//	-------------------------------------------- Setup -----------------------------------------------------------
 	HAL_Init();
-	Batterie_init(&drone.capteurs.batterie, BATTERIE_ADC_VOLTAGE, BATTERIE_RESISTANCES_COEF);
+	BATTERIE_init(&drone.capteurs.batterie, BATTERIE_ADC_VOLTAGE, BATTERIE_RESISTANCES_COEF);
 
 
 	//Init sequence led
@@ -91,6 +90,9 @@ int main(void)
 	//Init ms5611 baromètre
 	HAL_Delay(50);
 	MS5611_get_calibration_values(&drone.capteurs.ms5611, FALSE);
+
+	//Init module events
+	EVENT_init(&drone);
 
 	//Init pids pour le mode "angle / levelled "
 	PID_init(&drone.stabilisation.pid_roll, PID_SETTINGS_ROLL);

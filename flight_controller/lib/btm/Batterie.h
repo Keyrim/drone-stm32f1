@@ -10,13 +10,22 @@
 
 #include "stm32f1_adc.h"
 
+typedef enum{
+	BATTERIE_LVL_NULL,
+	BATTERIE_LVL_LOW_CUTOF,
+	BATTERIE_LVL_LOW,
+	BATTERIE_LVL_MEDIUM,
+	BATTERIE_LVL_HIGH
+}batterie_lvl_t;
+
 typedef struct{
 	double voltage ;
 	adc_id_e adc_voltage ;
 	double voltage_coef ;
+	batterie_lvl_t batterie_lvl ;
 }DRONE_batterie_t;
 
-void Batterie_init(DRONE_batterie_t * batterie, adc_id_e adc, double voltage_coef);
-void Batterie_update(DRONE_batterie_t * batterie);
+void BATTERIE_init(DRONE_batterie_t * batterie, adc_id_e adc, double voltage_coef);
+void BATTERIE_update(DRONE_batterie_t * batterie);
 
 #endif /* LIB_PERSO_DRONE_BATTERIE_H_ */

@@ -4,10 +4,10 @@
  *  Created on: 13 août 2020
  *      Author: Théo
  */
+#include <high_lvl/high_lvl.h>
 #include "task.h"
 #include "scheduler/scheduler.h"
 #include "../sub/sub_action.h"
-#include "../high_lvl/high_lvl_cases.h"
 
 
 static State_drone_t * drone ;
@@ -113,71 +113,25 @@ void task_function_stabilisation(uint32_t current_time_us){
 
 }
 
+
+//Tâche qui s'occupe du haut niveau dans le drone
 void task_function_high_lvl(uint32_t current_time_us){
 	UNUSED(current_time_us);
-	//Détermine un changement de mode de vol
-	static Flight_Mode_SM previous_state_flight_mode = PARACHUTE ;
-	drone->soft.entrance_flight_mode = drone->soft.state_flight_mode != previous_state_flight_mode ;
-	previous_state_flight_mode = drone->soft.state_flight_mode ;
 
-	//Switch sur les différents états de la high lvl
-	switch(drone->soft.state_flight_mode){
+	//Mise à jour des flags
+	HIGH_LVL_Update_Flags(drone);
 
-		case ON_THE_GROUND :
-			HIGH_LVL_On_The_Ground(drone);
-			break;
+	//Appels fonction gestion des events (transition et erreur haut niveau)
+	EVENT_process_events();
 
-		case MANUAL :
-			HIGH_LVL_Manual(drone);
-			break;
-
-		case MANUAL_HAND_CONTROL:
-			HIGH_LVL_Manual_Hand_Control(drone, base);
-			break;
-
-		case PARACHUTE :
-			HIGH_LVL_Parachute(drone);
-			break;
-
-		case CALIBRATE_MPU6050:
-			HIGH_LVL_Calibrate_MPU(drone);
-			break;
-
-		case MANUAL_PC:
-			HIGH_LVL_Manual_Pc(drone);
-			break;
-
-		case MANUAL_ACCRO :
-			HIGH_LVL_Manual_Accro(drone);
-			break;
-
-		case IMU_FAILED_INIT:
-			HIGH_LVL_IMU_Failed_Init(drone);
-			break;
-
-		case PID_CHANGE_SETTINGS:
-			HIGH_LVL_Change_Pid_Settings(drone);
-			break;
-
-		case POSITION_HOLD:
-			//TODO Position hold function
-			break;
-		case ALTITUDE_HOLD:
-			//TODO Altitude hold function
-			break;
-	}
+	//Appel fonction mode de vol actuel
+	HIGH_LVL_Switch(drone, base);
 }
 
-//void task_function_uart_send(uint32_t current_time_us){
-//	UNUSED(current_time_us);
-//	//On envoit les données en buffer vers l'uart de telemétrie
-//	uart_send(&drone->communication.uart_telem, current_time_us);
-//
-//}
 
 void task_function_printf(uint32_t current_time_us){
 	UNUSED(current_time_us);
-	printf("%lu\t%lu\n", TASK_get_task(TASK_UART_SEND)->real_period_us, get_cpu_load());
+	printf("%lu\t%lu\n", TASK_get_task(TASK_HIGH_LVL)->execution_duration_us, get_cpu_load());
 }
 
 void task_function_ibus(uint32_t current_time_us){
@@ -215,10 +169,19 @@ void task_function_receive_data(uint32_t current_time_us){
 void task_function_verif_system(uint32_t current_time_us){
 
 	//Time out sur l ibus
-	if(current_time_us > drone->communication.ibus.last_update + TIME_OUT_IBUS)
+
+	if(current_time_us > drone->communication.ibus.last_update + TIME_OUT_IBUS){
 		drone->communication.ibus.is_ok = FALSE ;
-	else
+		EVENT_Set_flag(FLAG_TIMEOUT_PPM);
+		EVENT_Clean_flag(FLAG_PPM_OK);
+	}
+	else{
 		drone->communication.ibus.is_ok = TRUE ;
+		EVENT_Clean_flag(FLAG_TIMEOUT_PPM);
+		EVENT_Set_flag(FLAG_PPM_OK);
+
+	}
+
 
 	//Time out du gps
 	if(current_time_us > drone->capteurs.gps.last_time_read_gps + TIME_OUT_GPS)
@@ -227,7 +190,44 @@ void task_function_verif_system(uint32_t current_time_us){
 		drone->capteurs.gps.is_ok = TRUE ;
 
 	//Mesure batterie
-	Batterie_update(&drone->capteurs.batterie);
+	BATTERIE_update(&drone->capteurs.batterie);
+	switch(drone->capteurs.batterie.batterie_lvl){
+		case BATTERIE_LVL_HIGH :
+			EVENT_Set_flag(FLAG_BATTERY_HIGH);
+			EVENT_Clean_flag(FLAG_BATTERY_MEDIUM);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW_CUTOF);
+			EVENT_Clean_flag(FLAG_BATTERY_NO_BATT);
+			break;
+		case BATTERIE_LVL_MEDIUM :
+			EVENT_Clean_flag(FLAG_BATTERY_HIGH);
+			EVENT_Set_flag(FLAG_BATTERY_MEDIUM);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW_CUTOF);
+			EVENT_Clean_flag(FLAG_BATTERY_NO_BATT);
+			break;
+		case BATTERIE_LVL_LOW :
+			EVENT_Clean_flag(FLAG_BATTERY_HIGH);
+			EVENT_Clean_flag(FLAG_BATTERY_MEDIUM);
+			EVENT_Set_flag(FLAG_BATTERY_LOW);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW_CUTOF);
+			EVENT_Clean_flag(FLAG_BATTERY_NO_BATT);
+			break;
+		case BATTERIE_LVL_LOW_CUTOF :
+			EVENT_Clean_flag(FLAG_BATTERY_HIGH);
+			EVENT_Clean_flag(FLAG_BATTERY_MEDIUM);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW);
+			EVENT_Set_flag(FLAG_BATTERY_LOW_CUTOF);
+			EVENT_Clean_flag(FLAG_BATTERY_NO_BATT);
+			break;
+		case BATTERIE_LVL_NULL :
+			EVENT_Clean_flag(FLAG_BATTERY_HIGH);
+			EVENT_Clean_flag(FLAG_BATTERY_MEDIUM);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW);
+			EVENT_Clean_flag(FLAG_BATTERY_LOW_CUTOF);
+			EVENT_Set_flag(FLAG_BATTERY_NO_BATT);
+			break;
+	}
 
 }
 
@@ -251,7 +251,7 @@ void task_function_led(uint32_t current_time_us){
 task_t tasks [TASK_COUNT] ={
 		[TASK_IMU] = 			DEFINE_TASK(TASK_IMU ,				PRIORITY_REAL_TIME, 	task_function_imu, 				PERIOD_US_FROM_HERTZ(250)),
 		[TASK_GYRO_FILTERING] = DEFINE_TASK(TASK_GYRO_FILTERING ,	PRIORITY_REAL_TIME, 	task_function_gyro_filtering, 				PERIOD_US_FROM_HERTZ(250)),
-		[TASK_PRINTF] = 		DEFINE_TASK(TASK_PRINTF, 			PRIORITY_LOW, 			task_function_printf, 			PERIOD_US_FROM_HERTZ(40)),
+		[TASK_PRINTF] = 		DEFINE_TASK(TASK_PRINTF, 			PRIORITY_HIGH, 			task_function_printf, 			PERIOD_US_FROM_HERTZ(40)),
 		[TASK_IBUS] = 			DEFINE_TASK(TASK_IBUS, 				PRIORITY_HIGH, 			task_function_ibus, 			PERIOD_US_FROM_HERTZ(1000)),
 		[TASK_ESCS_IBUS_TEST] = DEFINE_TASK(TASK_ESCS_IBUS_TEST, 	PRIORITY_HIGH, 			task_function_escs_ibus_test, 	PERIOD_US_FROM_HERTZ(250)),
 		[TASK_SEND_DATA] = 		DEFINE_TASK(TASK_SEND_DATA, 		PRIORITY_MEDIUM, 		task_function_send_data, 		PERIOD_US_FROM_HERTZ(250)),
