@@ -74,7 +74,7 @@ int main(void)
 	//GPS_congif(UART_GPS);
 
 	//------------------Init du MPU et du complementary filer
-	Mpu_imu_init(&drone.capteurs.mpu,MPU6050_Accelerometer_16G, MPU6050_Gyroscope_500s, 0.998f, 250 );
+	Mpu_imu_init(&drone.capteurs.mpu,MPU6050_Accelerometer_16G, MPU6050_Gyroscope_500s, 0.998f, REGULATION_AND_MPU_FREQUENCY);
 	//Si le mpu ne s'est pas init on démarre dans la high lvl imu non init
 	if(drone.capteurs.mpu.mpu_result)
 		drone.soft.state_flight_mode = IMU_FAILED_INIT ;

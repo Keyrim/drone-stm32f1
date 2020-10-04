@@ -152,7 +152,7 @@ void task_function_escs_ibus_test(uint32_t current_time_us){
 
 void task_function_send_data(uint32_t current_time_us){
 	UNUSED(current_time_us);
-	if(drone->communication.ibus.channels[SWITCH_4] > 1500)
+	//if(drone->communication.ibus.channels[SWITCH_4] > 1500)
 		sub_send_data(drone);
 }
 
@@ -249,15 +249,15 @@ void task_function_led(uint32_t current_time_us){
 #define PERIOD_US_FROM_HERTZ(hertz_param) (1000000 / hertz_param)
 
 task_t tasks [TASK_COUNT] ={
-		[TASK_IMU] = 			DEFINE_TASK(TASK_IMU ,				PRIORITY_REAL_TIME, 	task_function_imu, 				PERIOD_US_FROM_HERTZ(250)),
-		[TASK_GYRO_FILTERING] = DEFINE_TASK(TASK_GYRO_FILTERING ,	PRIORITY_REAL_TIME, 	task_function_gyro_filtering, 				PERIOD_US_FROM_HERTZ(250)),
+		[TASK_IMU] = 			DEFINE_TASK(TASK_IMU ,				PRIORITY_REAL_TIME, 	task_function_imu, 				PERIOD_US_FROM_HERTZ(REGULATION_AND_MPU_FREQUENCY)),
+		[TASK_GYRO_FILTERING] = DEFINE_TASK(TASK_GYRO_FILTERING ,	PRIORITY_REAL_TIME, 	task_function_gyro_filtering, 	PERIOD_US_FROM_HERTZ(REGULATION_AND_MPU_FREQUENCY)),
 		[TASK_PRINTF] = 		DEFINE_TASK(TASK_PRINTF, 			PRIORITY_HIGH, 			task_function_printf, 			PERIOD_US_FROM_HERTZ(40)),
 		[TASK_IBUS] = 			DEFINE_TASK(TASK_IBUS, 				PRIORITY_HIGH, 			task_function_ibus, 			PERIOD_US_FROM_HERTZ(1000)),
 		[TASK_ESCS_IBUS_TEST] = DEFINE_TASK(TASK_ESCS_IBUS_TEST, 	PRIORITY_HIGH, 			task_function_escs_ibus_test, 	PERIOD_US_FROM_HERTZ(250)),
 		[TASK_SEND_DATA] = 		DEFINE_TASK(TASK_SEND_DATA, 		PRIORITY_MEDIUM, 		task_function_send_data, 		PERIOD_US_FROM_HERTZ(250)),
 		[TASK_RECEIVE_DATA] = 	DEFINE_TASK(TASK_RECEIVE_DATA, 		PRIORITY_MEDIUM, 		task_function_receive_data, 	PERIOD_US_FROM_HERTZ(500)),
 		[TASK_VERIF_SYSTEM] = 	DEFINE_TASK(TASK_VERIF_SYSTEM, 		PRIORITY_MEDIUM, 		task_function_verif_system, 	PERIOD_US_FROM_HERTZ(10)),
-		[TASK_STABILISATION] =	DEFINE_TASK(TASK_STABILISATION, 	PRIORITY_REAL_TIME, 	task_function_stabilisation, 	PERIOD_US_FROM_HERTZ(250)),
+		[TASK_STABILISATION] =	DEFINE_TASK(TASK_STABILISATION, 	PRIORITY_REAL_TIME, 	task_function_stabilisation, 	PERIOD_US_FROM_HERTZ(REGULATION_AND_MPU_FREQUENCY)),
 		[TASK_HIGH_LVL] = 		DEFINE_TASK(TASK_HIGH_LVL, 			PRIORITY_HIGH,	 		task_function_high_lvl, 		PERIOD_US_FROM_HERTZ(250)),
 		[TASK_MS5611] = 		DEFINE_TASK(TASK_MS5611, 			PRIORITY_MEDIUM,	 	task_function_ms5611, 			PERIOD_US_FROM_HERTZ(500)),
 		[TASK_LED] = 			DEFINE_TASK(TASK_LED, 				PRIORITY_LOW,	 		task_function_led, 				PERIOD_US_FROM_HERTZ(10))

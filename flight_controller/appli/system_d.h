@@ -79,7 +79,6 @@ typedef struct{
 	bool_e entrance_flight_mode ;
 
 	uint32_t dead_line ;
-	bool_e flags[NB_FLAGS];
 }DRONE_soft_t;
 
 //Structure de l'ihm

@@ -98,7 +98,7 @@ Data_group_t data_groups[DATA_GROUP_COUNT] = {
 		[DATA_MOTEURS] = DEFINE_DATA_GROUP(			5, 			10, 			TELEMETRIE_send_moteur_all),
 		//Cpu used
 		[DATA_CPU_USED] = DEFINE_DATA_GROUP(		2, 			10, 		TELEMETRIE_send_cpu_pourcentage),
-		[DATA_TASK_PERIODE] = DEFINE_DATA_GROUP(	4, 			0, 		TELEMETRIE_send_periode_task)
+		[DATA_TASK_PERIODE] = DEFINE_DATA_GROUP(	4, 			50, 		TELEMETRIE_send_periode_task)
 };
 
 //Sub qui envoit des donn�es par t�l�m�trie � qui veut l'entendre ^^
