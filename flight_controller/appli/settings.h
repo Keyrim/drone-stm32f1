@@ -30,7 +30,7 @@
 #define GPS_RELAY	FALSE
 
 //Regulation settings
-#define REGULATION_AND_MPU_FREQUENCY 1000
+#define REGULATION_AND_MPU_FREQUENCY 250
 
 //Temps à l'état haut mini et maxi pour les signaux destinés aux escs
 #define PULSATION_MIN 1000

@@ -42,6 +42,18 @@ typedef struct{
 	uint32_t periode_send_data ;
 }telemetrie_t;
 
+// -------------------- Fonctions hors sub télémétrie
+
+//Consigne base
+void TELEMETRIE_send_consigne_base(uint8_t consigne);
+
+//High transition state
+void TELEMETRIE_send_high_lvl_transi(uint8_t transi);
+
+//Envoit double
+void TELEMETRIE_send_double(float value, uint8_t id);
+void TELEMETRIE_send_double_16b(float value, uint8_t id);
+
 void TELEMETRIE_Init(telemetrie_t * telemetrie, uart_id_e uart_telemetrie, uint32_t baud_rate, uint32_t periode_send_data);
 void TELEMETRIE_Send_data(Ids_t id, uint8_t * data, uint8_t len);
 

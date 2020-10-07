@@ -6,37 +6,9 @@
  */
 
 #include "telemetrie_periodic_send_functions.h"
+#include "../lib/btm/Pid.h"
 
-// ----------------- fonctions hors sub telemetrie -----------------------------
-void TELEMETRIE_send_consigne_base(uint8_t consigne){
-	uint8_t bytes[1] ;
-	bytes[0] = consigne ;
-	TELEMETRIE_Send_data(ID_BASE_CONSIGNE_BASE, bytes, 1);
-}
 
-void TELEMETRIE_send_high_lvl_transi(uint8_t transi){
-	uint8_t bytes[1] ;
-	bytes[0] = transi ;
-	TELEMETRIE_Send_data(ID_PC_HIGH_LVL_TRANSITION, bytes, 1);
-}
-
-//Double
-void TELEMETRIE_send_double(float value, uint8_t id){
-	uint8_t bytes[4] = {0};
-	int32_t int_value = (int32_t)( value * (float) 1000000);
-	bytes[0] = (uint8_t)((int_value >> 24) & 0b11111111) ;
-	bytes[1] = (uint8_t)((int_value >> 16) & 0b11111111) ;
-	bytes[2] = (uint8_t)((int_value >> 8) & 0b11111111) ;
-	bytes[3] = (uint8_t)((int_value ) & 0b11111111) ;
-	TELEMETRIE_Send_data(id, bytes, 4);
-}
-void TELEMETRIE_send_double_16b(float value, uint8_t id){
-	uint8_t  bytes[2] = {0} ;
-	int16_t int_value =  (int16_t)( value * (double) 100);
-	bytes[0] = (uint8_t)(int_value >> 8);
-	bytes[2] = (uint8_t)(int_value & 0b11111111);
-	TELEMETRIE_Send_data(id, bytes, 2);
-}
 
 // ------------------------- Fonctions sub telemetrie
 
@@ -195,9 +167,9 @@ void TELEMETRIE_send_angle_x_y_as_int(State_drone_t * drone){
 }
 void TELEMETRIE_send_angle_x_y_z_rate_as_int(State_drone_t * drone){
 	uint8_t  bytes[3] = {0} ;
-	bytes[1] = (uint8_t)((int8_t)drone->capteurs.mpu.x_gyro);
-	bytes[2] = (uint8_t)((int8_t)drone->capteurs.mpu.y_gyro);
-	bytes[3] = (uint8_t)((int8_t)drone->capteurs.mpu.z_gyro);
+	bytes[0] = (uint8_t)((int8_t)drone->capteurs.mpu.x_gyro);
+	bytes[1] = (uint8_t)((int8_t)drone->capteurs.mpu.y_gyro);
+	bytes[2] = (uint8_t)((int8_t)drone->capteurs.mpu.z_gyro);
 	TELEMETRIE_Send_data(ID_PC_ANGLE_X_Y_Z_RATE, bytes, 3);
 }
 void TELEMETRIE_send_angle_z_as_int(State_drone_t * drone){
@@ -219,7 +191,7 @@ void TELEMETRIE_send_angle_x_y_acc_as_int(State_drone_t * drone){
 //Données state
 void TELEMETRIE_send_state_flying(State_drone_t * drone){
 	uint8_t  bytes[1] = {0} ;
-	bytes[1] = drone->soft.state_flight_mode;
+	bytes[0] = drone->soft.state_flight_mode;
 	TELEMETRIE_Send_data(ID_PC_STATE_FLYING, bytes, 1);
 }
 

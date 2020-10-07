@@ -11,6 +11,37 @@
 //Une seule télémétrie dans le drone donc en save en dure le pointeur sur la struct telem qu on va use
 static telemetrie_t * telemetrie ;
 
+// ----------------- fonctions hors sub telemetrie -----------------------------
+void TELEMETRIE_send_consigne_base(uint8_t consigne){
+	uint8_t bytes[1] ;
+	bytes[0] = consigne ;
+	TELEMETRIE_Send_data(ID_BASE_CONSIGNE_BASE, bytes, 1);
+}
+
+void TELEMETRIE_send_high_lvl_transi(uint8_t transi){
+	uint8_t bytes[1] ;
+	bytes[0] = transi ;
+	TELEMETRIE_Send_data(ID_PC_HIGH_LVL_TRANSITION, bytes, 1);
+}
+
+//Double
+void TELEMETRIE_send_double(float value, uint8_t id){
+	uint8_t bytes[4] = {0};
+	int32_t int_value = (int32_t)( value * (float) 1000000);
+	bytes[0] = (uint8_t)((int_value >> 24) & 0b11111111) ;
+	bytes[1] = (uint8_t)((int_value >> 16) & 0b11111111) ;
+	bytes[2] = (uint8_t)((int_value >> 8) & 0b11111111) ;
+	bytes[3] = (uint8_t)((int_value ) & 0b11111111) ;
+	TELEMETRIE_Send_data(id, bytes, 4);
+}
+void TELEMETRIE_send_double_16b(float value, uint8_t id){
+	uint8_t  bytes[2] = {0} ;
+	int16_t int_value =  (int16_t)( value * (double) 100);
+	bytes[0] = (uint8_t)(int_value >> 8);
+	bytes[2] = (uint8_t)(int_value & 0b11111111);
+	TELEMETRIE_Send_data(id, bytes, 2);
+}
+
 //Fonction d'init, configure l'uart et le print
 void TELEMETRIE_Init(telemetrie_t * telemetrie_, uart_id_e uart_telemetrie, uint32_t baud_rate, uint32_t periode_send_data){
 	//Save du pointeur
