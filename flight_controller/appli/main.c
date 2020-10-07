@@ -20,7 +20,6 @@
 #include "settings.h"
 #include "pid_config.h"
 #include "../ressources/sequences_led.h"
-#include "../lib/btm/telem_2.h"
 
 
 
@@ -46,32 +45,11 @@ int main(void)
 
 	//On laisse du temps à tout le monde pour bien démarer
 	HAL_Delay(100);
-	//------------------Init serial uart
-	drone.communication.uart_telem = UART_TELEMETRIE ;
-	UART_init(UART_TELEMETRIE, 57600);
-	//uart_init(&drone.communication.uart_telem, UART_TELEMETRIE, 57600, 2);
-	SYS_set_std_usart(UART_TELEMETRIE, UART_TELEMETRIE, UART_TELEMETRIE);
 
 
-	//test sur la telem
-//	uint32_t previous = 0 ;
-//	uint32_t periode = 1300 ;
-//
-//	uint8_t str[] = "test";
-//	while(1){
-//		uint32_t time = SYSTICK_get_time_us()  ;
-//		uint32_t clock = time  ;
-//		clock = clock % 4000 ;
-//		if((time > previous + periode) & (clock > 0)){
-//			TELEM2_send_data(69, str, 4);
-//			previous += periode ;
-//		}
-//
-//	}
+	//------------------Init de la télémétrie
+	TELEMETRIE_Init(&drone.communication.telemetrie, UART_TELEMETRIE, 57600, 1);
 
-
-	//Init du gps
-	//GPS_congif(UART_GPS);
 
 	//------------------Init du MPU et du complementary filer
 	Mpu_imu_init(&drone.capteurs.mpu,MPU6050_Accelerometer_16G, MPU6050_Gyroscope_500s, 0.998f, REGULATION_AND_MPU_FREQUENCY);

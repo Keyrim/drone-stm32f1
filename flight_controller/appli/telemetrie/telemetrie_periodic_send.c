@@ -1,13 +1,21 @@
 /*
+ * telemetrie_periodic_send.c
+ *
+ *  Created on: 6 oct. 2020
+ *      Author: Theo
+ */
+
+
+/*
  * sub_send_data.c
  *
  *  Created on: 19 avr. 2020
  *      Author: Theo
  */
 
-#include "sub_action.h"
-
-#include "../../lib/btm/Telemetrie.h"
+#include "telemetrie.h"
+#include "telemetrie_periodic_send_functions.h"
+#include "../system_d.h"
 
 #define NB_OCTECT_MAX 30	//On envoit au plus 20 octects par loop
 
@@ -19,7 +27,7 @@ typedef struct{
 }Data_group_t;
 
 
-//PLacer les donn�es dans l'ordre de priorit� d'envoit
+//PLacer les donnees dans l'ordre de prioritees d'envoit
 typedef enum{
 	DATA_ANGLES,
 	DATA_ANGLE_Z,
@@ -101,8 +109,8 @@ Data_group_t data_groups[DATA_GROUP_COUNT] = {
 		[DATA_TASK_PERIODE] = DEFINE_DATA_GROUP(	4, 			50, 		TELEMETRIE_send_periode_task)
 };
 
-//Sub qui envoit des donn�es par t�l�m�trie � qui veut l'entendre ^^
-void sub_send_data(State_drone_t * drone){
+//Sub qui envoit des donn�es par telemetrie � qui veut l'entendre ^^
+void TELEMETRIE_Periodic_send(State_drone_t * drone){
 
 	static uint32_t compteur = 0 ;
 	int32_t compteur_octet = NB_OCTECT_MAX ;

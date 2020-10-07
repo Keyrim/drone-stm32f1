@@ -8,6 +8,7 @@
 #include "task.h"
 #include "scheduler/scheduler.h"
 #include "../sub/sub_action.h"
+#include "../telemetrie/telemetrie_periodic_send_functions.h"
 
 
 static State_drone_t * drone ;
@@ -152,16 +153,16 @@ void task_function_escs_ibus_test(uint32_t current_time_us){
 
 void task_function_send_data(uint32_t current_time_us){
 	UNUSED(current_time_us);
-	//if(drone->communication.ibus.channels[SWITCH_4] > 1500)
-		sub_send_data(drone);
+	if(drone->communication.ibus.channels[SWITCH_4] > 1500)
+		TELEMETRIE_Periodic_send(drone);
 }
 
 void task_function_receive_data(uint32_t current_time_us){
 	UNUSED(current_time_us);
 	uint32_t compteur = 0 ;
 	//Compteur permet de lire X Octets par appel de la tâche
-	while(UART_data_ready(drone->communication.uart_telem) && compteur < 10){
-		sub_receive_data(UART_get_next_byte(drone->communication.uart_telem), drone, base);
+	while(UART_data_ready(drone->communication.telemetrie.uart) && compteur < 10){
+		sub_receive_data(UART_get_next_byte(drone->communication.telemetrie.uart), drone, base);
 		compteur ++ ;
 	}
 }

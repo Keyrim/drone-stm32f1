@@ -8,7 +8,7 @@
 #include <high_lvl/high_lvl.h>
 
 #include "../../ressources/sequences_led.h"
-#include "../lib/btm/Telemetrie.h"
+#include "../telemetrie/telemetrie.h"
 #include "../lib/btm/Test_transition.h"
 #include "stdlib.h"
 
@@ -62,7 +62,7 @@ void HIGH_LVL_Manual_Accro(State_drone_t * drone){
 void HIGH_LVL_Manual_Hand_Control(State_drone_t * drone, State_base_t * base){
 	if(drone->soft.entrance_flight_mode){
 		drone->stabilisation.stab_mode = LEVELLED ;
-		TELEMETRIE_send_consigne_base(SUB_ID_BASE_CONSIGNE_START_SENDING_ANGLES, drone->communication.uart_telem);
+		TELEMETRIE_send_consigne_base(SUB_ID_BASE_CONSIGNE_START_SENDING_ANGLES);
 		LED_SEQUENCE_set_sequence(&drone->ihm.led_etat, SEQUENCE_LED_4);
 	}
 	//			---------------------------- 		MAIN PART 			----------------------------------------

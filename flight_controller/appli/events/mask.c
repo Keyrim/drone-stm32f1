@@ -15,7 +15,7 @@ Mask_t MASK_get_empty_mask(){
 	return mask_return ;
 }
 //Clean tous les flags d un mask
-Mask_t MASK_clean_every_flags(Mask_t * mask){
+void MASK_clean_every_flags(Mask_t * mask){
 	for(int m = 0; m < NB_ARRAY_MASK; m++)
 		mask->array[m] = 0 ;
 }

@@ -1,37 +1,35 @@
 /*
- * telemetrie.h
+ * telemetrie_periodic_send_functions.h
  *
- *  Created on: 4 avr. 2020
+ *  Created on: 6 oct. 2020
  *      Author: Theo
  */
 
-#ifndef TELEMETRIE_H_
-#define TELEMETRIE_H_
+#ifndef TELEMETRIE_TELEMETRIE_PERIODIC_SEND_FUNCTIONS_H_
+#define TELEMETRIE_TELEMETRIE_PERIODIC_SEND_FUNCTIONS_H_
 
 #include "stdio.h"
-#include "../../appli/IDs.h"
-#include "../appli/system_d.h"
 #include "scheduler/scheduler.h"
+#include "telemetrie.h"
 
 
 #define TASK_TO_SEND TASK_IMU
 
 
-//voir le fichier adressage com drone pour les détails
-//Ainsi que IDs.h
-
+//Fonction appeler periodiquement
+void TELEMETRIE_Periodic_send(State_drone_t * drone);
 
 // -------------------- Fonctions hors sub télémétrie
 
 //Consigne base
-void TELEMETRIE_send_consigne_base(uint8_t consigne,  uart_id_e uart);
+void TELEMETRIE_send_consigne_base(uint8_t consigne);
 
 //High transition state
-void TELEMETRIE_send_high_lvl_transi(uint8_t transi, uart_id_e uart);
+void TELEMETRIE_send_high_lvl_transi(uint8_t transi);
 
 //Envoit double
-void TELEMETRIE_send_double(float value, uint8_t id, uart_id_e uart);
-void TELEMETRIE_send_double_16b(float value, uint8_t id, uart_id_e uart);
+void TELEMETRIE_send_double(float value, uint8_t id);
+void TELEMETRIE_send_double_16b(float value, uint8_t id);
 
 // ---------------------- Fonctions pour la sub télémétrie ------------------------
 //Période task
@@ -93,5 +91,4 @@ void TELEMETRIE_send_long(State_drone_t * drone);
 //Envoi every_is_ok
 void TELEMETRIE_send_every_is_ok(State_drone_t * drone);
 
-
-#endif /* TELEMETRIE_H_ */
+#endif /* TELEMETRIE_TELEMETRIE_PERIODIC_SEND_FUNCTIONS_H_ */

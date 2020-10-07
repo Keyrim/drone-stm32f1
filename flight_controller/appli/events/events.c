@@ -5,8 +5,9 @@
  *      Author: Théo
  */
 
-#include "events.h"
 #include "mask_def.h"
+#include "flags.h"
+#include "events.h"
 
 #define CLEAR_FLAG_FLIGHT_MODE flags = MASK_and(flags, mask_flight_mode_clear)
 
@@ -20,8 +21,8 @@ static State_drone_t * drone ;
 static bool_e initialized = FALSE ;
 
 //Masks flight mode clear
-Mask_t mask_flight_mode_clear ;
-Flags_t flags_flight_mode_clear [9] = {FLAG_STATE_ON_THE_GROUND,
+static Mask_t mask_flight_mode_clear ;
+static Flags_t flags_flight_mode_clear [9] = {FLAG_STATE_ON_THE_GROUND,
 		FLAG_STATE_MANUAL,
 		FLAG_STATE_MANUAL_PC,
 		FLAG_STATE_MANUAL_HAND_CONTROL,
@@ -114,7 +115,7 @@ static void event_function_change_pid_settings(mask_def_ids_t mask_id){
 
 //Définitions des events
 //Attention !!!! nb_mask < EVENT_NB_MASK_PER_EVENT_MAX sinon dérapage :)
-Event_t events[EVENT_COUNT] ={
+static Event_t events[EVENT_COUNT] ={
 		[EVENT_TRANSIT_ON_THE_GROUND] 			= DEFINE_EVENT(event_function_on_the_ground, 		ON_THE_GROUND_MASK_COUNT, 	EVENT_TYPE_HIGH_LVL),
 		[EVENT_TRANSIT_MANUAL] 					= DEFINE_EVENT(event_function_manual, 				MANUAL_MASK_COUNT, 			EVENT_TYPE_HIGH_LVL),
 		[EVENT_TRANSIT_MANUAL_PC] 				= DEFINE_EVENT(event_function_manual_pc, 			MANUAL_PC_MASK_COUNT, 		EVENT_TYPE_HIGH_LVL),
