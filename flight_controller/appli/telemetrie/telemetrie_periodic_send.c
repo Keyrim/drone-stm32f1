@@ -86,18 +86,18 @@ Data_group_t data_groups[DATA_GROUP_COUNT] = {
 		//Altitude
 		[DATA_ALTITUDE] = DEFINE_DATA_GROUP(		5, 			0, 			TELEMETRIE_send_altitude),
 		//Angles
-		[DATA_ANGLES] = DEFINE_DATA_GROUP(			3, 			10, 		TELEMETRIE_send_angle_x_y_as_int),
+		[DATA_ANGLES] = DEFINE_DATA_GROUP(			3, 			5, 		TELEMETRIE_send_angle_x_y_as_int),
 		[DATA_ANGLE_Z] = DEFINE_DATA_GROUP(			3, 			0, 		TELEMETRIE_send_angle_z_as_int),
-		[DATA_ANGLES_ACC] = DEFINE_DATA_GROUP(		3, 			10, 		TELEMETRIE_send_angle_x_y_acc_as_int),
-		[DATA_X_Y_Z_RATE] = DEFINE_DATA_GROUP(		4, 			0, 		TELEMETRIE_send_angle_x_y_z_rate_as_int),
+		[DATA_ANGLES_ACC] = DEFINE_DATA_GROUP(		3, 			0, 		TELEMETRIE_send_angle_x_y_acc_as_int),
+		[DATA_X_Y_Z_RATE] = DEFINE_DATA_GROUP(		4, 			10, 		TELEMETRIE_send_angle_x_y_z_rate_as_int),
 		//Latitude & longitude
 		[DATA_LATTITUDE] = DEFINE_DATA_GROUP(		5, 			0, 			TELEMETRIE_send_lat),
 		[DATA_LONGITUDE] = DEFINE_DATA_GROUP(		5, 			0, 			TELEMETRIE_send_long),
 		//Acc�l�ration
 		[DATA_ACC_Z] = DEFINE_DATA_GROUP(			5, 			0, 			TELEMETRIE_send_acc_z),
 		//Radios
-		[DATA_RADIO_1] = DEFINE_DATA_GROUP(			5, 			10, 	TELEMETRIE_send_channel_all_1_4),
-		[DATA_RADIO_2] = DEFINE_DATA_GROUP(			5, 			10, 		TELEMETRIE_send_channel_all_5_8),
+		[DATA_RADIO_1] = DEFINE_DATA_GROUP(			5, 			100, 	TELEMETRIE_send_channel_all_1_4),
+		[DATA_RADIO_2] = DEFINE_DATA_GROUP(			5, 			100, 		TELEMETRIE_send_channel_all_5_8),
 		//States
 		[DATA_FLIGHT_MODE] = DEFINE_DATA_GROUP(		2, 			50, 		TELEMETRIE_send_state_flying),
 		[DATA_BATTERIE] = DEFINE_DATA_GROUP(		2, 			1000, 		TELEMETRIE_send_v_bat),
@@ -105,7 +105,7 @@ Data_group_t data_groups[DATA_GROUP_COUNT] = {
 		//Moteurs
 		[DATA_MOTEURS] = DEFINE_DATA_GROUP(			5, 			10, 			TELEMETRIE_send_moteur_all),
 		//Cpu used
-		[DATA_CPU_USED] = DEFINE_DATA_GROUP(		2, 			10, 		TELEMETRIE_send_cpu_pourcentage),
+		[DATA_CPU_USED] = DEFINE_DATA_GROUP(		2, 			100, 		TELEMETRIE_send_cpu_pourcentage),
 		[DATA_TASK_PERIODE] = DEFINE_DATA_GROUP(	4, 			50, 		TELEMETRIE_send_periode_task)
 };
 

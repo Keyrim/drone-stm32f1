@@ -19,6 +19,7 @@ float FILTER_process(Filter_t * filter, float new_value){
 	switch(filter->order){
 		case FILTER_FIRST_ORDER :
 			filter->values[0] = new_value * filter->settings[0] + filter->values[1] * filter->settings[1] ;
+			filter->values[1] = filter->values[0];
 			to_return =  filter->values[0];
 			break ;
 
