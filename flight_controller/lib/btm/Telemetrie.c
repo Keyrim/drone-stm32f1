@@ -63,7 +63,7 @@ void TELEMETRIE_send_altitude(State_drone_t * drone){
 }
 //Accélération
 void TELEMETRIE_send_acc_z(State_drone_t * drone){
-	TELEMETRIE_send_double(drone->capteurs.mpu.z_acc, ID_PC_ACC_Z, drone->communication.uart_telem);
+	TELEMETRIE_send_double(drone->capteurs.mpu.z_acc_filtered, ID_PC_ACC_Z, drone->communication.uart_telem);
 }
 //Données gps
 void TELEMETRIE_send_lat(State_drone_t * drone){
@@ -84,7 +84,7 @@ void TELEMETRIE_send_pid_pitch(State_drone_t * drone){
 	TELEMETRIE_send_double(drone->stabilisation.pid_pitch_rate.output, ID_PC_PID_PITCH, drone->communication.uart_telem);
 }
 void TELEMETRIE_send_pid_yaw(State_drone_t * drone){
-	TELEMETRIE_send_double(drone->capteurs.mpu.y_gyro, ID_PC_PID_YAW, drone->communication.uart_telem);
+	TELEMETRIE_send_double(drone->capteurs.mpu.y_gyro_filtered, ID_PC_PID_YAW, drone->communication.uart_telem);
 }
 void TELEMETRIE_send_pid_roll_p(State_drone_t * drone){
 	TELEMETRIE_send_double(drone->stabilisation.pid_roll_rate.P, ID_PC_PID_P_ROLL, drone->communication.uart_telem);
@@ -224,9 +224,9 @@ void TELEMETRIE_send_angle_x_y_as_int(State_drone_t * drone){
 void TELEMETRIE_send_angle_x_y_z_rate_as_int(State_drone_t * drone){
 	uint8_t  bytes[4] = {0} ;
 	bytes[0] =  ID_PC_ANGLE_X_Y_Z_RATE ;
-	bytes[1] = (uint8_t)((int8_t)drone->capteurs.mpu.x_gyro);
-	bytes[2] = (uint8_t)((int8_t)drone->capteurs.mpu.y_gyro);
-	bytes[3] = (uint8_t)((int8_t)drone->capteurs.mpu.z_gyro);
+	bytes[1] = (uint8_t)((int8_t)drone->capteurs.mpu.x_gyro_filtered);
+	bytes[2] = (uint8_t)((int8_t)drone->capteurs.mpu.y_gyro_filtered);
+	bytes[3] = (uint8_t)((int8_t)drone->capteurs.mpu.z_gyro_filtered);
 	TELEM2_send_data(ID_PC_ANGLE_X_Y_Z_RATE, &bytes[1], 3);
 	//UART_puts_it(drone->communication.uart_telem, bytes, 4);
 }

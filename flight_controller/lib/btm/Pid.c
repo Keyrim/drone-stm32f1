@@ -18,10 +18,7 @@ float PID_compute(PID_t * pid, float consigne, float measurement){
 	pid->D = pid->settings[PID_KD] * (measurement - pid->previous_measurement) * pid->settings[PID_FREQUENCY] ;
 
 	//Filtrage
-	if(pid->use_filter_on_p)
-		pid->P = FILTER_second_order_process(pid->filter_p, pid->P);
-	if(pid->use_filter_on_d)
-		pid->D = FILTER_second_order_process(pid->filter_d, pid->D);
+	pid->D = FILTER_process(&pid->d_filter, pid->D);
 
 	//On somme le tout
 	pid->output = pid->P + pid->I + pid->D ;
@@ -38,21 +35,16 @@ float PID_compute(PID_t * pid, float consigne, float measurement){
 
 
 //Init des valeurs sur le pid donné
-void PID_init(PID_t * pid, float settings[PID_NB_SETTINGS]){
+void PID_init(PID_t * pid, float settings[PID_NB_SETTINGS], Filter_order_e d_filter_order, float settings_filter[3]){
 	//Set settings
 	for(uint8_t s = 0 ; s < PID_NB_SETTINGS; s++)
 		pid->settings[s] = settings[s] ;
 
 	//Init values
+	pid->P = 0 ;
 	pid->I = 0 ;
-}
+	pid->D = 0 ;
 
-void PID_set_filter_p(PID_t * pid,Filter_second_order_t * filter){
-	pid->filter_p = filter ;
-	pid->use_filter_on_p = TRUE ;
-}
-
-void PID_set_filter_d(PID_t * pid,Filter_second_order_t * filter){
-	pid->filter_d = filter ;
-	pid->use_filter_on_d = TRUE ;
+	//Init du filtre
+	FILTER_init(&pid->d_filter, settings_filter, d_filter_order);
 }

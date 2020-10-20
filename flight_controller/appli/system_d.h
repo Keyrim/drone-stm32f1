@@ -37,18 +37,6 @@ typedef struct{
 	ms5611_t ms5611 ;
 }DRONE_capteurs_t;
 
-//Structure fitler
-typedef struct{
-	//PID angle
-	Filter_second_order_t pid_roll ;
-	Filter_second_order_t pid_pitch ;
-	Filter_second_order_t pid_yaw ;
-
-	//Pid accro
-	Filter_second_order_t pid_roll_rate ;
-	Filter_second_order_t pid_pitch_rate ;
-	Filter_second_order_t pid_yaw_rate ;
-}DRONE_filters;
 
 //Structure stabilisation
 typedef struct{
@@ -95,7 +83,6 @@ typedef struct{
 	DRONE_communication_t communication ;
 	DRONE_soft_t soft ;
 	DRONE_ihm_t ihm ;
-	DRONE_filters filters ;
 
 }State_drone_t;
 

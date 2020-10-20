@@ -14,11 +14,11 @@
 
 //Include des deux machines à état principales (qui elles include bcp de choses)
 #include "scheduler/scheduler.h"
+#include "regulation_filtrage/regulation_filtrage.h"
 
 //Fichier de ref pour les configurations / branchements
 #include "branchement.h"
 #include "settings.h"
-#include "pid_config.h"
 #include "../ressources/sequences_led.h"
 #include "../lib/btm/telem_2.h"
 
@@ -94,39 +94,8 @@ int main(void)
 	//Init module events
 	EVENT_init(&drone);
 
-	//Init pids pour le mode "angle / levelled "
-	PID_init(&drone.stabilisation.pid_roll, PID_SETTINGS_ROLL);
-	PID_init(&drone.stabilisation.pid_pitch,  PID_SETTINGS_PITCH);
-	PID_init(&drone.stabilisation.pid_yaw, PID_SETTINGS_YAW);
-
-	//Init pids pour le mode "accro / rate"
-	PID_init(&drone.stabilisation.pid_roll_rate, PID_SETTINGS_ROLL_ACCRO);
-	PID_init(&drone.stabilisation.pid_pitch_rate, PID_SETTINGS_PITCH_ACCRO);
-	PID_init(&drone.stabilisation.pid_yaw_rate, PID_SETTINGS_YAW_ACCRO);
-
-	//Init des filtres pour les pids
-	FILTER_second_order_init(&drone.filters.pid_roll, FILTER_SETTINGS_ANGLE);
-	FILTER_second_order_init(&drone.filters.pid_pitch, FILTER_SETTINGS_ANGLE);
-	FILTER_second_order_init(&drone.filters.pid_yaw, FILTER_SETTINGS_ANGLE);
-	FILTER_second_order_init(&drone.filters.pid_roll_rate, FILTER_SETTINGS_ANGLE);
-	FILTER_second_order_init(&drone.filters.pid_pitch_rate, FILTER_SETTINGS_ANGLE);
-	FILTER_second_order_init(&drone.filters.pid_yaw_rate, FILTER_SETTINGS_ANGLE);
-
-	//Filtres gyro
-	FILTER_second_order_init(&drone.capteurs.mpu.gyro_x_filter, FILTER_SETTINGS_GYRO);
-	FILTER_second_order_init(&drone.capteurs.mpu.gyro_y_filter, FILTER_SETTINGS_GYRO);
-	FILTER_second_order_init(&drone.capteurs.mpu.gyro_z_filter, FILTER_SETTINGS_GYRO);
-
-
-	//Associations filtres / pids
-	PID_set_filter_d(&drone.stabilisation.pid_roll, &drone.filters.pid_roll);
-	PID_set_filter_d(&drone.stabilisation.pid_pitch, &drone.filters.pid_pitch);
-	PID_set_filter_d(&drone.stabilisation.pid_yaw, &drone.filters.pid_yaw);
-
-	PID_set_filter_p(&drone.stabilisation.pid_roll_rate, &drone.filters.pid_roll_rate);
-	PID_set_filter_p(&drone.stabilisation.pid_pitch_rate, &drone.filters.pid_pitch_rate);
-	PID_set_filter_p(&drone.stabilisation.pid_yaw_rate, &drone.filters.pid_yaw_rate);
-
+	REGU_FILTRAGE_filters_imu_config(&drone);
+	REGU_FILTRAGE_pids_orientation_init(&drone);
 
 	ESCS_init(&drone.stabilisation.escs_timer, ESC_OUTPUT_ONE_SHOT_125);
 
