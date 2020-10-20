@@ -8,6 +8,7 @@
 
 #include "sub_action.h"
 #include "../IDs.h"
+#include "../events/events.h"
 
 //Macro pratique
 #define SAVE_AND_INCREASE buffer[compteur] = c ;compteur++ ;

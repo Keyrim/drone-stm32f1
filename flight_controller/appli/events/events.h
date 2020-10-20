@@ -5,12 +5,14 @@
  *      Author: Théo
  */
 
+
 #ifndef EVENTS_EVENTS_H_
 #define EVENTS_EVENTS_H_
 
-#include "../system_d.h"
+
 #include "mask_def_enum.h"
 #include "mask.h"
+#include "../system_d.h"
 
 
 #define EVENT_NB_MASK_PER_EVENT_MAX 7

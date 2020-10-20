@@ -6,6 +6,7 @@
  */
 
 #include "sub_action.h"
+#include "systick.h"
 
 //Analyse des séquences des cannaux radio
 void sub_channels_analysis(State_drone_t * drone){
