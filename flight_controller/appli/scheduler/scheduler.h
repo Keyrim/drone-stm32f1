@@ -9,6 +9,7 @@
 #define SCHEDULER_SCHEDULER_H_
 
 #include "../system_d.h"
+#include "systick.h"
 #include "../tasks/task.h"
 #include "string.h"
 

@@ -7,9 +7,15 @@
 
 
 
+
+
+#ifndef SYSTEM_D_H_
+#define SYSTEM_D_H_
+
 #include "settings.h"
 #include "macro_types.h"
 #include "MAE.h"
+
 
 #include "../lib/btm/Batterie.h"
 #include "../lib/btm/Channel_annalysis.h"
@@ -21,13 +27,11 @@
 #include "../lib/btm/MS5611.h"
 #include "../lib/btm/Pid.h"
 #include "../lib/btm/Sequence_led.h"
-#include "../lib/btm/Uart_lib.h"
 #include "../lib/btm/esc_timer.h"
 #include "../lib/btm/Filters.h"
-#include "events/events.h"
 
-#ifndef SYSTEM_D_H_
-#define SYSTEM_D_H_
+
+#include "telemetrie/telemetrie.h"
 
 //Structure capteurs
 typedef struct{
@@ -57,7 +61,7 @@ typedef struct{
 //Structure communication
 typedef struct{
 	ibus_t ibus;
-	uart_id_e uart_telem ;
+	telemetrie_t telemetrie ;
 	channel_analysis_t ch_analysis ;
 }DRONE_communication_t;
 
