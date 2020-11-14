@@ -18,7 +18,7 @@
 void scheduler_init(State_drone_t * drone, State_base_t * base);
 void scheduler(void);
 
-void scheduler_enable_gyro();
+void scheduler_enable_gyro(bool_e enable);
 
 void queu_clear(void);
 bool_e queu_contains(task_t * task);

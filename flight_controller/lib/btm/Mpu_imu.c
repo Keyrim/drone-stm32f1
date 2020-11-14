@@ -90,36 +90,49 @@ bool_e Mpu_imu_calibrate(DRONE_mpu6050_t * angles, uint16_t epoch){
 }
 
 //Mis à jour des donnée brute
-void IMU_update_mpu6050(DRONE_mpu6050_t * angles){
-	MPU6050_ReadAll(&angles->raw_data_mpu);
+bool_e IMU_update_mpu6050(DRONE_mpu6050_t * angles){
+	if(MPU6050_ReadAll(&angles->raw_data_mpu) == MPU6050_Timeout)
+		angles->mpu_is_ok = FALSE ;
+	else{
+		//On dit que le mpu va bien
+		angles->mpu_is_ok = TRUE ;
+		//Accélération en m/s^2 (je crois en g)
+		angles->x_acc_raw = ((float)angles->raw_data_mpu.Accelerometer_X * angles->acc_sensi) - angles->x_acc_offset ;
+		angles->y_acc_raw = ((float)angles->raw_data_mpu.Accelerometer_Y * angles->acc_sensi) - angles->y_acc_offset ;
+		angles->z_acc_raw = ((float)angles->raw_data_mpu.Accelerometer_Z * angles->acc_sensi) - angles->z_acc_offset ;
 
-	//Accélération en m/s^2 (je crois en g)
-	angles->x_acc_raw = ((float)angles->raw_data_mpu.Accelerometer_X * angles->acc_sensi) - angles->x_acc_offset ;
-	angles->y_acc_raw = ((float)angles->raw_data_mpu.Accelerometer_Y * angles->acc_sensi) - angles->y_acc_offset ;
-	angles->z_acc_raw = ((float)angles->raw_data_mpu.Accelerometer_Z * angles->acc_sensi) - angles->z_acc_offset ;
-
-	//Vitesse angulaire en degre / sec
-	angles->x_gyro_raw = ((float)angles->raw_data_mpu.Gyroscope_X * angles->gyro_sensi) - angles->x_gyro_offset;
-	angles->y_gyro_raw = ((float)angles->raw_data_mpu.Gyroscope_Y * angles->gyro_sensi) - angles->y_gyro_offset;
-	angles->z_gyro_raw = ((float)angles->raw_data_mpu.Gyroscope_Z * angles->gyro_sensi) - angles->z_gyro_offset;
+		//Vitesse angulaire en degre / sec
+		angles->x_gyro_raw = ((float)angles->raw_data_mpu.Gyroscope_X * angles->gyro_sensi) - angles->x_gyro_offset;
+		angles->y_gyro_raw = ((float)angles->raw_data_mpu.Gyroscope_Y * angles->gyro_sensi) - angles->y_gyro_offset;
+		angles->z_gyro_raw = ((float)angles->raw_data_mpu.Gyroscope_Z * angles->gyro_sensi) - angles->z_gyro_offset;
+	}
+	return angles->mpu_is_ok ;
 }
 
 void IMU_gyro_low_filter(DRONE_mpu6050_t * angles){
-	angles->x_gyro_filtered = FILTER_process(&angles->x_gyro_filter, angles->x_gyro_raw);
-	angles->y_gyro_filtered = FILTER_process(&angles->y_gyro_filter, angles->y_gyro_raw);
-	angles->z_gyro_filtered = FILTER_process(&angles->z_gyro_filter, angles->z_gyro_raw);
+	if(angles->mpu_is_ok){
+		angles->x_gyro_filtered = FILTER_process(&angles->x_gyro_filter, angles->x_gyro_raw);
+		angles->y_gyro_filtered = FILTER_process(&angles->y_gyro_filter, angles->y_gyro_raw);
+		angles->z_gyro_filtered = FILTER_process(&angles->z_gyro_filter, angles->z_gyro_raw);
+	}
+
 }
 
 void IMU_acc_low_filter(DRONE_mpu6050_t * angles){
-	angles->x_acc_filtered = FILTER_process(&angles->x_acc_filter, angles->x_acc_raw);
-	angles->y_acc_filtered = FILTER_process(&angles->y_acc_filter, angles->y_acc_raw);
-	angles->z_acc_filtered = FILTER_process(&angles->z_acc_filter, angles->z_acc_raw);
+	if(angles->mpu_is_ok){
+		angles->x_acc_filtered = FILTER_process(&angles->x_acc_filter, angles->x_acc_raw);
+		angles->y_acc_filtered = FILTER_process(&angles->y_acc_filter, angles->y_acc_raw);
+		angles->z_acc_filtered = FILTER_process(&angles->z_acc_filter, angles->z_acc_raw);
+	}
+
 }
 
 //On lit les données brutes de l'accèléromètre puis on les filtre pour récupèrer l'angle
 void IMU_complementary_filter(DRONE_mpu6050_t * angles){
-
-//On calcul l'accélération total
+	//Si le mpu à un pb ca sert à rien de faire quoi que ce soit
+	if(!angles->mpu_is_ok)
+		return ;
+	//On calcul l'accélération total
 	float acc_total = sqrtf((angles->x_acc_filtered * angles->x_acc_filtered ) + (angles->y_acc_filtered * angles->y_acc_filtered) + (angles->z_acc_filtered * angles->z_acc_filtered));
 
 	//On divise par l'accélération plus tard donc pour éviter une divisions par zéro ..
@@ -179,6 +192,11 @@ void IMU_complementary_filter(DRONE_mpu6050_t * angles){
 void Mpu_imu_init(DRONE_mpu6050_t * angles, MPU6050_Accelerometer_t acc, MPU6050_Gyroscope_t gyro, float alpha, int32_t frequency){
 	//Init du mpu
 	angles->mpu_result =  MPU6050_Init(&angles->raw_data_mpu, NULL, GPIO_PIN_12, MPU6050_Device_0,acc, gyro);
+	//Si on a un pb on arrête tout
+	if(angles->mpu_result)
+		return ;
+	//Sinon on active le mpu
+	angles->mpu_is_ok = TRUE ;
 
 	angles->alpha = alpha ;
 	angles->one_minus_alpha = (float)1 - alpha ;

@@ -33,7 +33,7 @@ static Flags_t flags_flight_mode_clear [9] = {FLAG_STATE_ON_THE_GROUND,
 		FLAG_STATE_CHANGE_PID_SETTINGS};
 
 
-//Fonctions liées aux events
+//Fonction appelées lors de la transition d'un event à un autre
 static void event_function_on_the_ground(mask_def_ids_t mask_id){
 	CLEAR_FLAG_FLIGHT_MODE ;
 	EVENT_Set_flag(FLAG_STATE_ON_THE_GROUND);
@@ -46,6 +46,9 @@ static void event_function_on_the_ground(mask_def_ids_t mask_id){
 			break;
 		case ON_THE_GROUND_CHANGE_PID_SETTINGS :
 			EVENT_Clean_flag(FLAG_CHAN_9_PUSH);
+			break;
+		case ON_THE_GROUND_IMU_TIMEOUT :
+			EVENT_Clean_flag(FLAG_IMU_TIMEOUT);
 			break;
 		default :
 			break;
@@ -114,7 +117,7 @@ static void event_function_change_pid_settings(mask_def_ids_t mask_id){
 }
 
 //Définitions des events
-//Attention !!!! nb_mask < EVENT_NB_MASK_PER_EVENT_MAX sinon dérapage :)
+//Attention !!!! nb_mask <= EVENT_NB_MASK_PER_EVENT_MAX sinon dérapage :)
 static Event_t events[EVENT_COUNT] ={
 		[EVENT_TRANSIT_ON_THE_GROUND] 			= DEFINE_EVENT(event_function_on_the_ground, 		ON_THE_GROUND_MASK_COUNT, 	EVENT_TYPE_HIGH_LVL),
 		[EVENT_TRANSIT_MANUAL] 					= DEFINE_EVENT(event_function_manual, 				MANUAL_MASK_COUNT, 			EVENT_TYPE_HIGH_LVL),

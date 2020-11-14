@@ -9,6 +9,7 @@
 #include "scheduler/scheduler.h"
 #include "../sub/sub_action.h"
 #include "../telemetrie/telemetrie_periodic_send_functions.h"
+#include "../regulation_filtrage/regulation_filtrage.h"
 
 
 static State_drone_t * drone ;
@@ -30,14 +31,21 @@ void tasks_init(State_drone_t * drone_, State_base_t * base_){
 	task_enable(TASK_VERIF_SYSTEM, TRUE);
 	task_enable(TASK_STABILISATION, TRUE);
 	task_enable(TASK_HIGH_LVL, TRUE);
-	task_enable(TASK_MS5611, TRUE);
+	//task_enable(TASK_MS5611, TRUE);
 	task_enable(TASK_LED, TRUE);
 
 }
 
 void task_function_imu(uint32_t current_time_us){
 	UNUSED(current_time_us);
-	IMU_update_mpu6050(&drone->capteurs.mpu);
+	//Si timeout
+	if(IMU_update_mpu6050(&drone->capteurs.mpu)==FALSE){
+		//On lève le flag et on stop gyro, filtrage & régulation
+		scheduler_enable_gyro(FALSE);
+		task_enable(TASK_IMU, FALSE);
+		EVENT_Set_flag(FLAG_IMU_TIMEOUT);
+	}
+
 }
 
 void task_function_gyro_filtering(uint32_t current_time_us){
@@ -49,58 +57,7 @@ void task_function_gyro_filtering(uint32_t current_time_us){
 
 void task_function_stabilisation(uint32_t current_time_us){
 	UNUSED(current_time_us);
-	//Si on vole, on stabilise le drone tel que le souhaite le mode de vol actuel
-	float roll_output = 0 ;
-	float pitch_output = 0 ;
-	float yaw_output = 0 ;
-
-
-	//On peut stabiliser par rapprot à l'angle,  par rapport à la vitesse angulaire ou ne pas stabiliser (si le drone vole pas)
-	switch(drone->stabilisation.stab_mode){
-
-		case STAB_OFF :
-			//Si on ne stabilise pas, on stop tous les moteurs
-			ESCS_set_period(PULSATION_MIN, PULSATION_MIN, PULSATION_MIN, PULSATION_MIN);
-			break;
-
-		case LEVELLED :
-			//On calcule les consigne des moteurs selon les consignes d'angles
-			drone->consigne.roll_rate 	= -PID_compute(&drone->stabilisation.pid_roll, drone->consigne.roll, drone->capteurs.mpu.y);
-			drone->consigne.pitch_rate  = -PID_compute(&drone->stabilisation.pid_pitch, drone->consigne.pitch, drone->capteurs.mpu.x);
-
-			//On calcule les consigne des moteurs selon les consignes d'angles
-			roll_output 	= PID_compute(&drone->stabilisation.pid_roll_rate, drone->consigne.roll_rate, drone->capteurs.mpu.y_gyro_filtered);
-			pitch_output 	= PID_compute(&drone->stabilisation.pid_pitch_rate, drone->consigne.pitch_rate, drone->capteurs.mpu.x_gyro_filtered);
-			yaw_output 		= PID_compute(&drone->stabilisation.pid_yaw_rate, drone->consigne.yaw_rate, drone->capteurs.mpu.z_gyro_filtered);
-
-			//Et on envoit aux moteurs en vérifiant qu'on ne dépasse les valeurs autorisées
-			ESCS_set_period((uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output + pitch_output - yaw_output)),
-							(uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output + pitch_output + yaw_output)),
-							(uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output - pitch_output + yaw_output)),
-							(uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output - pitch_output - yaw_output)));
-
-			break;
-
-		case ACCRO :
-			//On calcule les consigne des moteurs selon les consignes d'angles
-			roll_output 	= PID_compute(&drone->stabilisation.pid_roll_rate, drone->consigne.roll_rate, drone->capteurs.mpu.y_gyro_filtered);
-			pitch_output 	= PID_compute(&drone->stabilisation.pid_pitch_rate, drone->consigne.pitch_rate, drone->capteurs.mpu.x_gyro_filtered);
-			yaw_output 		= PID_compute(&drone->stabilisation.pid_yaw_rate, drone->consigne.yaw_rate, drone->capteurs.mpu.z_gyro_filtered);
-
-
-			//Et on envoit aux moteurs en vérifiant qu'on ne dépasse les valeurs autorisées
-			ESCS_set_period((uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output + pitch_output - yaw_output)),
-							(uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output + pitch_output + yaw_output)),
-							(uint16_t)(1000 + drone->consigne.throttle + (int16_t)(- roll_output - pitch_output + yaw_output)),
-							(uint16_t)(1000 + drone->consigne.throttle + (int16_t)(+ roll_output - pitch_output - yaw_output)));
-			break;
-
-		default:
-			break;
-	}
-
-
-
+	REGULATION_procces(drone);
 }
 
 
@@ -169,8 +126,18 @@ void task_function_verif_system(uint32_t current_time_us){
 		drone->communication.ibus.is_ok = TRUE ;
 		EVENT_Clean_flag(FLAG_TIMEOUT_PPM);
 		EVENT_Set_flag(FLAG_PPM_OK);
-
 	}
+
+	//verif mpu
+	if(drone->capteurs.mpu.mpu_is_ok){
+		EVENT_Set_flag(FLAG_IMU_OK);
+		EVENT_Clean_flag(FLAG_IMU_FAIL);
+	}
+	else{
+		EVENT_Set_flag(FLAG_IMU_FAIL);
+		EVENT_Clean_flag(FLAG_IMU_OK);
+	}
+
 
 
 	//Time out du gps
@@ -178,6 +145,7 @@ void task_function_verif_system(uint32_t current_time_us){
 		drone->capteurs.gps.is_ok = FALSE ;
 	else
 		drone->capteurs.gps.is_ok = TRUE ;
+
 
 	//Mesure batterie
 	BATTERIE_update(&drone->capteurs.batterie);
@@ -239,15 +207,15 @@ void task_function_led(uint32_t current_time_us){
 #define PERIOD_US_FROM_HERTZ(hertz_param) (1000000 / hertz_param)
 
 task_t tasks [TASK_COUNT] ={
-		[TASK_IMU] = 			DEFINE_TASK(TASK_IMU ,				PRIORITY_REAL_TIME, 	task_function_imu, 				PERIOD_US_FROM_HERTZ(REGULATION_AND_MPU_FREQUENCY)),
-		[TASK_GYRO_FILTERING] = DEFINE_TASK(TASK_GYRO_FILTERING ,	PRIORITY_REAL_TIME, 	task_function_gyro_filtering, 	PERIOD_US_FROM_HERTZ(REGULATION_AND_MPU_FREQUENCY)),
+		[TASK_IMU] = 			DEFINE_TASK(TASK_IMU ,				PRIORITY_REAL_TIME, 	task_function_imu, 				PERIOD_US_FROM_HERTZ(REGULATION_AND_MPU_FREQUENCY)),//Fonctionnement particulié
+		[TASK_GYRO_FILTERING] = DEFINE_TASK(TASK_GYRO_FILTERING ,	PRIORITY_REAL_TIME, 	task_function_gyro_filtering, 	PERIOD_US_FROM_HERTZ(REGULATION_AND_MPU_FREQUENCY)),//Fonctionnement particulié
 		[TASK_PRINTF] = 		DEFINE_TASK(TASK_PRINTF, 			PRIORITY_HIGH, 			task_function_printf, 			PERIOD_US_FROM_HERTZ(40)),
 		[TASK_IBUS] = 			DEFINE_TASK(TASK_IBUS, 				PRIORITY_HIGH, 			task_function_ibus, 			PERIOD_US_FROM_HERTZ(1000)),
 		[TASK_ESCS_IBUS_TEST] = DEFINE_TASK(TASK_ESCS_IBUS_TEST, 	PRIORITY_HIGH, 			task_function_escs_ibus_test, 	PERIOD_US_FROM_HERTZ(250)),
 		[TASK_SEND_DATA] = 		DEFINE_TASK(TASK_SEND_DATA, 		PRIORITY_MEDIUM, 		task_function_send_data, 		PERIOD_US_FROM_HERTZ(250)),
 		[TASK_RECEIVE_DATA] = 	DEFINE_TASK(TASK_RECEIVE_DATA, 		PRIORITY_MEDIUM, 		task_function_receive_data, 	PERIOD_US_FROM_HERTZ(500)),
 		[TASK_VERIF_SYSTEM] = 	DEFINE_TASK(TASK_VERIF_SYSTEM, 		PRIORITY_MEDIUM, 		task_function_verif_system, 	PERIOD_US_FROM_HERTZ(10)),
-		[TASK_STABILISATION] =	DEFINE_TASK(TASK_STABILISATION, 	PRIORITY_REAL_TIME, 	task_function_stabilisation, 	PERIOD_US_FROM_HERTZ(REGULATION_AND_MPU_FREQUENCY)),
+		[TASK_STABILISATION] =	DEFINE_TASK(TASK_STABILISATION, 	PRIORITY_HIGH, 			task_function_stabilisation, 	PERIOD_US_FROM_HERTZ(250)),//Fonctionement particulié
 		[TASK_HIGH_LVL] = 		DEFINE_TASK(TASK_HIGH_LVL, 			PRIORITY_HIGH,	 		task_function_high_lvl, 		PERIOD_US_FROM_HERTZ(250)),
 		[TASK_MS5611] = 		DEFINE_TASK(TASK_MS5611, 			PRIORITY_MEDIUM,	 	task_function_ms5611, 			PERIOD_US_FROM_HERTZ(500)),
 		[TASK_LED] = 			DEFINE_TASK(TASK_LED, 				PRIORITY_LOW,	 		task_function_led, 				PERIOD_US_FROM_HERTZ(10))

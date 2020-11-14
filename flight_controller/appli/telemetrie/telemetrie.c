@@ -38,7 +38,7 @@ void TELEMETRIE_send_double_16b(float value, uint8_t id){
 	uint8_t  bytes[2] = {0} ;
 	int16_t int_value =  (int16_t)( value * (double) 100);
 	bytes[0] = (uint8_t)(int_value >> 8);
-	bytes[2] = (uint8_t)(int_value & 0b11111111);
+	bytes[1] = (uint8_t)(int_value & 0b11111111);
 	TELEMETRIE_Send_data(id, bytes, 2);
 }
 

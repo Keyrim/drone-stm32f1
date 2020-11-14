@@ -113,7 +113,7 @@ void TELEMETRIE_send_pid_pitch_kd(State_drone_t * drone){
 void TELEMETRIE_send_periode_task(State_drone_t * drone){
 	UNUSED(drone);
 	uint8_t bytes[3] = {0};
-	uint32_t int_value = (uint32_t)( TASK_get_task(TASK_GYRO_FILTERING)->real_period_us);
+	uint32_t int_value = (uint32_t)( TASK_get_task(TASK_STABILISATION)->real_period_us);
 	bytes[0] = (uint8_t)((int_value >> 16) & 0b11111111) ;
 	bytes[1] = (uint8_t)((int_value >> 8) & 0b11111111) ;
 	bytes[2] = (uint8_t)((int_value ) & 0b11111111) ;

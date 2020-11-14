@@ -10,6 +10,7 @@ static task_t * task_queu[TASK_COUNT];
 static uint32_t task_queu_size = 0 ;
 static uint32_t task_queu_position = 0 ;
 static bool_e gyro_enabled = 0 ;
+static bool_e flag_gyro_data_ready = 0 ;
 
 void scheduler_init(State_drone_t * drone, State_base_t * base){
 	tasks_init(drone, base);
@@ -19,24 +20,35 @@ void scheduler(void){
 	uint32_t current_time_us = SYSTICK_get_time_us();
 	static uint32_t gyro_time_left = 5000 ;
 
-	//Tâches temps réel (de l'acquisition du gyro à l'envoit des consignes aux moteurs) ont la priorité absolue sur le reste
+	//Tâches du gyro
 	task_t * task_gyro = TASK_get_task(TASK_IMU) ;
 	if(gyro_enabled){
 		if(current_time_us >= task_gyro->last_execution_us + task_gyro->desired_period_us){
 			current_time_us = task_execute(task_gyro, current_time_us);
 			current_time_us = task_execute(TASK_get_task(TASK_GYRO_FILTERING), current_time_us);
-			current_time_us = task_execute(TASK_get_task(TASK_STABILISATION), current_time_us);
+			flag_gyro_data_ready = TRUE ;
 		}
 		else
 			gyro_time_left = task_gyro->last_execution_us + task_gyro->desired_period_us - current_time_us ;
 	}
+
+	//Tâche de régulation
+	//Elle peut être déclenché suite à la réalisation des tâche du gyro
+	//Ou en dans le séquenceur comme une tâche normale
+	//Permet de suivre la fréquence du gyro
+	//Mais si le gyro ne fonctionne pas, on peut quand même couper les moteurs quoi
+	if(flag_gyro_data_ready){
+		flag_gyro_data_ready = FALSE ;
+		current_time_us = task_execute(TASK_get_task(TASK_STABILISATION), current_time_us);
+	}
+
 	task_t * task = get_first_task();
 	while(task_queu_position < task_queu_size && task != NULL){
 
 		//TODO : Tâches par évennement
 		if(task->static_priority != PRIORITY_REAL_TIME)
 			if(current_time_us >= task->last_execution_us + task->desired_period_us)
-				if(task->execution_duration_us_worst < gyro_time_left)
+				if((task->execution_duration_us_worst < gyro_time_left) || !gyro_enabled)
 					current_time_us = task_execute(task, current_time_us);
 
 		task = get_next_task();
@@ -92,8 +104,8 @@ void task_enable(task_ids_t id, bool_e enable){
 		queu_remove(TASK_get_task(id));
 }
 
-void scheduler_enable_gyro(){
-	gyro_enabled = TRUE ;
+void scheduler_enable_gyro(bool_e enable){
+	gyro_enabled = enable ;
 }
 
 void task_reschedule(task_ids_t id, uint32_t new_period_us){

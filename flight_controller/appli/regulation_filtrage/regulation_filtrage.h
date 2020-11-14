@@ -13,4 +13,6 @@
 void REGU_FILTRAGE_pids_orientation_init(State_drone_t * drone);
 void REGU_FILTRAGE_filters_imu_config(State_drone_t * drone);
 
+void REGULATION_procces(State_drone_t * drone);
+
 #endif /* REGULATION_FILTRAGE_REGULATION_FILTRAGE_H_ */

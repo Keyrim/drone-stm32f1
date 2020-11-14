@@ -72,7 +72,7 @@ typedef struct{
 }DRONE_mpu6050_t;
 
 void Mpu_imu_init(DRONE_mpu6050_t * angles, MPU6050_Accelerometer_t acc_sensi, MPU6050_Gyroscope_t gyro_sensi, float alpha, int32_t frequency);
-void IMU_update_mpu6050(DRONE_mpu6050_t * angles);
+bool_e IMU_update_mpu6050(DRONE_mpu6050_t * angles);
 void IMU_gyro_low_filter(DRONE_mpu6050_t * angles); //Need filter gyro
 void IMU_acc_low_filter(DRONE_mpu6050_t * angles);	//Need filter acc
 void IMU_complementary_filter(DRONE_mpu6050_t * angles);

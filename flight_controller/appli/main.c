@@ -57,7 +57,7 @@ int main(void)
 	if(drone.capteurs.mpu.mpu_result)
 		drone.soft.state_flight_mode = IMU_FAILED_INIT ;
 	else
-		scheduler_enable_gyro();
+		scheduler_enable_gyro(TRUE);
 
 	//------------------Init ibus
 	IBUS_init(&drone.communication.ibus, UART_IBUS);

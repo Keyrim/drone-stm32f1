@@ -23,7 +23,7 @@
 
 //On puet modifer les coefs des pids depuis la base
 //Ici on choisit si on modifi les pids "angle rate" ou "angle"
-#define SET_COEF_ON_RATE_PID 1
+#define SET_COEF_ON_RATE_PID 0
 
 //Paramètre du gps
 #define TIME_OUT_GPS 2000000 //(en microsecondes)

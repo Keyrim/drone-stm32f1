@@ -234,7 +234,8 @@ MPU6050_Result_t MPU6050_ReadAll(MPU6050_t* DataStruct) {
 	int16_t temp;
 
 	/* Read full raw data, 14bytes */
-	I2C_ReadMulti(MPU6050_I2C, DataStruct->Address, MPU6050_ACCEL_XOUT_H, data, 14);
+	if(I2C_ReadMulti(MPU6050_I2C, DataStruct->Address, MPU6050_ACCEL_XOUT_H, data, 14) == HAL_TIMEOUT)
+		return MPU6050_Timeout ;
 
 	/* Format accelerometer data */
 	DataStruct->Accelerometer_X = (int16_t)(data[0] << 8 | data[1]);
