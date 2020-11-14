@@ -49,7 +49,10 @@ typedef enum{
 
 	//Flags état périphérique
 	FLAG_IMU_FAIL,
+	FLAG_IMU_OK,
+	FLAG_IMU_TIMEOUT,
 	FLAG_IMU_DONE_CALIB,
+
 	FLAG_TIMEOUT_PPM,
 	FLAG_PPM_OK,
 

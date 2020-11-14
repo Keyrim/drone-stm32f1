@@ -14,13 +14,12 @@
 
 //Include des deux machines à état principales (qui elles include bcp de choses)
 #include "scheduler/scheduler.h"
+#include "regulation_filtrage/regulation_filtrage.h"
 
 //Fichier de ref pour les configurations / branchements
 #include "branchement.h"
 #include "settings.h"
-#include "pid_config.h"
 #include "../ressources/sequences_led.h"
-#include "../lib/btm/telem_2.h"
 
 
 
@@ -46,32 +45,11 @@ int main(void)
 
 	//On laisse du temps à tout le monde pour bien démarer
 	HAL_Delay(100);
-	//------------------Init serial uart
-	drone.communication.uart_telem = UART_TELEMETRIE ;
-	UART_init(UART_TELEMETRIE, 57600);
-	//uart_init(&drone.communication.uart_telem, UART_TELEMETRIE, 57600, 2);
-	SYS_set_std_usart(UART_TELEMETRIE, UART_TELEMETRIE, UART_TELEMETRIE);
 
 
-	//test sur la telem
-//	uint32_t previous = 0 ;
-//	uint32_t periode = 1300 ;
-//
-//	uint8_t str[] = "test";
-//	while(1){
-//		uint32_t time = SYSTICK_get_time_us()  ;
-//		uint32_t clock = time  ;
-//		clock = clock % 4000 ;
-//		if((time > previous + periode) & (clock > 0)){
-//			TELEM2_send_data(69, str, 4);
-//			previous += periode ;
-//		}
-//
-//	}
+	//------------------Init de la télémétrie
+	TELEMETRIE_Init(&drone.communication.telemetrie, UART_TELEMETRIE, 57600, 1);
 
-
-	//Init du gps
-	//GPS_congif(UART_GPS);
 
 	//------------------Init du MPU et du complementary filer
 	Mpu_imu_init(&drone.capteurs.mpu,MPU6050_Accelerometer_16G, MPU6050_Gyroscope_500s, 0.998f, REGULATION_AND_MPU_FREQUENCY);
@@ -79,7 +57,7 @@ int main(void)
 	if(drone.capteurs.mpu.mpu_result)
 		drone.soft.state_flight_mode = IMU_FAILED_INIT ;
 	else
-		scheduler_enable_gyro();
+		scheduler_enable_gyro(TRUE);
 
 	//------------------Init ibus
 	IBUS_init(&drone.communication.ibus, UART_IBUS);
@@ -94,39 +72,8 @@ int main(void)
 	//Init module events
 	EVENT_init(&drone);
 
-	//Init pids pour le mode "angle / levelled "
-	PID_init(&drone.stabilisation.pid_roll, PID_SETTINGS_ROLL);
-	PID_init(&drone.stabilisation.pid_pitch,  PID_SETTINGS_PITCH);
-	PID_init(&drone.stabilisation.pid_yaw, PID_SETTINGS_YAW);
-
-	//Init pids pour le mode "accro / rate"
-	PID_init(&drone.stabilisation.pid_roll_rate, PID_SETTINGS_ROLL_ACCRO);
-	PID_init(&drone.stabilisation.pid_pitch_rate, PID_SETTINGS_PITCH_ACCRO);
-	PID_init(&drone.stabilisation.pid_yaw_rate, PID_SETTINGS_YAW_ACCRO);
-
-	//Init des filtres pour les pids
-	FILTER_second_order_init(&drone.filters.pid_roll, FILTER_SETTINGS_ANGLE);
-	FILTER_second_order_init(&drone.filters.pid_pitch, FILTER_SETTINGS_ANGLE);
-	FILTER_second_order_init(&drone.filters.pid_yaw, FILTER_SETTINGS_ANGLE);
-	FILTER_second_order_init(&drone.filters.pid_roll_rate, FILTER_SETTINGS_ANGLE);
-	FILTER_second_order_init(&drone.filters.pid_pitch_rate, FILTER_SETTINGS_ANGLE);
-	FILTER_second_order_init(&drone.filters.pid_yaw_rate, FILTER_SETTINGS_ANGLE);
-
-	//Filtres gyro
-	FILTER_second_order_init(&drone.capteurs.mpu.gyro_x_filter, FILTER_SETTINGS_GYRO);
-	FILTER_second_order_init(&drone.capteurs.mpu.gyro_y_filter, FILTER_SETTINGS_GYRO);
-	FILTER_second_order_init(&drone.capteurs.mpu.gyro_z_filter, FILTER_SETTINGS_GYRO);
-
-
-	//Associations filtres / pids
-	PID_set_filter_d(&drone.stabilisation.pid_roll, &drone.filters.pid_roll);
-	PID_set_filter_d(&drone.stabilisation.pid_pitch, &drone.filters.pid_pitch);
-	PID_set_filter_d(&drone.stabilisation.pid_yaw, &drone.filters.pid_yaw);
-
-	PID_set_filter_p(&drone.stabilisation.pid_roll_rate, &drone.filters.pid_roll_rate);
-	PID_set_filter_p(&drone.stabilisation.pid_pitch_rate, &drone.filters.pid_pitch_rate);
-	PID_set_filter_p(&drone.stabilisation.pid_yaw_rate, &drone.filters.pid_yaw_rate);
-
+	REGU_FILTRAGE_filters_imu_config(&drone);
+	REGU_FILTRAGE_pids_orientation_init(&drone);
 
 	ESCS_init(&drone.stabilisation.escs_timer, ESC_OUTPUT_ONE_SHOT_125);
 

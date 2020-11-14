@@ -10,15 +10,23 @@
 
 #include "macro_types.h"
 
-//Second order filter struct
+
+typedef enum {
+	FILTER_FIRST_ORDER = 0,
+	FILTER_SECOND_ORDER,
+	FILTER_NO_FILTERING
+}Filter_order_e;
+
+//Filter structure
 typedef struct{
 	float settings[3];
 	float values[3];
-}Filter_second_order_t;
+	Filter_order_e order ;
+}Filter_t;
 
-void FILTER_second_order_init(Filter_second_order_t * filter, float settings[3]);
-float FILTER_first_order_process(Filter_second_order_t * filter, float new_value);
-float FILTER_second_order_process(Filter_second_order_t * filter, float new_value);
+
+void FILTER_init(Filter_t * filter, float settings[3], Filter_order_e order);
+float FILTER_process(Filter_t * filter, float new_value);
 
 
 #endif /* BTM_FILTERS_H_ */

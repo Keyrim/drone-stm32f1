@@ -178,7 +178,8 @@ typedef enum {
 typedef enum {
 	MPU6050_Result_Ok = 0x00,          /*!< Everything OK */
 	MPU6050_Result_DeviceNotConnected, /*!< There is no device with valid slave address */
-	MPU6050_Result_DeviceInvalid       /*!< Connected device with address is not MPU6050 */
+	MPU6050_Result_DeviceInvalid,      /*!< Connected device with address is not MPU6050 */
+	MPU6050_Timeout						//Timeout lors de la lecture
 } MPU6050_Result_t;
 
 /**

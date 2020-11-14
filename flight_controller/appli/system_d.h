@@ -7,9 +7,15 @@
 
 
 
+
+
+#ifndef SYSTEM_D_H_
+#define SYSTEM_D_H_
+
 #include "settings.h"
 #include "macro_types.h"
 #include "MAE.h"
+
 
 #include "../lib/btm/Batterie.h"
 #include "../lib/btm/Channel_annalysis.h"
@@ -21,13 +27,11 @@
 #include "../lib/btm/MS5611.h"
 #include "../lib/btm/Pid.h"
 #include "../lib/btm/Sequence_led.h"
-#include "../lib/btm/Uart_lib.h"
 #include "../lib/btm/esc_timer.h"
 #include "../lib/btm/Filters.h"
-#include "events/events.h"
 
-#ifndef SYSTEM_D_H_
-#define SYSTEM_D_H_
+
+#include "telemetrie/telemetrie.h"
 
 //Structure capteurs
 typedef struct{
@@ -37,18 +41,6 @@ typedef struct{
 	ms5611_t ms5611 ;
 }DRONE_capteurs_t;
 
-//Structure fitler
-typedef struct{
-	//PID angle
-	Filter_second_order_t pid_roll ;
-	Filter_second_order_t pid_pitch ;
-	Filter_second_order_t pid_yaw ;
-
-	//Pid accro
-	Filter_second_order_t pid_roll_rate ;
-	Filter_second_order_t pid_pitch_rate ;
-	Filter_second_order_t pid_yaw_rate ;
-}DRONE_filters;
 
 //Structure stabilisation
 typedef struct{
@@ -69,7 +61,7 @@ typedef struct{
 //Structure communication
 typedef struct{
 	ibus_t ibus;
-	uart_id_e uart_telem ;
+	telemetrie_t telemetrie ;
 	channel_analysis_t ch_analysis ;
 }DRONE_communication_t;
 
@@ -95,7 +87,6 @@ typedef struct{
 	DRONE_communication_t communication ;
 	DRONE_soft_t soft ;
 	DRONE_ihm_t ihm ;
-	DRONE_filters filters ;
 
 }State_drone_t;
 

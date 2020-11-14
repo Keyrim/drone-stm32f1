@@ -8,7 +8,7 @@
 #include <high_lvl/high_lvl.h>
 
 #include "../../ressources/sequences_led.h"
-#include "../lib/btm/Telemetrie.h"
+#include "../telemetrie/telemetrie.h"
 #include "../lib/btm/Test_transition.h"
 #include "stdlib.h"
 
@@ -62,7 +62,7 @@ void HIGH_LVL_Manual_Accro(State_drone_t * drone){
 void HIGH_LVL_Manual_Hand_Control(State_drone_t * drone, State_base_t * base){
 	if(drone->soft.entrance_flight_mode){
 		drone->stabilisation.stab_mode = LEVELLED ;
-		TELEMETRIE_send_consigne_base(SUB_ID_BASE_CONSIGNE_START_SENDING_ANGLES, drone->communication.uart_telem);
+		TELEMETRIE_send_consigne_base(SUB_ID_BASE_CONSIGNE_START_SENDING_ANGLES);
 		LED_SEQUENCE_set_sequence(&drone->ihm.led_etat, SEQUENCE_LED_4);
 	}
 	//			---------------------------- 		MAIN PART 			----------------------------------------
@@ -139,13 +139,10 @@ void HIGH_LVL_Change_Pid_Settings(State_drone_t * drone){
 		pid_pitch = &drone->stabilisation.pid_pitch ;
 	#endif
 
-	const float divider = 1000000 ;
+	const float divider = 200000 ;
 	if(drone->communication.ibus.channels[SWITCH_3] > 1300 && drone->communication.ibus.channels[SWITCH_3] < 1600){
-		//Dead band pour ne pas increase pour rien
-		if(abs(drone->communication.ibus.channels[8] - 1500) > 20)
-			pid_roll->settings[PID_KP] += (float)(drone->communication.ibus.channels[8] - 1500) / divider ;
-		if(abs(drone->communication.ibus.channels[9] - 1500) > 20)
-			pid_roll->settings[PID_KD] += (float)(drone->communication.ibus.channels[9] - 1500) / divider ;
+		pid_roll->settings[PID_KP] -= (float)(drone->communication.ibus.channels[YAW] - 1500) / divider ;
+		pid_roll->settings[PID_KD] -= (float)(drone->communication.ibus.channels[ROLL] - 1500) / divider ;
 
 		//Pas de valeurs négative, on veut pas compenser à l'envers
 		pid_roll->settings[PID_KP] = MAX(pid_roll->settings[PID_KP], 0);
@@ -157,11 +154,8 @@ void HIGH_LVL_Change_Pid_Settings(State_drone_t * drone){
 
 	}
 	else if(drone->communication.ibus.channels[SWITCH_3] > 1600){
-		//Dead band pour ne pas increase pour rien
-		if(abs(drone->communication.ibus.channels[8] - 1500) > 20)
-			pid_pitch->settings[PID_KP] += (float)(drone->communication.ibus.channels[8] - 1500) / divider ;
-		if(abs(drone->communication.ibus.channels[9] - 1500) > 20)
-			pid_pitch->settings[PID_KD] += (float)(drone->communication.ibus.channels[9] - 1500) / divider ;
+		pid_pitch->settings[PID_KP] -= (float)(drone->communication.ibus.channels[YAW] - 1500) / divider ;
+		pid_pitch->settings[PID_KD] -= (float)(drone->communication.ibus.channels[ROLL] - 1500) / divider ;
 
 		//Pas de valeurs négative, on veut pas compenser à l'envers
 		pid_pitch->settings[PID_KP] = MAX(pid_pitch->settings[PID_KP], 0);
