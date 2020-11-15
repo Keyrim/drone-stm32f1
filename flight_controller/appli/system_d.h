@@ -29,6 +29,7 @@
 #include "../lib/btm/Sequence_led.h"
 #include "../lib/btm/esc_timer.h"
 #include "../lib/btm/Filters.h"
+#include "../lib/btm/Hmc5883.h"
 
 
 #include "telemetrie/telemetrie.h"
@@ -39,6 +40,7 @@ typedef struct{
 	DRONE_batterie_t batterie ;
 	DRONE_mpu6050_t mpu ;
 	ms5611_t ms5611 ;
+	compas_struct_t hmc ;
 }DRONE_capteurs_t;
 
 

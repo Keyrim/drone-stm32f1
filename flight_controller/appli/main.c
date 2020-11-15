@@ -50,6 +50,16 @@ int main(void)
 	//------------------Init de la télémétrie
 	TELEMETRIE_Init(&drone.communication.telemetrie, UART_TELEMETRIE, 57600, 1);
 
+	//------------------Init du compas
+	HMC5883_init(&drone.capteurs.hmc, TRUE, 0, 0, 0, 0);
+
+	HAL_Delay(5);
+
+	while(1){
+		HMC5883_test();
+		HAL_Delay(500);
+	}
+
 
 	//------------------Init du MPU et du complementary filer
 	Mpu_imu_init(&drone.capteurs.mpu,MPU6050_Accelerometer_16G, MPU6050_Gyroscope_500s, 0.998f, REGULATION_AND_MPU_FREQUENCY);

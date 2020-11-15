@@ -101,6 +101,7 @@ typedef struct{
 }compas_struct_t;
 
 void HMC5883_init(compas_struct_t * compas, bool_e init_i2c, uint8_t operating_mode, uint8_t measurement_rate, uint8_t gain_config, uint8_t sample_average);
+void HMC5883_test();
 void HMC5883_read(compas_struct_t * compas);
 
 

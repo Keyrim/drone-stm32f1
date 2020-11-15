@@ -42,17 +42,26 @@ void HMC5883_init(compas_struct_t * compas, bool_e init_i2c, uint8_t operating_m
 
 	//Register A config
 	uint8_t tmp = (uint8_t)((measurement_rate << HMC5883_output_rate_shift) + (sample_average << HMC55883_average_shift));
-	I2C_Write(I2C1, HMC5883_I2C_ADRESSE, HMC5883_CONF_A, tmp);
-
+	//I2C_Write(I2C1, HMC5883_I2C_ADRESSE, HMC5883_CONF_A, tmp);
+	I2C_Write(I2C1, HMC5883_I2C_ADRESSE, HMC5883_CONF_A, 0x78);
 	//Register B config
 	tmp = (uint8_t)(gain_config << HMC5883_gain_configuration_shift) ;
+	//I2C_Write(I2C1, HMC5883_I2C_ADRESSE, HMC5883_CONF_B , 0xA0);
 	I2C_Write(I2C1, HMC5883_I2C_ADRESSE, HMC5883_CONF_B , tmp);
 
 	//register mode config
 	tmp = operating_mode << HMC5883_mode_shift ;
+	//I2C_Write(I2C1, HMC5883_I2C_ADRESSE, HMC5883_MODE , 0);
 	I2C_Write(I2C1, HMC5883_I2C_ADRESSE, HMC5883_MODE , tmp);
-
 }
+
+//Fonction de test voir si le capteur répond
+void HMC5883_test(){
+	int8_t buffer[3] = {0};
+	bool_e result = 0 ;
+	result = I2C_ReadMulti(I2C1, HMC5883_I2C_ADRESSE, HMC5883_IDENTIFICATION_A, buffer, 3);
+	printf("Retour : %d\t%d\t%d\t%d\r\n", result, buffer[0], buffer[1], buffer[2]);
+
 //On lit les valeurs sur les trois axes
 void HMC5883_read(compas_struct_t * compas){
 	uint8_t data[6];

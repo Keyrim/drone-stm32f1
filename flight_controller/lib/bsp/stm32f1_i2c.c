@@ -290,7 +290,7 @@ HAL_StatusTypeDef I2C_Write(I2C_TypeDef* I2Cx, uint8_t address, uint8_t reg, uin
 	assert(I2Cx == I2C1 || I2Cx == I2C2);
 	I2C_ID_e id = ((I2Cx == I2C2)?I2C2_ID:I2C1_ID);
 
-	return HAL_I2C_Mem_Write(&hi2c[id],address,reg,I2C_MEMADD_SIZE_8BIT,&data,1,I2C_TIMEOUT);
+	return HAL_I2C_Mem_Write(&hi2c[id],address,reg,I2C_MEMADD_SIZE_8BIT,&data,1,100);
 }
 
 /**
