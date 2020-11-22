@@ -51,14 +51,14 @@ int main(void)
 	TELEMETRIE_Init(&drone.communication.telemetrie, UART_TELEMETRIE, 57600, 1);
 
 	//------------------Init du compas
-	HMC5883_init(&drone.capteurs.hmc, TRUE, 0, 0, 0, 0);
-
-	HAL_Delay(5);
-
-	while(1){
-		HMC5883_test();
-		HAL_Delay(500);
-	}
+//	HMC5883_init(&drone.capteurs.hmc, TRUE, 0, 0, 0, 0);
+//
+//	HAL_Delay(5);
+//
+//	while(1){
+//		HMC5883_test();
+//		HAL_Delay(500);
+//	}
 
 
 	//------------------Init du MPU et du complementary filer

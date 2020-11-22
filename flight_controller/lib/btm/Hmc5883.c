@@ -61,7 +61,7 @@ void HMC5883_test(){
 	bool_e result = 0 ;
 	result = I2C_ReadMulti(I2C1, HMC5883_I2C_ADRESSE, HMC5883_IDENTIFICATION_A, buffer, 3);
 	printf("Retour : %d\t%d\t%d\t%d\r\n", result, buffer[0], buffer[1], buffer[2]);
-
+}
 //On lit les valeurs sur les trois axes
 void HMC5883_read(compas_struct_t * compas){
 	uint8_t data[6];
